@@ -9,7 +9,7 @@ class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE)
 
     view = models.IntegerField()
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=False)
 
     order = models.IntegerField(default=0)
 
@@ -40,4 +40,3 @@ class FilterField(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
     filter_type = models.IntegerField(default=0)
     filter_settings = JSONField(default={})
-
