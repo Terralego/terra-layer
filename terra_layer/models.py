@@ -22,17 +22,17 @@ class Layer(models.Model):
 
     table_enable = models.BooleanField(default=False)
     table_export_enable = models.BooleanField(default=False)
-    table_fields = models.ManyToManyField(Field, related_name='in_layers')
-    table_export_fields = models.ManyToManyField(Field, related_name='in_layers_export')
 
     popup_enable = models.BooleanField(default=False)
     popup_template = models.TextField(blank=True)
+    popup_minzoom = models.FloatField(default=10)
+    popup_maxzoom = models.FloatField(default=10)
 
     minisheet_enable = models.BooleanField(default=False)
     minisheet_template = models.TextField(blank=True)
 
     filter_enable = models.BooleanField(default=False)
-    filter_fields = models.ManyToManyField(Field, through="FilterField")
+    fields = models.ManyToManyField(Field, through="FilterField")
 
 
 class FilterField(models.Model):
@@ -40,3 +40,6 @@ class FilterField(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
     filter_type = models.IntegerField(default=0)
     filter_settings = JSONField(default={})
+
+    exportable = models.BooleanField(default=False)
+    shown = models.BooleanField(default=False)
