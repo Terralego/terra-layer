@@ -1,4 +1,6 @@
+
 from rest_framework.serializers import ModelSerializer
+from django.db import transaction
 
 from django_geosource.models import Field
 from django_geosource.serializers import FieldSerializer
@@ -16,6 +18,7 @@ class FilterFieldSerializer(ModelSerializer):
 class LayerSerializer(ModelSerializer):
     fields = FilterFieldSerializer(many=True, read_only=True, source="fields_filters")
 
+    @transaction.atomic
     def create(self, validated_data):
         instance = super().create(validated_data)
 
@@ -24,6 +27,7 @@ class LayerSerializer(ModelSerializer):
 
         return instance
 
+    @transaction.atomic
     def update(self, instance, validated_data):
 
         instance = super().update(instance, validated_data)
@@ -37,6 +41,8 @@ class LayerSerializer(ModelSerializer):
         getattr(instance, field).clear()
 
         for value in self.initial_data.get(field, []):
+            value['field'] = value['id']
+
             obj = serializer(data=value)
             if obj.is_valid(raise_exception=True):
                 obj.save(layer=instance)
