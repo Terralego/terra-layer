@@ -1,5 +1,8 @@
 from functools import reduce
+import json
 
+from django.conf import settings
+from django.urls import reverse
 from django.utils.functional import cached_property
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -19,20 +22,79 @@ class LayerViewset(ModelViewSet):
 
 class LayerViews(APIView):
     model = Layer
+    DEFAULT_SOURCE_NAME = 'terra'
+    DEFAULT_SOURCE_TYPE = 'vector'
 
     def get(self, request, pk, format=None):
+        layers = self.layers(pk)
         view_response = {
             'title': 'View Title',
-            'layersTree': self.get_layers_tree(pk),
-            'interactions': [],
-            'map': {}
+            'layersTree': self.get_layers_tree(layers),
+            'interactions': self.get_interactions(layers),
+            'map': {
+                    **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                    **{
+                    'customStyle': {
+                        'sources': [{
+                            'id': self.DEFAULT_SOURCE_NAME,
+                            'type': self.DEFAULT_SOURCE_TYPE,
+                            'url': reverse('terra:group-tilejson', args=(layers[0].source.get_layer().group, ))
+                        }],
+                        'layers': self.get_map_layers(layers),
+                    },
+                }
+            }
         }
 
         return Response(view_response)
 
-    def get_layers_tree(self, pk):
+    def get_map_layers(self, layers):
+        return [{
+            **layer.layer_style,
+            **{
+                'source': self.DEFAULT_SOURCE_NAME,
+                'id': layer.layer_id,
+                'source-layer': layer.source.name,
+            }
+        } for layer in layers]
+
+    def get_interactions(self, layers):
+        return [
+            self.get_interactions_for_layer(layer)
+            for layer in layers
+        ]
+
+    def get_interactions_for_layer(self, layer):
+        interactions = []
+
+        if layer.popup_enable:
+            interactions.append({
+                'id': layer.layer_id,
+                'interaction': 'displayTooltip',
+                'trigger': 'mouveover',
+                'template': layer.popup_template,
+                'constraints': [{
+                    'minZoom': layer.popup_minzoom,
+                    'maxZoom': layer.popup_maxzoom,
+                },]
+            })
+
+        if layer.minisheet_enable:
+            interactions.append({
+                'id': layer.layer_id,
+                'interaction': 'displayDetails',
+                'template': layer.minisheet_template,
+                'fetchProperties': {
+                    'url': reverse('terra:feature-detail', args=(layer.source.name, '{{id}}')),
+                    'id': '_id',
+                },
+            })
+
+        return interactions
+
+    def get_layers_tree(self, layers):
         layer_tree = []
-        for layer in self.layers(pk):
+        for layer in layers:
             layer_path, layer_name = layer.name.rsplit('/', 1)
 
             layer_object = {
@@ -41,7 +103,7 @@ class LayerViews(APIView):
                     'active': False,
                     'opacity': 1,
                 },
-                'layers': [layer.source.name, ],
+                'layers': [layer.layer_id, ],
                 'filters': [{
                     'layer': layer.source.name,
                     # 'mainField': None, # TODO: find the mainfield
@@ -88,7 +150,7 @@ class LayerViews(APIView):
         ]
 
     def get_filter_forms_for_layer(self, layer):
-        [
+        return [
             {
                 'property': field_filter.field.name,
                 'label': field_filter.field.label,
