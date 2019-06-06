@@ -1,6 +1,8 @@
+from hashlib import md5
 from enum import Enum
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
 
@@ -15,7 +17,7 @@ class Layer(models.Model):
 
     description = models.TextField(blank=True)
 
-    layer_style = models.TextField(blank=True)
+    layer_style = JSONField(default=dict)
 
     legend_enable = models.BooleanField(default=False)
     legend_template = models.TextField(blank=True)
@@ -33,6 +35,10 @@ class Layer(models.Model):
 
     filter_enable = models.BooleanField(default=False)
     fields = models.ManyToManyField(Field, through="FilterField")
+
+    @cached_property
+    def layer_id(self):
+        return md5(self.name.encode('utf-8')).hexdigest()
 
 
 class FilterField(models.Model):
