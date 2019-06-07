@@ -10,12 +10,13 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
 from .models import Layer, FilterField
+from .permissions import LayerPermission
 from .serializers import LayerSerializer
 
 class LayerViewset(ModelViewSet):
     model = Layer
     serializer_class = LayerSerializer
-    authentication_classes = ()
+    permission_classes = (LayerPermission, )
 
     def get_queryset(self):
         return self.model.objects.all()
