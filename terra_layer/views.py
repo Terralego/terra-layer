@@ -95,7 +95,10 @@ class LayerViews(APIView):
     def get_layers_tree(self, layers):
         layer_tree = []
         for layer in layers:
-            layer_path, layer_name = layer.name.rsplit('/', 1)
+            try:
+                layer_path, layer_name = layer.name.rsplit('/', 1)
+            except ValueError:
+                layer_path, layer_name = '', layer.name
 
             layer_object = {
                 'label': layer_name,
