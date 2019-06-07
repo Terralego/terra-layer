@@ -1,5 +1,6 @@
 
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+
 from django.db import transaction
 
 from django_geosource.models import Field
@@ -9,6 +10,7 @@ from .models import Layer, FilterField
 
 
 class FilterFieldSerializer(ModelSerializer):
+    id = PrimaryKeyRelatedField(source='field', read_only=True)
 
     class Meta:
         model = FilterField
