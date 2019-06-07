@@ -2,6 +2,7 @@ from functools import reduce
 import json
 
 from django.conf import settings
+from django.http import Http404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from rest_framework.response import Response
@@ -27,26 +28,27 @@ class LayerViews(APIView):
 
     def get(self, request, pk, format=None):
         layers = self.layers(pk)
-        view_response = {
-            'title': 'View Title',
-            'layersTree': self.get_layers_tree(layers),
-            'interactions': self.get_interactions(layers),
-            'map': {
-                    **settings.TERRA_DEFAULT_MAP_SETTINGS,
-                    **{
-                    'customStyle': {
-                        'sources': [{
-                            'id': self.DEFAULT_SOURCE_NAME,
-                            'type': self.DEFAULT_SOURCE_TYPE,
-                            'url': reverse('terra:group-tilejson', args=(layers[0].source.get_layer().group, ))
-                        }],
-                        'layers': self.get_map_layers(layers),
-                    },
+        return Response(
+            {
+                'title': 'View Title',
+                'layersTree': self.get_layers_tree(layers),
+                'interactions': self.get_interactions(layers),
+                'map': {
+                        **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                        **{
+                        'customStyle': {
+                            'sources': [{
+                                'id': self.DEFAULT_SOURCE_NAME,
+                                'type': self.DEFAULT_SOURCE_TYPE,
+                                'url': reverse('terra:group-tilejson',
+                                                args=(layers[0].source.get_layer().group, ))
+                            }],
+                            'layers': self.get_map_layers(layers),
+                        },
+                    }
                 }
             }
-        }
-
-        return Response(view_response)
+        )
 
     def get_map_layers(self, layers):
         return [{
@@ -164,4 +166,7 @@ class LayerViews(APIView):
         ]
 
     def layers(self, pk):
-        return self.model.objects.filter(view=pk)
+        layers = self.model.objects.filter(view=pk)
+        if layers:
+            return layers
+        raise Http404
