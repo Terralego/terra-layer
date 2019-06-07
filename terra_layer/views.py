@@ -62,10 +62,10 @@ class LayerViews(APIView):
         } for layer in layers]
 
     def get_interactions(self, layers):
-        return [
-            self.get_interactions_for_layer(layer)
-            for layer in layers
-        ]
+        interactions = []
+        for layer in layers:
+            interactions += self.get_interactions_for_layer(layer)
+        return interactions
 
     def get_interactions_for_layer(self, layer):
         interactions = []
