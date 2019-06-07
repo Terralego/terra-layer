@@ -40,6 +40,11 @@ class Layer(models.Model):
     def layer_id(self):
         return md5(self.name.encode('utf-8')).hexdigest()
 
+    class Meta:
+        permissions = (
+            ('can_manage_layers', 'Can manage layers'),
+        )
+
 
 class FilterField(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE)
