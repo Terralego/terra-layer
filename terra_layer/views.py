@@ -31,7 +31,7 @@ class LayerViews(APIView):
         layers = self.layers(pk)
         return Response(
             {
-                'title': 'View Title',
+                'title': settings.TERRA_LAYER_VIEWS[pk]['name'],
                 'layersTree': self.get_layers_tree(layers),
                 'interactions': self.get_interactions(layers),
                 'map': {

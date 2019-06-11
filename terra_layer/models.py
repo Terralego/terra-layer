@@ -1,16 +1,18 @@
 from hashlib import md5
 from enum import Enum
 from django.db import models
+from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
 
+VIEW_CHOICES = [(key, view['name']) for key, view in settings.TERRA_LAYER_VIEWS.items()]
 
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE)
 
-    view = models.IntegerField()
+    view = models.IntegerField(choices=VIEW_CHOICES)
     name = models.CharField(max_length=255, blank=False)
 
     order = models.IntegerField(default=0)
