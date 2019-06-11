@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
 
-VIEW_CHOICES = [(key, view['name']) for key, view in settings.TERRA_LAYER_VIEWS.items()]
+VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
 
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE)

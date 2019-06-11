@@ -27,11 +27,16 @@ class LayerViews(APIView):
     DEFAULT_SOURCE_NAME = 'terra'
     DEFAULT_SOURCE_TYPE = 'vector'
 
-    def get(self, request, pk, format=None):
-        layers = self.layers(pk)
+    def get(self, request, slug, format=None):
+        if slug not in settings.TERRA_LAYER_VIEWS:
+            raise Http404('View does not exist')
+
+        view = settings.TERRA_LAYER_VIEWS[slug]
+        layers = self.layers(view['pk'])
+
         return Response(
             {
-                'title': settings.TERRA_LAYER_VIEWS[pk]['name'],
+                'title': view['pk'],
                 'layersTree': self.get_layers_tree(layers),
                 'interactions': self.get_interactions(layers),
                 'map': {

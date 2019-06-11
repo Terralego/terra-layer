@@ -9,9 +9,9 @@ In Django settings, you must set the different views provided to fronted, like t
 
 ```
 TERRA_LAYER_VIEWS = {
-    1: {
+    'slug-name': {
         'name': 'Human Name',
-        'slug': 'slug-name',
+        'pk': 1,
     },
 }
 ```
