@@ -159,7 +159,7 @@ class LayerViews(APIView):
     def get_filter_fields_for_layer(self, layer):
         return [
             {
-                'property': field_filter.field.name,
+                'value': field_filter.field.name,
                 'label': field_filter.field.label,
             }
             for field_filter in FilterField.objects.filter(layer=layer)
