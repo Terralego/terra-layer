@@ -36,7 +36,7 @@ class LayerViews(APIView):
 
         return Response(
             {
-                'title': view['pk'],
+                'title': view['name'],
                 'layersTree': self.get_layers_tree(layers),
                 'interactions': self.get_interactions(layers),
                 'map': {
