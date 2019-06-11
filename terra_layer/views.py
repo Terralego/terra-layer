@@ -74,7 +74,7 @@ class LayerViews(APIView):
             interactions.append({
                 'id': layer.layer_id,
                 'interaction': 'displayTooltip',
-                'trigger': 'mouveover',
+                'trigger': 'mouseover',
                 'template': layer.popup_template,
                 'constraints': [{
                     'minZoom': layer.popup_minzoom,
