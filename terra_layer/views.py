@@ -106,7 +106,7 @@ class LayerViews(APIView):
             try:
                 layer_path, layer_name = layer.name.rsplit('/', 1)
             except ValueError:
-                layer_path, layer_name = '', layer.name
+                layer_path, layer_name = None, layer.name
 
             layer_object = {
                 'label': layer_name,
@@ -122,11 +122,16 @@ class LayerViews(APIView):
                     'forms': self.get_filter_forms_for_layer(layer),
                 }
             }
-            # layer_tree.append(layer_object)
-            self.insert_layer_in_path(layer_tree, layer_path, layer_object)
+
+            if layer_path is not None:
+                self.insert_layer_in_path(layer_tree, layer_path, layer_object)
+            else:
+                layer_tree.append(layer_object)
+
         return layer_tree
 
     def insert_layer_in_path(self, layer_tree, path, layer):
+
         try:
             current_path, sub_path = path.split('/', 1)
         except ValueError:
@@ -135,8 +140,8 @@ class LayerViews(APIView):
             sub_path = None
 
         try:
-            group_layers = reduce(lambda x: x['group'] == current_path, layer_tree)
-        except TypeError:
+            group_layers = next(filter(lambda x: x['group'] == current_path, layer_tree))[0]
+        except StopIteration:
             # Layer does not exist, create it and follow
             group_layers = {
                 'group': current_path,
