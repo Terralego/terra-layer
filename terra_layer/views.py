@@ -110,12 +110,12 @@ class LayerViews(APIView):
                     'opacity': 1,
                 },
                 'layers': [layer.layer_id, ],
-                'filters': [{
+                'filters': {
                     'layer': layer.source.name,
                     # 'mainField': None, # TODO: find the mainfield
                     'fields': self.get_filter_fields_for_layer(layer),
                     'forms': self.get_filter_forms_for_layer(layer),
-                }]
+                }
             }
             # layer_tree.append(layer_object)
             self.insert_layer_in_path(layer_tree, layer_path, layer_object)
