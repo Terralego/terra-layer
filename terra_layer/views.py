@@ -93,7 +93,7 @@ class LayerViews(APIView):
                 'interaction': 'displayDetails',
                 'template': layer.minisheet_template,
                 'fetchProperties': {
-                    'url': reverse('terra:feature-detail', args=(layer.source.name, '{{id}}')),
+                    'url': reverse('terra:feature-detail', args=(layer.source.pk, '{{id}}')),
                     'id': '_id',
                 },
             })
