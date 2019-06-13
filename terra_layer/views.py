@@ -140,7 +140,7 @@ class LayerViews(APIView):
             sub_path = None
 
         try:
-            group_layers = next(filter(lambda x: x['group'] == current_path, layer_tree))
+            group_layers = next(filter(lambda x: 'group' in x and x.get('group') == current_path, layer_tree))
         except StopIteration:
             # Layer does not exist, create it and follow
             group_layers = {
