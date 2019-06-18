@@ -159,7 +159,7 @@ class LayerViews(APIView):
 
     def get_legends(self, layer):
         if layer.legend_enable:
-            return [{'content': self.legend_template, }, ]
+            return [{'content': layer.legend_template, }, ]
 
         return []
 
