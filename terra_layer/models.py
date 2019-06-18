@@ -10,7 +10,7 @@ from django_geosource.models import Source, Field
 VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
 
 class Layer(models.Model):
-    source = models.ForeignKey(Source, on_delete=models.CASCADE)
+    source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='layers')
 
     view = models.IntegerField(choices=VIEW_CHOICES)
     name = models.CharField(max_length=255, blank=False)
