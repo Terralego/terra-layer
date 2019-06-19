@@ -164,13 +164,14 @@ class LayerViews(APIView):
         return []
 
     def get_filter_fields_for_layer(self, layer):
-        return [
-            {
-                'value': field_filter.field.name,
-                'label': field_filter.field.label,
-            }
-            for field_filter in FilterField.objects.filter(layer=layer)
-        ]
+        if layer.table_enable:
+            return [
+                {
+                    'value': field_filter.field.name,
+                    'label': field_filter.field.label,
+                }
+                for field_filter in FilterField.objects.filter(layer=layer)
+            ]
 
     def get_filter_forms_for_layer(self, layer):
         return [
