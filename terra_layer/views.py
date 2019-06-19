@@ -169,6 +169,7 @@ class LayerViews(APIView):
                 {
                     'value': field_filter.field.name,
                     'label': field_filter.field.label,
+                    'exportable': field_filter.exportable,
                 }
                 for field_filter in FilterField.objects.filter(layer=layer)
             ]
