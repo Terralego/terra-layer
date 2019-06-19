@@ -119,7 +119,7 @@ class LayerViews(APIView):
                     'layer': layer.source.name,
                     # 'mainField': None, # TODO: find the mainfield
                     'fields': self.get_filter_fields_for_layer(layer),
-                    'forms': self.get_filter_forms_for_layer(layer),
+                    'form': self.get_filter_forms_for_layer(layer),
                     'legends': self.get_legends(layer),
                 }
             }
