@@ -182,7 +182,7 @@ class LayerViews(APIView):
                 'type': field_filter.filter_type,
                 # 'fetchValues': true, TODO: When front provide the information
             }
-            for field_filter in FilterField.objects.filter(layer=layer)
+            for field_filter in FilterField.objects.filter(layer=layer, shown=True)
         ]
 
     def layers(self, pk):
