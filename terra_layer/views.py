@@ -175,15 +175,17 @@ class LayerViews(APIView):
             ]
 
     def get_filter_forms_for_layer(self, layer):
-        return [
-            {
-                'property': field_filter.field.name,
-                'label': field_filter.field.label,
-                'type': field_filter.filter_type,
-                # 'fetchValues': true, TODO: When front provide the information
-            }
-            for field_filter in FilterField.objects.filter(layer=layer, shown=True)
-        ]
+        filter_fields = FilterField.objects.filter(layer=layer, shown=True)
+        if filter_fields.count() > 0:
+            return [
+                {
+                    'property': field_filter.field.name,
+                    'label': field_filter.field.label,
+                    'type': field_filter.filter_type,
+                    # 'fetchValues': true, TODO: When front provide the information
+                }
+                for field_filter in filter_fields
+            ]
 
     def layers(self, pk):
         layers = self.model.objects.filter(view=pk)
