@@ -171,7 +171,7 @@ class LayerViews(APIView):
                     'label': field_filter.field.label,
                     'exportable': field_filter.exportable,
                 }
-                for field_filter in FilterField.objects.filter(layer=layer)
+                for field_filter in FilterField.objects.filter(layer=layer, filter_enable=True)
             ]
 
     def get_filter_forms_for_layer(self, layer):
