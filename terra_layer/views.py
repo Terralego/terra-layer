@@ -182,7 +182,7 @@ class LayerViews(APIView):
                     'property': field_filter.field.name,
                     'label': field_filter.field.label,
                     'type': field_filter.filter_type,
-                    # 'fetchValues': true, TODO: When front provide the information
+                    **field_filter.settings,
                 }
                 for field_filter in filter_fields
             ]
