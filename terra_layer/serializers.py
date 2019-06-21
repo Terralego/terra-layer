@@ -1,5 +1,5 @@
 
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, ValidationError
 
 from django.db import transaction
 
@@ -43,7 +43,10 @@ class LayerSerializer(ModelSerializer):
         getattr(instance, field).clear()
 
         for value in self.initial_data.get(field, []):
-            value['field'] = value['id']
+            try:
+                value['field'] = value['id']
+            except KeyError:
+                raise ValidationError("Fields must contain Source's field id")
 
             obj = serializer(data=value)
             if obj.is_valid(raise_exception=True):
