@@ -50,6 +50,7 @@ class Layer(models.Model):
 class FilterField(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE)
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
+    label = models.CharField(max_length=255, blank=True)
 
     filter_enable = models.BooleanField(default=False)
     filter_type = models.CharField(max_length=255, null=True, default=None)
