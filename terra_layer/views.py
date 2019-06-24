@@ -182,7 +182,7 @@ class LayerViews(APIView):
                     'property': field_filter.field.name,
                     'label': field_filter.field.label,
                     'type': field_filter.filter_type,
-                    **field_filter.settings,
+                    **field_filter.filter_settings,
                 }
                 for field_filter in filter_fields
             ]
