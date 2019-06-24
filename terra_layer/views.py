@@ -188,7 +188,7 @@ class LayerViews(APIView):
             ]
 
     def layers(self, pk):
-        layers = self.model.objects.filter(view=pk)
+        layers = self.model.objects.filter(view=pk).order_by('order')
         if layers:
             return layers
         raise Http404
