@@ -120,7 +120,7 @@ class LayerViews(APIView):
                     # 'mainField': None, # TODO: find the mainfield
                     'fields': self.get_filter_fields_for_layer(layer),
                     'form': self.get_filter_forms_for_layer(layer),
-                    'legends': self.get_legends(layer),
+                    'legends': layer.legend_template,
                 }
             }
 
@@ -158,12 +158,6 @@ class LayerViews(APIView):
             group_layers['layers'].append(layer)
 
         return layer_tree
-
-    def get_legends(self, layer):
-        if layer.legend_enable:
-            return [{'content': layer.legend_template, }, ]
-
-        return []
 
     def get_filter_fields_for_layer(self, layer):
         if layer.table_enable:
