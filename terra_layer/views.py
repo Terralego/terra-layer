@@ -124,6 +124,8 @@ class LayerViews(APIView):
                 }
             }
 
+            layer_object['filters']['exportable'] = any([f['exportable'] for f in layer_object['filters']['fields'] or []])
+
             if layer_path is not None:
                 self.insert_layer_in_path(layer_tree, layer_path, layer_object)
             else:
