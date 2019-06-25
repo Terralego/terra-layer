@@ -16,7 +16,7 @@ from .serializers import LayerSerializer
 class LayerViewset(ModelViewSet):
     model = Layer
     serializer_class = LayerSerializer
-    # permission_classes = (LayerPermission, )
+    permission_classes = (LayerPermission, )
 
     def get_queryset(self):
         return self.model.objects.all()
