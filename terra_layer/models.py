@@ -53,7 +53,6 @@ class FilterField(models.Model):
     label = models.CharField(max_length=255, blank=True)
 
     filter_enable = models.BooleanField(default=False)
-    filter_type = models.CharField(max_length=255, null=True, default=None)
     filter_settings = JSONField(default=dict)
 
     exportable = models.BooleanField(default=False)

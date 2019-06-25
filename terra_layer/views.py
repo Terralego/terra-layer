@@ -16,7 +16,7 @@ from .serializers import LayerSerializer
 class LayerViewset(ModelViewSet):
     model = Layer
     serializer_class = LayerSerializer
-    permission_classes = (LayerPermission, )
+    # permission_classes = (LayerPermission, )
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -181,7 +181,6 @@ class LayerViews(APIView):
                 {
                     'property': field_filter.field.name,
                     'label': field_filter.label or field_filter.field.label,
-                    'type': field_filter.filter_type,
                     **field_filter.filter_settings,
                 }
                 for field_filter in filter_fields
