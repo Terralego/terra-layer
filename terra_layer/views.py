@@ -116,7 +116,7 @@ class LayerViews(APIView):
                     'opacity': 1,
                 },
                 'layers': [layer.layer_id, ],
-                'legends': layer.legend_template,
+                'legends': layer.legends,
                 'filters': {
                     'layer': layer.source.name,
                     # 'mainField': None, # TODO: find the mainfield

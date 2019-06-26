@@ -21,7 +21,7 @@ class Layer(models.Model):
 
     layer_style = JSONField(default=dict)
 
-    legend_template = JSONField(default=list)
+    legends = JSONField(default=list)
 
     table_enable = models.BooleanField(default=False)
     table_export_enable = models.BooleanField(default=False)
