@@ -9,8 +9,9 @@ router = routers.SimpleRouter()
 
 router.register(r'', LayerViewset, base_name='layer')
 
-urlpatterns = router.urls
-
-urlpatterns += [
+urlpatterns = [
+    path(r'view/', LayerViews.as_view(), name='layerview'),
     path(r'view/<str:slug>/', LayerViews.as_view(), name='layerview'),
 ]
+
+urlpatterns += router.urls

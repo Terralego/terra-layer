@@ -27,7 +27,10 @@ class LayerViews(APIView):
     DEFAULT_SOURCE_NAME = 'terra'
     DEFAULT_SOURCE_TYPE = 'vector'
 
-    def get(self, request, slug, format=None):
+    def get(self, request, slug=None, format=None):
+        if slug is None:
+            return Response(settings.TERRA_LAYER_VIEWS)
+
         if slug not in settings.TERRA_LAYER_VIEWS:
             raise Http404('View does not exist')
 
