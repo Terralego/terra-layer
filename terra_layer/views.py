@@ -66,7 +66,7 @@ class LayerViews(APIView):
             **{
                 'source': self.DEFAULT_SOURCE_NAME,
                 'id': layer.layer_id,
-                'source-layer': layer.source.name,
+                'source-layer': layer.source.slug,
             }
         } for layer in layers]
 
@@ -118,12 +118,11 @@ class LayerViews(APIView):
                     'active': False,
                     'opacity': 1,
                 },
-                '',
                 'content': layer.description,
                 'layers': [layer.layer_id, ],
                 'legends': layer.legends,
                 'filters': {
-                    'layer': layer.source.name,
+                    'layer': layer.source.slug,
                     # 'mainField': None, # TODO: find the mainfield
                     'fields': self.get_filter_fields_for_layer(layer),
                     'form': self.get_filter_forms_for_layer(layer),
