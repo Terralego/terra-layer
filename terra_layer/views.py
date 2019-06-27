@@ -118,6 +118,8 @@ class LayerViews(APIView):
                     'active': False,
                     'opacity': 1,
                 },
+                '',
+                'content': layer.description,
                 'layers': [layer.layer_id, ],
                 'legends': layer.legends,
                 'filters': {
