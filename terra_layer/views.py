@@ -44,31 +44,41 @@ class LayerViews(APIView):
                 'layersTree': self.get_layers_tree(layers),
                 'interactions': self.get_interactions(layers),
                 'map': {
-                        **settings.TERRA_DEFAULT_MAP_SETTINGS,
-                        **{
-                        'customStyle': {
-                            'sources': [{
-                                'id': self.DEFAULT_SOURCE_NAME,
-                                'type': self.DEFAULT_SOURCE_TYPE,
-                                'url': reverse('terra:group-tilejson',
-                                                args=(layers[0].source.get_layer().group, ))
-                            }],
-                            'layers': self.get_map_layers(layers),
-                        },
-                    }
+                    **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                    'customStyle': {
+                        'sources': [{
+                            'id': self.DEFAULT_SOURCE_NAME,
+                            'type': self.DEFAULT_SOURCE_TYPE,
+                            'url': reverse('terra:group-tilejson',
+                                            args=(layers[0].source.get_layer().group, ))
+                        }],
+                        'layers': self.get_map_layers(layers),
+                    },
                 }
             }
         )
 
     def get_map_layers(self, layers):
-        return [{
-            **layer.layer_style,
-            **{
-                'source': self.DEFAULT_SOURCE_NAME,
-                'id': layer.layer_id,
-                'source-layer': layer.source.slug,
-            }
-        } for layer in layers]
+        map_layers = []
+        for layer in layers:
+            map_layers += [{
+                    **layer.layer_style,
+                    'source': self.DEFAULT_SOURCE_NAME,
+                    'id': layer.layer_id,
+                    'source-layer': layer.source.slug,
+                },
+                *[
+                    {
+                        **cs.style,
+                        'id': cs.layer_style_id,
+                        'source': self.DEFAULT_SOURCE_NAME,
+                        'source-layer': cs.source.slug,
+                    }
+                    for cs in layer.custom_styles.all()
+                ]
+
+            ]
+        return map_layers
 
     def get_interactions(self, layers):
         interactions = []
@@ -104,6 +114,12 @@ class LayerViews(APIView):
 
         return interactions
 
+    def get_layers_list_for_layer(self, layer):
+        return [
+            layer.layer_id,
+            *[s.layer_style_id for s in layer.custom_styles.all()]
+        ]
+
     def get_layers_tree(self, layers):
         layer_tree = []
         for layer in layers:
@@ -119,7 +135,7 @@ class LayerViews(APIView):
                     'opacity': 1,
                 },
                 'content': layer.description,
-                'layers': [layer.layer_id, ],
+                'layers': self.get_layers_list_for_layer(layer),
                 'legends': layer.legends,
                 'filters': {
                     'layer': layer.source.slug,

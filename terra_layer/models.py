@@ -38,7 +38,7 @@ class Layer(models.Model):
 
     @cached_property
     def layer_id(self):
-        return md5(self.name.encode('utf-8')).hexdigest()
+        return md5(self.source.slug.encode('utf-8')).hexdigest()
 
     class Meta:
         permissions = (
@@ -50,6 +50,10 @@ class CustomStyle(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name='custom_styles')
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='sublayers')
     style = JSONField(default=dict)
+
+    @property
+    def layer_style_id(self):
+        return md5(f"{self.source.slug}-{self.source.pk}".encode('utf-8')).hexdigest()
 
 
 class FilterField(models.Model):
