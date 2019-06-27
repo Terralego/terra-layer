@@ -38,7 +38,7 @@ class Layer(models.Model):
 
     @cached_property
     def layer_id(self):
-        return md5(self.source.slug.encode('utf-8')).hexdigest()
+        return md5(f"{self.source.slug}-{self.pk}".encode('utf-8')).hexdigest()
 
     class Meta:
         permissions = (
