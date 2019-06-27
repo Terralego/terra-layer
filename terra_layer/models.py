@@ -46,6 +46,12 @@ class Layer(models.Model):
         )
 
 
+class CustomStyle(models.Model):
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name='custom_styles')
+    source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='sublayers')
+    style = JSONField(default=dict)
+
+
 class FilterField(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE)
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
