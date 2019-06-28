@@ -45,7 +45,7 @@ class Layer(models.Model):
         return self.layer_style
 
     @cached_property
-    def layer_id(self):
+    def layer_identifier(self):
         return md5(f"{self.source.slug}-{self.pk}".encode('utf-8')).hexdigest()
 
     class Meta:
@@ -60,7 +60,7 @@ class CustomStyle(models.Model):
     style = JSONField(default=dict)
 
     @property
-    def layer_id(self):
+    def layer_identifier(self):
         return md5(f"{self.source.slug}-{self.source.pk}-{self.pk}".encode('utf-8')).hexdigest()
 
 

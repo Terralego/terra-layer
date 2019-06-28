@@ -83,7 +83,7 @@ class LayerViews(APIView):
 
         if layer.popup_enable:
             interactions.append({
-                'id': layer.layer_id,
+                'id': layer.layer_identifier,
                 'interaction': 'displayTooltip',
                 'trigger': 'mouseover',
                 'template': layer.popup_template,
@@ -95,7 +95,7 @@ class LayerViews(APIView):
 
         if layer.minisheet_enable:
             interactions.append({
-                'id': layer.layer_id,
+                'id': layer.layer_identifier,
                 'interaction': 'displayDetails',
                 'template': layer.minisheet_template,
                 'fetchProperties': {
@@ -108,8 +108,8 @@ class LayerViews(APIView):
 
     def get_layers_list_for_layer(self, layer):
         return [
-            layer.layer_id,
-            *[s.layer_id for s in layer.custom_styles.all()]
+            layer.layer_identifier,
+            *[s.layer_identifier for s in layer.custom_styles.all()]
         ]
 
     def get_layers_tree(self, layers):

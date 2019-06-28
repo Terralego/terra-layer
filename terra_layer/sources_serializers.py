@@ -21,7 +21,7 @@ class SourceSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return {
             **obj.style,
-            'id': obj.layer_id,
+            'id': obj.layer_identifier,
             'source': DEFAULT_SOURCE_NAME,
             'source-layer': obj.source.slug,
         }
@@ -33,7 +33,7 @@ class WMTSSourceSerializer(SourceSerializer):
     def to_representation(self, obj):
         return {
             **obj.style,
-            'id': obj.layer_id,
+            'id': obj.layer_identifier,
             'type': 'raster',
             'minzoom': obj.source.minzoom or 0,
             'maxzoom': obj.source.maxzoom or 26,
