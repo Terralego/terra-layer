@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import Http404
 from django.urls import reverse
 from django.utils.functional import cached_property
+from django.utils.http import urlunquote
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
@@ -99,7 +100,7 @@ class LayerViews(APIView):
                 'interaction': 'displayDetails',
                 'template': layer.minisheet_template,
                 'fetchProperties': {
-                    'url': reverse('terra:feature-detail', args=(layer.source.pk, '{{id}}')),
+                    'url': urlunquote(reverse('terra:feature-detail', args=(layer.source.pk, '{{id}}'))),
                     'id': '_id',
                 },
             })
