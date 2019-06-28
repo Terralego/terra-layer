@@ -12,7 +12,7 @@ VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYE
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='layers')
 
-    view = models.IntegerField(choices=VIEW_CHOICES)
+    view = models.IntegerField()
     name = models.CharField(max_length=255, blank=False)
 
     order = models.IntegerField(default=0)
@@ -35,6 +35,10 @@ class Layer(models.Model):
     minisheet_template = models.TextField(blank=True)
 
     fields = models.ManyToManyField(Field, through="FilterField")
+
+    def __init__(self,  *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._meta.get_field('view')._choices = VIEW_CHOICES
 
     @cached_property
     def layer_id(self):
