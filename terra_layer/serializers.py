@@ -33,7 +33,7 @@ class LayerSerializer(ModelSerializer):
         instance = super().create(validated_data)
 
         # Update m2m through field
-        self._update_nested(instance, 'sublayers', 'custom_styles', CustomStyleSerializer)
+        self._update_nested(instance, 'custom_styles', CustomStyleSerializer)
         self._update_m2m_through(instance, 'fields', FilterFieldSerializer)
 
         return instance
