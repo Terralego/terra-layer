@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from .models import Layer, FilterField
 from .permissions import LayerPermission
 from .serializers import LayerSerializer
+from .sources_serializers import SourceSerializer
+
 
 class LayerViewset(ModelViewSet):
     model = Layer
@@ -61,22 +63,12 @@ class LayerViews(APIView):
     def get_map_layers(self, layers):
         map_layers = []
         for layer in layers:
-            map_layers += [{
-                    **layer.layer_style,
-                    'source': self.DEFAULT_SOURCE_NAME,
-                    'id': layer.layer_id,
-                    'source-layer': layer.source.slug,
-                },
+            map_layers += [
+                SourceSerializer.get_object_serializer(layer).data,
                 *[
-                    {
-                        **cs.style,
-                        'id': cs.layer_style_id,
-                        'source': self.DEFAULT_SOURCE_NAME,
-                        'source-layer': cs.source.slug,
-                    }
+                    SourceSerializer.get_object_serializer(cs).data
                     for cs in layer.custom_styles.all()
-                ]
-
+                ],
             ]
         return map_layers
 
@@ -117,7 +109,7 @@ class LayerViews(APIView):
     def get_layers_list_for_layer(self, layer):
         return [
             layer.layer_id,
-            *[s.layer_style_id for s in layer.custom_styles.all()]
+            *[s.layer_id for s in layer.custom_styles.all()]
         ]
 
     def get_layers_tree(self, layers):

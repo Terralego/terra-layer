@@ -40,6 +40,10 @@ class Layer(models.Model):
         super().__init__(*args, **kwargs)
         self._meta.get_field('view')._choices = VIEW_CHOICES
 
+    @property
+    def style(self):
+        return self.layer_style
+
     @cached_property
     def layer_id(self):
         return md5(f"{self.source.slug}-{self.pk}".encode('utf-8')).hexdigest()
@@ -56,7 +60,7 @@ class CustomStyle(models.Model):
     style = JSONField(default=dict)
 
     @property
-    def layer_style_id(self):
+    def layer_id(self):
         return md5(f"{self.source.slug}-{self.source.pk}-{self.pk}".encode('utf-8')).hexdigest()
 
 
