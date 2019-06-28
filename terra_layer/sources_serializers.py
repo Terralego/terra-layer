@@ -13,7 +13,6 @@ class SourceSerializer(serializers.BaseSerializer):
         clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
         for _, serializer in clsmembers:
             if serializer.__module__ == __name__ and serializer.Meta.model is obj.source.__class__:
-                print(serializer)
                 return serializer(obj)
 
         return cls(obj)
