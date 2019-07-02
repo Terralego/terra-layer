@@ -34,6 +34,8 @@ class Layer(models.Model):
     minisheet_enable = models.BooleanField(default=False)
     minisheet_template = models.TextField(blank=True)
 
+    interactions = JSONField(default=list)
+
     fields = models.ManyToManyField(Field, through="FilterField")
 
     def __init__(self,  *args, **kwargs):
