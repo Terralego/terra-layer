@@ -80,7 +80,7 @@ class LayerViews(APIView):
         return interactions
 
     def get_interactions_for_layer(self, layer):
-        interactions = layer.interactions
+        interactions = layer.interactions + layer.custom_styles.interactions
 
         if layer.popup_enable:
             interactions.append({

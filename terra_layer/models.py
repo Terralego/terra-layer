@@ -60,6 +60,7 @@ class CustomStyle(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name='custom_styles')
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='sublayers')
     style = JSONField(default=dict)
+    interactions = JSONField(default=list)
 
     @property
     def layer_identifier(self):
