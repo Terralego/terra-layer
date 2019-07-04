@@ -79,10 +79,19 @@ class LayerViews(APIView):
             interactions += self.get_interactions_for_layer(layer)
         return interactions
 
+    def get_formatted_interactions(self, layer_id, interactions):
+        return [
+            {
+                'id': layer_id,
+                **interaction,
+            }
+            for interaction in interactions
+        ]
+
     def get_interactions_for_layer(self, layer):
-        interactions = layer.interactions
+        interactions = self.get_formatted_interactions(layer.layer_identifier, layer.interactions)
         for cs in layer.custom_styles.all():
-            interactions += cs.interactions
+            interactions += self.get_formatted_interactions(cs.layer_identifier, cs.interactions)
 
         if layer.popup_enable:
             interactions.append({
