@@ -35,7 +35,7 @@ class WMTSSourceSerializer(SourceSerializer):
             'id': obj.layer_identifier,
             'type': 'raster',
             'minzoom': obj.source.minzoom or 0,
-            'maxzoom': obj.source.maxzoom or 26,
+            'maxzoom': obj.source.maxzoom or 24,
             'source': {
                 'type': 'raster',
                 'tileSize': obj.source.tile_size,
