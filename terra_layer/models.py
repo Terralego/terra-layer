@@ -9,10 +9,20 @@ from django_geosource.models import Source, Field
 
 VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
 
+
+class LayerGroup(models.Model):
+    view = models.IntegerField()
+    label = models.CharField(max_length=255)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ['view', 'label']
+
+
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='layers')
 
-    view = models.IntegerField()
+    group = models.ForeignKey(LayerGroup, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=255, blank=False)
 
     order = models.IntegerField(default=0)
