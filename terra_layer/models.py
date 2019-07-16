@@ -49,10 +49,6 @@ class Layer(models.Model):
 
     fields = models.ManyToManyField(Field, through="FilterField")
 
-    def __init__(self,  *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._meta.get_field('view')._choices = VIEW_CHOICES
-
     @property
     def style(self):
         return self.layer_style
