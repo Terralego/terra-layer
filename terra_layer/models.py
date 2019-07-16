@@ -23,7 +23,7 @@ class LayerGroup(models.Model):
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='layers')
 
-    group = models.ForeignKey(LayerGroup, on_delete=models.CASCADE, null=True)
+    group = models.ForeignKey(LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers")
     name = models.CharField(max_length=255, blank=False)
 
     order = models.IntegerField(default=0)

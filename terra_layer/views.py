@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
-from .models import Layer, FilterField
+from .models import Layer, LayerGroup, FilterField
 from .permissions import LayerPermission
 from .serializers import LayerSerializer
 from .sources_serializers import SourceSerializer
@@ -44,7 +44,7 @@ class LayerViews(APIView):
             {
                 'title': view['name'],
                 'type': view.get('type', 'default'),
-                'layersTree': self.get_layers_tree(layers),
+                'layersTree': self.get_layers_tree(view),
                 'interactions': self.get_interactions(layers),
                 'map': {
                     **settings.TERRA_DEFAULT_MAP_SETTINGS,
@@ -124,16 +124,28 @@ class LayerViews(APIView):
             *[s.layer_identifier for s in layer.custom_styles.all()]
         ]
 
-    def get_layers_tree(self, layers):
+    def get_layers_tree(self, view):
         layer_tree = []
-        for layer in layers:
-            try:
-                layer_path, layer_name = layer.name.rsplit('/', 1)
-            except ValueError:
-                layer_path, layer_name = None, layer.name
+        for group in LayerGroup.objects.filter(view=view['pk'], parent=None):
+            layer_tree.append(self.get_tree_group(group))
+        return layer_tree
+
+    def get_tree_group(self, group):
+        group_content = {
+            'group': group.label,
+            'exclusive': group.exclusive,
+            'layers': [],
+        }
+
+        # Add subgroups
+        for group in LayerGroup.objects.filter(view=group.view, parent=group):
+            group_content['layers'].append(self.get_tree_group(group))
+
+        # Add layers of group
+        for layer in group.layers.all():
 
             layer_object = {
-                'label': layer_name,
+                'label': layer.name,
                 'initialState': {
                     'active': False,
                     'opacity': 1,
@@ -151,12 +163,9 @@ class LayerViews(APIView):
 
             layer_object['filters']['exportable'] = any([f['exportable'] for f in layer_object['filters']['fields'] or []])
 
-            if layer_path is not None:
-                self.insert_layer_in_path(layer_tree, layer_path, layer_object)
-            else:
-                layer_tree.append(layer_object)
+            group_content['layers'].append(layer_object)
 
-        return layer_tree
+        return group_content
 
     def insert_layer_in_path(self, layer_tree, path, layer):
 
@@ -208,7 +217,7 @@ class LayerViews(APIView):
             ]
 
     def layers(self, pk):
-        layers = self.model.objects.filter(view=pk).order_by('order')
+        layers = self.model.objects.filter(group__view=pk).order_by('order')
         if layers:
             return layers
         raise Http404
