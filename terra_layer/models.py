@@ -15,6 +15,7 @@ class LayerGroup(models.Model):
     label = models.CharField(max_length=255)
     parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
     exclusive = models.BooleanField(default=False)
+    selectors = JSONField(default=list)
 
     class Meta:
         unique_together = ['view', 'label']
