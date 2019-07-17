@@ -138,12 +138,11 @@ class LayerViews(APIView):
         }
 
         # Add subgroups
-        for group in LayerGroup.objects.filter(view=group.view, parent=group):
-            group_content['layers'].append(self.get_tree_group(group))
+        for sub_group in LayerGroup.objects.filter(view=group.view, parent=group):
+            group_content['layers'].append(self.get_tree_group(sub_group))
 
         # Add layers of group
         for layer in group.layers.all():
-
             layer_object = {
                 **layer.settings,
                 'label': layer.name,
