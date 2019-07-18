@@ -14,11 +14,13 @@ class LayerGroup(models.Model):
     view = models.IntegerField()
     label = models.CharField(max_length=255)
     parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+    order = models.IntegerField(default=0)
     exclusive = models.BooleanField(default=False)
     selectors = JSONField(default=list)
 
     class Meta:
         unique_together = ['view', 'label']
+        ordering = ['order']
 
 
 class Layer(models.Model):
