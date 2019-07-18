@@ -19,7 +19,7 @@ class LayerGroup(models.Model):
     selectors = JSONField(null=True, default=None)
 
     class Meta:
-        unique_together = ['view', 'label']
+        unique_together = ['view', 'label', 'parent']
         ordering = ['order']
 
 
