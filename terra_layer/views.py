@@ -134,6 +134,7 @@ class LayerViews(APIView):
         group_content = {
             'group': group.label,
             'exclusive': group.exclusive,
+            'selectors': group.selectors,
             'layers': [],
         }
 
