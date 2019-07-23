@@ -45,8 +45,8 @@ class Layer(models.Model):
 
     popup_enable = models.BooleanField(default=False)
     popup_template = models.TextField(blank=True)
-    popup_minzoom = models.FloatField(default=10)
-    popup_maxzoom = models.FloatField(default=10)
+    popup_minzoom = models.FloatField(default=0)
+    popup_maxzoom = models.FloatField(default=22)
 
     minisheet_enable = models.BooleanField(default=False)
     minisheet_template = models.TextField(blank=True)
