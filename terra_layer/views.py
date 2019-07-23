@@ -136,6 +136,7 @@ class LayerViews(APIView):
             'exclusive': group.exclusive,
             'selectors': group.selectors,
             'layers': [],
+            **group.settings,
         }
 
         # Add subgroups
