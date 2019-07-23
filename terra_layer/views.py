@@ -52,8 +52,9 @@ class LayerViews(APIView):
                         'sources': [{
                             'id': self.DEFAULT_SOURCE_NAME,
                             'type': self.DEFAULT_SOURCE_TYPE,
-                            'url': reverse('terra:group-tilejson',
-                                            args=(layers[0].source.get_layer().group, ))
+                            'url': reverse(
+                                        'terra:group-tilejson',
+                                        args=(layers.first().source.get_layer().group, ))
                         }],
                         'layers': self.get_map_layers(layers),
                     },
@@ -79,19 +80,23 @@ class LayerViews(APIView):
             interactions += self.get_interactions_for_layer(layer)
         return interactions
 
-    def get_formatted_interactions(self, layer_id, interactions):
+    def get_formatted_interactions(self, layer):
         return [
             {
-                'id': layer_id,
+                'id': layer.layer_identifier,
+                'fetchProperties': {
+                    'url': urlunquote(reverse('terra:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
+                    'id': '_id',
+                },
                 **interaction,
             }
-            for interaction in interactions
+            for interaction in layer.interactions
         ]
 
     def get_interactions_for_layer(self, layer):
-        interactions = self.get_formatted_interactions(layer.layer_identifier, layer.interactions)
+        interactions = self.get_formatted_interactions(layer)
         for cs in layer.custom_styles.all():
-            interactions += self.get_formatted_interactions(cs.layer_identifier, cs.interactions)
+            interactions += self.get_formatted_interactions(cs)
 
         if layer.popup_enable:
             interactions.append({
@@ -144,7 +149,7 @@ class LayerViews(APIView):
             group_content['layers'].append(self.get_tree_group(sub_group))
 
         # Add layers of group
-        for layer in group.layers.all():
+        for layer in group.layers.filter(in_tree=True):
             layer_object = {
                 'label': layer.name,
                 'initialState': {

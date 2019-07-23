@@ -29,6 +29,7 @@ class Layer(models.Model):
 
     group = models.ForeignKey(LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers")
     name = models.CharField(max_length=255, blank=False)
+    in_tree = models.BooleanField(default=True)
 
     order = models.IntegerField(default=0)
 
