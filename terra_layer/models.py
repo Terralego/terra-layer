@@ -64,6 +64,7 @@ class Layer(models.Model):
         return md5(f"{self.source.slug}-{self.pk}".encode('utf-8')).hexdigest()
 
     class Meta:
+        ordering = ('order', )
         permissions = (
             ('can_manage_layers', 'Can manage layers'),
         )
