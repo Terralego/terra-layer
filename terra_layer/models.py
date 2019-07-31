@@ -12,7 +12,7 @@ VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYE
 class LayerGroup(models.Model):
     view = models.IntegerField()
     label = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='children')
     order = models.IntegerField(default=0)
     exclusive = models.BooleanField(default=False)
     selectors = JSONField(null=True, default=None)
