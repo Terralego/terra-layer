@@ -1,5 +1,4 @@
 from hashlib import md5
-from enum import Enum
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
