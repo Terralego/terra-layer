@@ -1,5 +1,6 @@
 
 from django.conf import settings
+from django.db.models import Prefetch
 from django.http import Http404
 from django.urls import reverse
 from django.utils.http import urlunquote
@@ -26,6 +27,24 @@ class LayerViews(APIView):
     model = Layer
     DEFAULT_SOURCE_NAME = 'terra'
     DEFAULT_SOURCE_TYPE = 'vector'
+
+    prefetch_layers = Prefetch('layers', (
+        Layer.objects
+        .select_related('source')
+        .prefetch_related(
+            Prefetch(
+                'fields_filters',
+                FilterField.objects.filter(shown=True).select_related('field'),
+                to_attr='filters_shown'
+            ),
+            Prefetch(
+                'fields_filters',
+                FilterField.objects.filter(filter_enable=True).select_related('field'),
+                to_attr='filters_enabled'
+            ),
+            'custom_styles__source',
+        )
+    ))
 
     def get(self, request, slug=None, format=None):
         if slug is None:
@@ -128,7 +147,9 @@ class LayerViews(APIView):
 
     def get_layers_tree(self, view):
         layer_tree = []
-        for group in LayerGroup.objects.filter(view=view['pk'], parent=None):
+        for group in LayerGroup.objects.filter(view=view['pk'], parent=None).prefetch_related(
+                self.prefetch_layers
+        ):
             layer_tree.append(self.get_tree_group(group))
         return layer_tree
 
@@ -142,7 +163,7 @@ class LayerViews(APIView):
         }
 
         # Add subgroups
-        for sub_group in LayerGroup.objects.filter(view=group.view, parent=group):
+        for sub_group in group.children.filter(view=group.view).prefetch_related(self.prefetch_layers):
             group_content['layers'].append(self.get_tree_group(sub_group))
 
         # Add layers of group
@@ -214,23 +235,30 @@ class LayerViews(APIView):
                     'label': field_filter.label or field_filter.field.label,
                     'exportable': field_filter.exportable,
                 }
-                for field_filter in FilterField.objects.filter(layer=layer, shown=True)
+                for field_filter in layer.filters_shown
             ]
 
     def get_filter_forms_for_layer(self, layer):
-        filter_fields = FilterField.objects.filter(layer=layer, filter_enable=True)
-        if filter_fields.count() > 0:
+        if layer.filters_enabled:
             return [
                 {
                     'property': field_filter.field.name,
                     'label': field_filter.label or field_filter.field.label,
                     **field_filter.filter_settings,
                 }
-                for field_filter in filter_fields
+                for field_filter in layer.filters_enabled
             ]
 
     def layers(self, pk):
-        layers = self.model.objects.filter(group__view=pk)
+        layers = (
+            self.model.objects
+                .filter(group__view=pk)
+                .order_by('order')
+                .select_related('source')
+                .prefetch_related(
+                    'custom_styles__source'
+                )
+        )
         if layers:
             return layers
         raise Http404
