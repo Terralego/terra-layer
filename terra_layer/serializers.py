@@ -1,10 +1,6 @@
-
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, ValidationError
 
 from django.db import transaction
-
-from django_geosource.models import Field
-from django_geosource.serializers import FieldSerializer
 
 from .models import Layer, FilterField, CustomStyle
 

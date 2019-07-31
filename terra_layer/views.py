@@ -1,10 +1,7 @@
-from functools import reduce
-import json
 
 from django.conf import settings
 from django.http import Http404
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.http import urlunquote
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -107,7 +104,7 @@ class LayerViews(APIView):
                 'constraints': [{
                     'minZoom': layer.popup_minzoom,
                     'maxZoom': layer.popup_maxzoom,
-                },]
+                }]
             })
 
         if layer.minisheet_enable:
@@ -168,7 +165,10 @@ class LayerViews(APIView):
                 },
             }
 
-            layer_object['filters']['exportable'] = any([f['exportable'] for f in layer_object['filters']['fields'] or []])
+            layer_object['filters']['exportable'] = any([
+                f['exportable']
+                for f in layer_object['filters']['fields'] or []
+            ])
 
             group_content['layers'].append(layer_object)
 
