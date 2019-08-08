@@ -85,8 +85,13 @@ class FilterField(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
     label = models.CharField(max_length=255, blank=True)
 
+    order = models.IntegerField(default=0)
+
     filter_enable = models.BooleanField(default=False)
     filter_settings = JSONField(default=dict)
 
     exportable = models.BooleanField(default=False)
     shown = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('order', )
