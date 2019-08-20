@@ -143,7 +143,7 @@ class LayerViews(APIView):
                 'legends': layer.legends,
                 'filters': {
                     'layer': layer.source.slug,
-                    # 'mainField': None, # TODO: find the mainfield
+                    'mainField': self.get_filters_mainfield(layer),
                     'fields': self.get_filter_fields_for_layer(layer),
                     'form': self.get_filter_forms_for_layer(layer),
                 },
@@ -184,6 +184,12 @@ class LayerViews(APIView):
             group_layers['layers'].append(layer)
 
         return layer_tree
+
+    def get_filters_mainfield(self, layer):
+        try:
+            return layer.settings['filters']['mainField']
+        except KeyError:
+            return None
 
     def get_filter_fields_for_layer(self, layer):
         if layer.table_enable:
