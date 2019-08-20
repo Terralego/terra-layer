@@ -20,6 +20,7 @@ class Layer(models.Model):
     description = models.TextField(blank=True)
 
     layer_style = JSONField(default=dict)
+    settings = JSONField(default=dict)
 
     legends = JSONField(default=list)
 

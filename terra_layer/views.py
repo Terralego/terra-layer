@@ -146,7 +146,8 @@ class LayerViews(APIView):
                     # 'mainField': None, # TODO: find the mainfield
                     'fields': self.get_filter_fields_for_layer(layer),
                     'form': self.get_filter_forms_for_layer(layer),
-                }
+                },
+                **layer.settings,
             }
 
             layer_object['filters']['exportable'] = any([f['exportable'] for f in layer_object['filters']['fields'] or []])
