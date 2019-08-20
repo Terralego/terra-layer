@@ -13,11 +13,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='layer',
-            name='settings',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
-        ),
-        migrations.AddField(
             model_name='layergroup',
             name='selectors',
             field=django.contrib.postgres.fields.jsonb.JSONField(default=list),

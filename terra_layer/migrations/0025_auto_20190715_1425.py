@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('terra_layer', '0024_customstyle_interactions'),
+        ('terra_layer', '0025_layer_settings'),
     ]
 
     operations = [
