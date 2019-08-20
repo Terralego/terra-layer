@@ -133,6 +133,7 @@ class LayerViews(APIView):
                 layer_path, layer_name = None, layer.name
 
             layer_object = {
+                **layer.settings,
                 'label': layer_name,
                 'initialState': {
                     'active': False,
@@ -147,7 +148,6 @@ class LayerViews(APIView):
                     'fields': self.get_filter_fields_for_layer(layer),
                     'form': self.get_filter_forms_for_layer(layer),
                 },
-                **layer.settings,
             }
 
             layer_object['filters']['exportable'] = any([f['exportable'] for f in layer_object['filters']['fields'] or []])
