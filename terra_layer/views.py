@@ -12,7 +12,7 @@ from .models import Layer, LayerGroup, FilterField
 from .permissions import LayerPermission
 from .serializers import LayerSerializer
 from .sources_serializers import SourceSerializer
-
+from .utils import dict_merge
 
 class LayerViewset(ModelViewSet):
     model = Layer
@@ -168,13 +168,17 @@ class LayerViews(APIView):
 
         # Add layers of group
         for layer in group.layers.filter(in_tree=True):
-            layer_object = {
-                **layer.settings,
-                'label': layer.name,
+
+            default_values = {
                 'initialState': {
                     'active': False,
                     'opacity': 1,
                 },
+            }
+
+            layer_object = {
+                **dict_merge(default_values, layer.settings),
+                'label': layer.name,
                 'content': layer.description,
                 'layers': self.get_layers_list_for_layer(layer),
                 'legends': layer.legends,
