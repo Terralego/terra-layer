@@ -1,10 +1,14 @@
 from hashlib import md5
+
+from django.core.cache import cache
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
+
+from .utils import get_layer_group_cache_key
 
 VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
 
@@ -67,6 +71,13 @@ class Layer(models.Model):
         permissions = (
             ('can_manage_layers', 'Can manage layers'),
         )
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        # Invalidate cache for layer group
+        if self.group:
+            cache.delete(get_layer_group_cache_key(self.group.view))
 
 
 class CustomStyle(models.Model):

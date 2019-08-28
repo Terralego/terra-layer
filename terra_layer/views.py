@@ -1,5 +1,5 @@
-
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Prefetch
 from django.http import Http404
 from django.urls import reverse
@@ -12,7 +12,8 @@ from .models import Layer, LayerGroup, FilterField
 from .permissions import LayerPermission
 from .serializers import LayerSerializer
 from .sources_serializers import SourceSerializer
-from .utils import dict_merge
+from .utils import dict_merge, get_layer_group_cache_key
+
 
 class LayerViewset(ModelViewSet):
     model = Layer
@@ -46,6 +47,8 @@ class LayerViews(APIView):
         )
     ))
 
+    view = None
+
     def get(self, request, slug=None, format=None):
         if slug is None:
             return Response(settings.TERRA_LAYER_VIEWS)
@@ -53,30 +56,33 @@ class LayerViews(APIView):
         if slug not in settings.TERRA_LAYER_VIEWS:
             raise Http404('View does not exist')
 
-        view = settings.TERRA_LAYER_VIEWS[slug]
-        layers = self.layers(view['pk'])
+        self.view = settings.TERRA_LAYER_VIEWS[slug]
 
-        return Response(
-            {
-                'title': view['name'],
-                'type': view.get('type', 'default'),
-                'layersTree': self.get_layers_tree(view),
-                'interactions': self.get_interactions(layers),
-                'map': {
-                    **settings.TERRA_DEFAULT_MAP_SETTINGS,
-                    'customStyle': {
-                        'sources': [{
-                            'id': self.DEFAULT_SOURCE_NAME,
-                            'type': self.DEFAULT_SOURCE_TYPE,
-                            'url': reverse(
-                                        'terra:group-tilejson',
-                                        args=(layers.first().source.get_layer().group, ))
-                        }],
-                        'layers': self.get_map_layers(layers),
-                    },
-                }
+        cache_key = get_layer_group_cache_key(self.view['pk'])
+        return Response(cache.get_or_set(cache_key, self.get_layer_structure))
+
+    def get_layer_structure(self):
+        layers = self.layers(self.view['pk'])
+        return {
+            'title': self.view['name'],
+            'type': self.view.get('type', 'default'),
+            'layersTree': self.get_layers_tree(self.view),
+            'interactions': self.get_interactions(layers),
+            'map': {
+                **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                'customStyle': {
+                    'sources': [{
+                        'id': self.DEFAULT_SOURCE_NAME,
+                        'type': self.DEFAULT_SOURCE_TYPE,
+                        'url': reverse(
+                            'terra:group-tilejson',
+                            args=(layers.first().source.get_layer().group,)
+                        )
+                    }],
+                    'layers': self.get_map_layers(layers),
+                },
             }
-        )
+        }
 
     def get_map_layers(self, layers):
         map_layers = []
