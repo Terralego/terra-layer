@@ -17,3 +17,13 @@ def dict_merge(dct, merge_dct, add_keys=True):
             dct[k] = merge_dct[k]
 
     return dct
+
+
+def get_layer_group_cache_key(pk):
+    """
+    :param pk: The pk of the layer group to be cached
+    :type pk: int
+    :return: The cache key
+    :rtype: string
+    """
+    return 'terra-layer-{}'.format(pk)

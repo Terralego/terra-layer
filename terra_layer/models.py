@@ -8,6 +8,8 @@ from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
 
+from .utils import get_layer_group_cache_key
+
 VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
 
 
@@ -73,13 +75,9 @@ class Layer(models.Model):
     def save(self, **kwargs):
         super().save(**kwargs)
 
-        # Find the upmost group for this layer
-        group = self.group
-        if group:
-            while group.parent:
-                group = group.parent
-            # Invalidate cache
-            cache.delete('terra-layer-{}'.format(group.view))
+        # Invalidate cache for layer group
+        if self.group:
+            cache.delete(get_layer_group_cache_key(self.group.view))
 
 
 class CustomStyle(models.Model):
