@@ -1,4 +1,6 @@
 from hashlib import md5
+
+from django.core.cache import cache
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
@@ -67,6 +69,17 @@ class Layer(models.Model):
         permissions = (
             ('can_manage_layers', 'Can manage layers'),
         )
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        # Find the upmost group for this layer
+        group = self.group
+        if group:
+            while group.parent:
+                group = group.parent
+            # Invalidate cache
+            cache.delete('terra-layer-{}'.format(group.view))
 
 
 class CustomStyle(models.Model):

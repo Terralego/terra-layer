@@ -1,5 +1,5 @@
-
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Prefetch
 from django.http import Http404
 from django.urls import reverse
@@ -13,6 +13,7 @@ from .permissions import LayerPermission
 from .serializers import LayerSerializer
 from .sources_serializers import SourceSerializer
 from .utils import dict_merge
+
 
 class LayerViewset(ModelViewSet):
     model = Layer
@@ -54,10 +55,11 @@ class LayerViews(APIView):
             raise Http404('View does not exist')
 
         view = settings.TERRA_LAYER_VIEWS[slug]
-        layers = self.layers(view['pk'])
 
-        return Response(
-            {
+        response_dict = cache.get('terra-layer-{}'.format(view['pk']))
+        if not response_dict:
+            layers = self.layers(view['pk'])
+            response_dict = {
                 'title': view['name'],
                 'type': view.get('type', 'default'),
                 'layersTree': self.get_layers_tree(view),
@@ -69,14 +71,17 @@ class LayerViews(APIView):
                             'id': self.DEFAULT_SOURCE_NAME,
                             'type': self.DEFAULT_SOURCE_TYPE,
                             'url': reverse(
-                                        'terra:group-tilejson',
-                                        args=(layers.first().source.get_layer().group, ))
+                                'terra:group-tilejson',
+                                args=(layers.first().source.get_layer().group,)
+                            )
                         }],
                         'layers': self.get_map_layers(layers),
                     },
                 }
             }
-        )
+            cache.set('terra-layer-{}'.format(view['pk']), response_dict)
+
+        return Response(response_dict)
 
     def get_map_layers(self, layers):
         map_layers = []
