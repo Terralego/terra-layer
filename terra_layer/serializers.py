@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, 
 
 from django.db import transaction
 
-from .models import Layer, FilterField, CustomStyle
+from .models import Layer, LayerGroup, FilterField, CustomStyle
 
 
 class FilterFieldSerializer(ModelSerializer):
@@ -33,6 +33,40 @@ class LayerSerializer(ModelSerializer):
         self._update_m2m_through(instance, 'fields', FilterFieldSerializer)
 
         return instance
+
+    def to_internal_value(self, data):
+        data['group'], data['name'] = self._get_layer_group(data)
+        return super().to_internal_value(data)
+
+    def to_representation(self, obj):
+        return {
+            **super().to_representation(obj),
+            'name': self._get_name_path(obj),
+            'view': obj.group.view,
+        }
+
+    def _get_layer_group(self, data):
+        view = data['view']
+        group_path, layer_name = data['name'].rsplit('/', 1)
+
+        group = None
+        for group_name in group_path.split('/'):
+            if group:
+                group, _ = group.children.get_or_create(label=group_name)
+            else:
+                group, _ = LayerGroup.objects.get_or_create(view=view, label=group_name)
+
+        return group.pk, layer_name
+
+    def _get_name_path(self, obj):
+        def get_group_path(group):
+            name = group.label
+            if group.parent:
+                name = get_group_path(group.parent) + f'/{name}'
+            return name
+
+        group_path = get_group_path(obj.group)
+        return f'{group_path}/{obj.name}'
 
     @transaction.atomic
     def update(self, instance, validated_data):
