@@ -133,15 +133,20 @@ class LayerViews(APIView):
             })
 
         if layer.minisheet_enable:
-            interactions.append({
+            settings_interactions = {
                 'id': layer.layer_identifier,
                 'interaction': 'displayDetails',
                 'template': layer.minisheet_template,
                 'fetchProperties': {
-                    'url': urlunquote(reverse('terra:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
+                    'url': urlunquote(
+                        reverse('terra:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
                     'id': '_id',
                 },
-            })
+            }
+            if layer.highlight_color:
+                settings_interactions['highlight_color'] = layer.highlight_color
+
+            interactions.append(settings_interactions)
 
         return interactions
 

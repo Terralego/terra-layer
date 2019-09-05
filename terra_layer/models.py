@@ -54,6 +54,8 @@ class Layer(models.Model):
     minisheet_enable = models.BooleanField(default=False)
     minisheet_template = models.TextField(blank=True)
 
+    highlight_color = models.CharField(max_length=255, blank=True)
+
     interactions = JSONField(default=list)
 
     fields = models.ManyToManyField(Field, through="FilterField")
