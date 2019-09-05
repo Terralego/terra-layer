@@ -12,7 +12,8 @@ class SourceSerializer(serializers.BaseSerializer):
     def get_object_serializer(cls, obj):
         clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
         for _, serializer in clsmembers:
-            if serializer.__module__ == __name__ and serializer.Meta.model is obj.source.__class__:
+            if (serializer.__module__ == __name__
+                    and serializer.Meta.model is obj.source.__class__):
                 return serializer(obj)
 
         return cls(obj)
@@ -27,6 +28,7 @@ class SourceSerializer(serializers.BaseSerializer):
 
     class Meta:
         model = Source
+
 
 class WMTSSourceSerializer(SourceSerializer):
     def to_representation(self, obj):

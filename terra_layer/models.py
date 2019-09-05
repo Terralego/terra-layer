@@ -1,5 +1,6 @@
 from hashlib import md5
-from enum import Enum
+
+from django.core.cache import cache
 from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
@@ -7,13 +8,31 @@ from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
 
+from .utils import get_layer_group_cache_key
+
 VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
+
+
+class LayerGroup(models.Model):
+    view = models.IntegerField()
+    label = models.CharField(max_length=255)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='children')
+    order = models.IntegerField(default=0)
+    exclusive = models.BooleanField(default=False)
+    selectors = JSONField(null=True, default=None)
+    settings = JSONField(default=dict)
+
+    class Meta:
+        unique_together = ['view', 'label', 'parent']
+        ordering = ['order']
+
 
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='layers')
 
-    view = models.IntegerField()
+    group = models.ForeignKey(LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers")
     name = models.CharField(max_length=255, blank=False)
+    in_tree = models.BooleanField(default=True)
 
     order = models.IntegerField(default=0)
 
@@ -29,8 +48,8 @@ class Layer(models.Model):
 
     popup_enable = models.BooleanField(default=False)
     popup_template = models.TextField(blank=True)
-    popup_minzoom = models.FloatField(default=10)
-    popup_maxzoom = models.FloatField(default=10)
+    popup_minzoom = models.FloatField(default=0)
+    popup_maxzoom = models.FloatField(default=22)
 
     minisheet_enable = models.BooleanField(default=False)
     minisheet_template = models.TextField(blank=True)
@@ -38,10 +57,6 @@ class Layer(models.Model):
     interactions = JSONField(default=list)
 
     fields = models.ManyToManyField(Field, through="FilterField")
-
-    def __init__(self,  *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._meta.get_field('view')._choices = VIEW_CHOICES
 
     @property
     def style(self):
@@ -52,9 +67,17 @@ class Layer(models.Model):
         return md5(f"{self.source.slug}-{self.pk}".encode('utf-8')).hexdigest()
 
     class Meta:
+        ordering = ('order', )
         permissions = (
             ('can_manage_layers', 'Can manage layers'),
         )
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        # Invalidate cache for layer group
+        if self.group:
+            cache.delete(get_layer_group_cache_key(self.group.view))
 
 
 class CustomStyle(models.Model):
@@ -73,8 +96,13 @@ class FilterField(models.Model):
     layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
     label = models.CharField(max_length=255, blank=True)
 
+    order = models.IntegerField(default=0)
+
     filter_enable = models.BooleanField(default=False)
     filter_settings = JSONField(default=dict)
 
     exportable = models.BooleanField(default=False)
     shown = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('order', )

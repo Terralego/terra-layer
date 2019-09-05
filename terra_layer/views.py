@@ -1,19 +1,18 @@
-from functools import reduce
-import json
-
 from django.conf import settings
+from django.core.cache import cache
+from django.db.models import Prefetch
 from django.http import Http404
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils.http import urlunquote
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
-from .models import Layer, FilterField
+from .models import Layer, LayerGroup, FilterField
 from .permissions import LayerPermission
 from .serializers import LayerSerializer
 from .sources_serializers import SourceSerializer
+from .utils import dict_merge, get_layer_group_cache_key
 
 
 class LayerViewset(ModelViewSet):
@@ -30,6 +29,26 @@ class LayerViews(APIView):
     DEFAULT_SOURCE_NAME = 'terra'
     DEFAULT_SOURCE_TYPE = 'vector'
 
+    prefetch_layers = Prefetch('layers', (
+        Layer.objects
+        .select_related('source')
+        .prefetch_related(
+            Prefetch(
+                'fields_filters',
+                FilterField.objects.filter(shown=True).select_related('field'),
+                to_attr='filters_shown'
+            ),
+            Prefetch(
+                'fields_filters',
+                FilterField.objects.filter(filter_enable=True).select_related('field'),
+                to_attr='filters_enabled'
+            ),
+            'custom_styles__source',
+        )
+    ))
+
+    view = None
+
     def get(self, request, slug=None, format=None):
         if slug is None:
             return Response(settings.TERRA_LAYER_VIEWS)
@@ -37,29 +56,33 @@ class LayerViews(APIView):
         if slug not in settings.TERRA_LAYER_VIEWS:
             raise Http404('View does not exist')
 
-        view = settings.TERRA_LAYER_VIEWS[slug]
-        layers = self.layers(view['pk'])
+        self.view = settings.TERRA_LAYER_VIEWS[slug]
 
-        return Response(
-            {
-                'title': view['name'],
-                'type': view.get('type', 'default'),
-                'layersTree': self.get_layers_tree(layers),
-                'interactions': self.get_interactions(layers),
-                'map': {
-                    **settings.TERRA_DEFAULT_MAP_SETTINGS,
-                    'customStyle': {
-                        'sources': [{
-                            'id': self.DEFAULT_SOURCE_NAME,
-                            'type': self.DEFAULT_SOURCE_TYPE,
-                            'url': reverse('terra:group-tilejson',
-                                            args=(layers[0].source.get_layer().group, ))
-                        }],
-                        'layers': self.get_map_layers(layers),
-                    },
-                }
+        cache_key = get_layer_group_cache_key(self.view['pk'])
+        return Response(cache.get_or_set(cache_key, self.get_layer_structure))
+
+    def get_layer_structure(self):
+        layers = self.layers(self.view['pk'])
+        return {
+            'title': self.view['name'],
+            'type': self.view.get('type', 'default'),
+            'layersTree': self.get_layers_tree(self.view),
+            'interactions': self.get_interactions(layers),
+            'map': {
+                **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                'customStyle': {
+                    'sources': [{
+                        'id': self.DEFAULT_SOURCE_NAME,
+                        'type': self.DEFAULT_SOURCE_TYPE,
+                        'url': reverse(
+                            'terra:group-tilejson',
+                            args=(layers.first().source.get_layer().group,)
+                        )
+                    }],
+                    'layers': self.get_map_layers(layers),
+                },
             }
-        )
+        }
 
     def get_map_layers(self, layers):
         map_layers = []
@@ -79,19 +102,23 @@ class LayerViews(APIView):
             interactions += self.get_interactions_for_layer(layer)
         return interactions
 
-    def get_formatted_interactions(self, layer_id, interactions):
+    def get_formatted_interactions(self, layer):
         return [
             {
-                'id': layer_id,
+                'id': layer.layer_identifier,
+                'fetchProperties': {
+                    'url': urlunquote(reverse('terra:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
+                    'id': '_id',
+                },
                 **interaction,
             }
-            for interaction in interactions
+            for interaction in layer.interactions
         ]
 
     def get_interactions_for_layer(self, layer):
-        interactions = self.get_formatted_interactions(layer.layer_identifier, layer.interactions)
+        interactions = self.get_formatted_interactions(layer)
         for cs in layer.custom_styles.all():
-            interactions += self.get_formatted_interactions(cs.layer_identifier, cs.interactions)
+            interactions += self.get_formatted_interactions(cs)
 
         if layer.popup_enable:
             interactions.append({
@@ -102,7 +129,7 @@ class LayerViews(APIView):
                 'constraints': [{
                     'minZoom': layer.popup_minzoom,
                     'maxZoom': layer.popup_maxzoom,
-                },]
+                }]
             })
 
         if layer.minisheet_enable:
@@ -124,21 +151,40 @@ class LayerViews(APIView):
             *[s.layer_identifier for s in layer.custom_styles.all()]
         ]
 
-    def get_layers_tree(self, layers):
+    def get_layers_tree(self, view):
         layer_tree = []
-        for layer in layers:
-            try:
-                layer_path, layer_name = layer.name.rsplit('/', 1)
-            except ValueError:
-                layer_path, layer_name = None, layer.name
+        for group in LayerGroup.objects.filter(view=view['pk'], parent=None).prefetch_related(
+                self.prefetch_layers
+        ):
+            layer_tree.append(self.get_tree_group(group))
+        return layer_tree
 
-            layer_object = {
-                **layer.settings,
-                'label': layer_name,
+    def get_tree_group(self, group):
+        group_content = {
+            'group': group.label,
+            'exclusive': group.exclusive,
+            'selectors': group.selectors,
+            'layers': [],
+            **group.settings,
+        }
+
+        # Add subgroups
+        for sub_group in group.children.filter(view=group.view).prefetch_related(self.prefetch_layers):
+            group_content['layers'].append(self.get_tree_group(sub_group))
+
+        # Add layers of group
+        for layer in group.layers.filter(in_tree=True):
+
+            default_values = {
                 'initialState': {
                     'active': False,
                     'opacity': 1,
                 },
+            }
+
+            layer_object = {
+                **dict_merge(default_values, layer.settings),
+                'label': layer.name,
                 'content': layer.description,
                 'layers': self.get_layers_list_for_layer(layer),
                 'legends': layer.legends,
@@ -150,14 +196,14 @@ class LayerViews(APIView):
                 },
             }
 
-            layer_object['filters']['exportable'] = any([f['exportable'] for f in layer_object['filters']['fields'] or []])
+            layer_object['filters']['exportable'] = any([
+                f['exportable']
+                for f in layer_object['filters']['fields'] or []
+            ])
 
-            if layer_path is not None:
-                self.insert_layer_in_path(layer_tree, layer_path, layer_object)
-            else:
-                layer_tree.append(layer_object)
+            group_content['layers'].append(layer_object)
 
-        return layer_tree
+        return group_content
 
     def insert_layer_in_path(self, layer_tree, path, layer):
 
@@ -199,23 +245,30 @@ class LayerViews(APIView):
                     'label': field_filter.label or field_filter.field.label,
                     'exportable': field_filter.exportable,
                 }
-                for field_filter in FilterField.objects.filter(layer=layer, shown=True)
+                for field_filter in layer.filters_shown
             ]
 
     def get_filter_forms_for_layer(self, layer):
-        filter_fields = FilterField.objects.filter(layer=layer, filter_enable=True)
-        if filter_fields.count() > 0:
+        if layer.filters_enabled:
             return [
                 {
                     'property': field_filter.field.name,
                     'label': field_filter.label or field_filter.field.label,
                     **field_filter.filter_settings,
                 }
-                for field_filter in filter_fields
+                for field_filter in layer.filters_enabled
             ]
 
     def layers(self, pk):
-        layers = self.model.objects.filter(view=pk).order_by('order')
+        layers = (
+            self.model.objects
+                .filter(group__view=pk)
+                .order_by('order')
+                .select_related('source')
+                .prefetch_related(
+                    'custom_styles__source'
+                )
+        )
         if layers:
             return layers
         raise Http404
