@@ -55,6 +55,7 @@ class Layer(models.Model):
     minisheet_template = models.TextField(blank=True)
 
     highlight_color = models.CharField(max_length=255, blank=True)
+    main_field = models.ForeignKey(Field, null=True, on_delete=models.CASCADE, related_name="is_main_of")
 
     interactions = JSONField(default=list)
 

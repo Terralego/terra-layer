@@ -187,15 +187,18 @@ class LayerViews(APIView):
                 },
             }
 
+            main_field = getattr(layer.main_field, 'name', None)
+
             layer_object = {
                 **dict_merge(default_values, layer.settings),
                 'label': layer.name,
                 'content': layer.description,
                 'layers': self.get_layers_list_for_layer(layer),
                 'legends': layer.legends,
+                'mainField': main_field,
                 'filters': {
                     'layer': layer.source.slug,
-                    'mainField': self.get_filters_mainfield(layer),
+                    'mainField': main_field,
                     'fields': self.get_filter_fields_for_layer(layer),
                     'form': self.get_filter_forms_for_layer(layer),
                 },
@@ -235,12 +238,6 @@ class LayerViews(APIView):
             group_layers['layers'].append(layer)
 
         return layer_tree
-
-    def get_filters_mainfield(self, layer):
-        try:
-            return layer.settings['filters']['mainField']
-        except KeyError:
-            return None
 
     def get_filter_fields_for_layer(self, layer):
         if layer.table_enable:
