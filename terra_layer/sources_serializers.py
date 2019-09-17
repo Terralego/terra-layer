@@ -1,8 +1,9 @@
 import inspect
 import sys
 
-from rest_framework import serializers
+from django.utils.functional import cached_property
 from django_geosource.models import Source, WMTSSource
+from rest_framework import serializers
 
 DEFAULT_SOURCE_NAME = 'terra'
 
@@ -10,20 +11,27 @@ DEFAULT_SOURCE_NAME = 'terra'
 class SourceSerializer(serializers.BaseSerializer):
     @classmethod
     def get_object_serializer(cls, obj):
+
+        source = obj.source.get_real_instance()
         clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+
         for _, serializer in clsmembers:
             if (serializer.__module__ == __name__
-                    and serializer.Meta.model is obj.source.__class__):
-                return serializer(obj)
+                and serializer.Meta.model is source.__class__):
+                    return serializer(obj)
 
         return cls(obj)
+
+    @cached_property
+    def source_object(self):
+        return self.instance.source.get_real_instance()
 
     def to_representation(self, obj):
         return {
             **obj.style,
             'id': obj.layer_identifier,
             'source': DEFAULT_SOURCE_NAME,
-            'source-layer': obj.source.slug,
+            'source-layer': self.source_object.slug,
         }
 
     class Meta:
@@ -36,13 +44,13 @@ class WMTSSourceSerializer(SourceSerializer):
             **obj.style,
             'id': obj.layer_identifier,
             'type': 'raster',
-            'minzoom': obj.source.minzoom or 0,
-            'maxzoom': obj.source.maxzoom or 24,
+            'minzoom': self.source_object.minzoom or 0,
+            'maxzoom': self.source_object.maxzoom or 24,
             'source': {
                 'type': 'raster',
-                'tileSize': obj.source.tile_size,
+                'tileSize': self.source_object.tile_size,
                 'tiles': [
-                    obj.source.url,
+                    self.source_object.url,
                 ],
             },
         }
