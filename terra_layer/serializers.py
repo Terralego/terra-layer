@@ -47,7 +47,11 @@ class LayerSerializer(ModelSerializer):
 
     def _get_layer_group(self, data):
         view = data['view']
-        group_path, layer_name = data['name'].rsplit('/', 1)
+
+        try:
+            group_path, layer_name = data['name'].rsplit('/', 1)
+        except ValueError:
+            group_path, layer_name = 'Unknown', data['name']
 
         group = None
         for group_name in group_path.split('/'):
