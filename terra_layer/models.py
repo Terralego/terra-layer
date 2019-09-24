@@ -103,6 +103,7 @@ class FilterField(models.Model):
 
     filter_enable = models.BooleanField(default=False)
     filter_settings = JSONField(default=dict)
+    format_type = models.CharField(max_length=255, default=None, null=True)
 
     exportable = models.BooleanField(default=False)
     shown = models.BooleanField(default=False)
