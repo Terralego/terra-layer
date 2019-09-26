@@ -18,6 +18,8 @@ from .utils import dict_merge, get_layer_group_cache_key
 class LayerViewset(ModelViewSet):
     model = Layer
     serializer_class = LayerSerializer
+    ordering_fields = filter_fields = ('source', 'group', 'name', 'order',
+                                       'table_enable', 'popup_enable', 'minisheet_enable')
     permission_classes = (LayerPermission, )
 
     def get_queryset(self):
