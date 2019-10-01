@@ -116,4 +116,4 @@ class SceneSerializer(ModelSerializer):
 
     class Meta:
         model = Scene
-        fields = '__all__'
+        fields = ('__all__', 'layerGroups', )

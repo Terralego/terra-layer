@@ -13,7 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
 from .models import Layer, LayerGroup, FilterField, Scene
-from .permissions import LayerPermission
+from .permissions import LayerPermission, ScenePermission
 from .serializers import LayerSerializer, SceneSerializer
 from .sources_serializers import SourceSerializer
 from .utils import dict_merge, get_layer_group_cache_key
@@ -351,6 +351,8 @@ class SceneViewset(ModelViewSet):
     model = Scene
     queryset = Scene.objects.all()
     serializer_class = SceneSerializer
+
+    permission_classes = (ScenePermission, )
 
     def get_queryset(self):
         return self.model.objects.all()
