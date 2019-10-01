@@ -21,8 +21,7 @@ def dict_merge(dct, merge_dct, add_keys=True):
 
 def get_layer_group_cache_key(pk, extras=[]):
     """
-    :param pk: The pk of the layer group to be cached
-    :type pk: int
+    :param self: The layer group to be cached
     :return: The cache key
     :rtype: string
     """

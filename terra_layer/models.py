@@ -8,7 +8,7 @@ from django.utils.functional import cached_property
 
 from django_geosource.models import Source, Field
 
-from .utils import get_layer_group_cache_key
+from .utils import create_layer_group_cache_key
 
 VIEW_CHOICES = [
     (view["pk"], view["name"]) for slug, view in settings.TERRA_LAYER_VIEWS.items()
@@ -16,7 +16,8 @@ VIEW_CHOICES = [
 
 
 class Scene(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
     type = models.CharField(max_length=255, default="map")
     icon_name = models.CharField(max_length=255, default=None, null=True)
     icon_path = models.CharField(max_length=255, default=None, null=True)
@@ -28,7 +29,7 @@ class Scene(models.Model):
 
 
 class LayerGroup(models.Model):
-    view = models.ForeignKey(Scene, on_delete=models.CASCADE, related_name="layerGroups")
+    view = models.ForeignKey(Scene, on_delete=models.CASCADE, related_name="layer_groups")
     label = models.CharField(max_length=255)
     parent = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="children"
@@ -98,7 +99,7 @@ class Layer(models.Model):
 
         # Invalidate cache for layer group
         if self.group:
-            cache.delete(get_layer_group_cache_key(self.group.view.pk))
+            cache.delete(create_layer_group_cache_key(self.group.view))
 
 
 class CustomStyle(models.Model):
