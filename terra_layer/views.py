@@ -12,9 +12,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
-from .models import Layer, LayerGroup, FilterField
+from .models import Layer, LayerGroup, FilterField, Scene
 from .permissions import LayerPermission
-from .serializers import LayerSerializer
+from .serializers import LayerSerializer, SceneSerializer
 from .sources_serializers import SourceSerializer
 from .utils import dict_merge, get_layer_group_cache_key
 
@@ -345,3 +345,12 @@ class LayerViews(APIView):
         if layers:
             return layers
         raise Http404
+
+
+class SceneViewset(ModelViewSet):
+    model = Scene
+    queryset = Scene.objects.all()
+    serializer_class = SceneSerializer
+
+    def get_queryset(self):
+        return self.model.objects.all()

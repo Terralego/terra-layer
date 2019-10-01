@@ -6,7 +6,7 @@ from rest_framework.serializers import (
 
 from django.db import transaction
 
-from .models import Layer, LayerGroup, FilterField, CustomStyle
+from .models import CustomStyle, FilterField, Layer, LayerGroup, Scene
 
 
 class FilterFieldSerializer(ModelSerializer):
@@ -109,4 +109,11 @@ class LayerSerializer(ModelSerializer):
 
     class Meta:
         model = Layer
-        fields = "__all__"
+        fields = '__all__'
+
+
+class SceneSerializer(ModelSerializer):
+
+    class Meta:
+        model = Scene
+        fields = '__all__'

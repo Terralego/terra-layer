@@ -124,3 +124,10 @@ class FilterField(models.Model):
 
     class Meta:
         ordering = ("order",)
+
+
+class Scene(models.Model):
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=255, default="map")
+    icon_name = models.CharField(max_length=255, default=None, null=True)
+    icon_path = models.CharField(max_length=255, default=None, null=True)
