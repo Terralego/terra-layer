@@ -8,15 +8,28 @@ from django.utils.http import urlunquote
 from django_geosource.models import WMTSSource
 from geostore.models import Layer as GeostoreLayer
 from geostore.tokens import tiles_token_generator
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
 from .models import Layer, LayerGroup, FilterField, Scene
 from .permissions import LayerPermission
-from .serializers import LayerSerializer, SceneSerializer
+from .serializers import LayerSerializer, SceneListSerializer, SceneDetailSerializer
 from .sources_serializers import SourceSerializer
 from .utils import dict_merge, get_layer_group_cache_key
+
+
+class SceneViewset(ModelViewSet):
+    model = Scene
+    queryset = Scene.objects.all()
+    lookup_field = 'slug'
+
+    # permission_classes = (LayerPermission, )
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return SceneDetailSerializer
+        return SceneListSerializer
 
 
 class LayerViewset(ModelViewSet):
@@ -37,7 +50,7 @@ class LayerViewset(ModelViewSet):
         return self.model.objects.all()
 
 
-class LayerViews(APIView):
+class LayerView(APIView):
     permission_classes = ()
     model = Layer
     EXTERNAL_SOURCES_CLASSES = [WMTSSource]
@@ -65,16 +78,14 @@ class LayerViews(APIView):
         ),
     )
 
-    view = None
+    scene = None
 
     def get(self, request, slug=None, format=None):
+        # Get all scene by default
         if slug is None:
-            return Response(settings.TERRA_LAYER_VIEWS)
+            return Response(SceneListSerializer(Scene.objects.all(), many=True).data)
 
-        if slug not in settings.TERRA_LAYER_VIEWS:
-            raise Http404("View does not exist")
-
-        self.view = settings.TERRA_LAYER_VIEWS[slug]
+        self.scene = get_object_or_404(Scene, slug=slug)
 
         self.layergroup = self.layers.first().source.get_layer().layer_groups.first()
         self.user_groups = tiles_token_generator.get_groups_intersect(
@@ -116,11 +127,11 @@ class LayerViews(APIView):
 
     def get_layer_structure(self):
         return {
-            "title": self.view["name"],
-            "type": self.view.get("type", "default"),
-            "layersTree": self.get_layers_tree(self.view),
-            "interactions": self.get_interactions(self.layers),
-            "map": {
+            'title': self.scene.name,
+            'type': self.scene.type,
+            'layersTree': self.get_layers_tree(self.scene),
+            'interactions': self.get_interactions(self.layers),
+            'map': {
                 **settings.TERRA_DEFAULT_MAP_SETTINGS,
                 "customStyle": {"sources": [], "layers": self.get_map_layers()},
             },
@@ -210,11 +221,11 @@ class LayerViews(APIView):
             *[s.layer_identifier for s in layer.custom_styles.all()],
         ]
 
-    def get_layers_tree(self, view):
+    def get_layers_tree(self, scene):
         layer_tree = []
-        for group in LayerGroup.objects.filter(
-            view=view["pk"], parent=None
-        ).prefetch_related(self.prefetch_layers):
+        for group in LayerGroup.objects.filter(view=scene, parent=None).prefetch_related(
+                self.prefetch_layers
+        ):
             layer_tree.append(self.get_tree_group(group))
         return layer_tree
 
@@ -345,11 +356,3 @@ class LayerViews(APIView):
         if layers:
             return layers
         raise Http404
-
-
-class SceneViewset(ModelViewSet):
-    model = Scene
-    queryset = Scene.objects.all()
-    serializer_class = SceneSerializer
-
-    permission_classes = (LayerPermission, )

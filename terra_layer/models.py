@@ -20,7 +20,7 @@ class Scene(models.Model):
     slug = models.SlugField(max_length=255, unique=True)
     type = models.CharField(max_length=255, default="map")
     icon_name = models.CharField(max_length=255, default=None, null=True)
-    icon_path = models.CharField(max_length=255, default=None, null=True)
+    icon_url = models.CharField(max_length=255, default=None, null=True)
 
     class Meta:
         permissions = (

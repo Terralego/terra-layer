@@ -3,6 +3,8 @@ from rest_framework.serializers import (
     PrimaryKeyRelatedField,
     ValidationError,
 )
+from rest_framework.fields import SerializerMethodField
+from rest_framework.reverse import reverse
 
 from django.db import transaction
 
@@ -112,8 +114,20 @@ class LayerSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class SceneSerializer(ModelSerializer):
+class SceneListSerializer(ModelSerializer):
+    detail_url = SerializerMethodField()
+
+    def get_detail_url(self, obj):
+        return reverse('terralayer:scene-detail',
+                       args=[obj.slug])
 
     class Meta:
         model = Scene
-        fields = ('__all__', 'layer_groups', )
+        fields = ('name', 'slug', 'type', 'icon_name', 'icon_url',  'detail_url', )
+
+
+class SceneDetailSerializer(ModelSerializer):
+
+    class Meta:
+        model = Scene
+        fields = '__all__'
