@@ -118,12 +118,11 @@ class SceneListSerializer(ModelSerializer):
     detail_url = SerializerMethodField()
 
     def get_detail_url(self, obj):
-        return reverse('terralayer:scene-detail',
-                       args=[obj.slug])
+        return reverse('terralayer:scene-detail', args=[obj.slug])
 
     class Meta:
         model = Scene
-        fields = ('name', 'slug', 'type', 'icon_name', 'icon_url',  'detail_url', )
+        fields = ('name', 'slug', 'type', 'icon_path', 'custom_icon', 'detail_url', )
 
 
 class SceneDetailSerializer(ModelSerializer):
