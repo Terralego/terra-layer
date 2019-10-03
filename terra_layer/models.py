@@ -18,9 +18,8 @@ VIEW_CHOICES = [
 class Scene(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
-    type = models.CharField(max_length=255, default="map")
+    category = models.CharField(max_length=255, default="map")
     # icon_path allow to handle hack with pre-generated icon whereas custom_icon allow to import custom icon
-    icon_path = models.CharField(max_length=255, default=None, null=True)
     custom_icon = models.ImageField(max_length=255, upload_to='icons', null=True, default=None)
 
     class Meta:

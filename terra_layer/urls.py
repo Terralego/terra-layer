@@ -23,7 +23,6 @@ scene_detail = SceneViewset.as_view({
 })
 
 urlpatterns = [
-    path(r'view/', LayerView.as_view(), name='layerview'),
     path(r'view/<str:slug>/', LayerView.as_view(), name='layerview'),
     path(r'scene/', scene_list, name='scene-list'),
     path(r'scene/<str:slug>/', scene_detail, name='scene-detail'),

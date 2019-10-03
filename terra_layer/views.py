@@ -14,7 +14,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
 from .models import Layer, LayerGroup, FilterField, Scene
-from .permissions import LayerPermission
+from .permissions import LayerPermission, ScenePermission
 from .serializers import LayerSerializer, SceneListSerializer, SceneDetailSerializer
 from .sources_serializers import SourceSerializer
 from .utils import dict_merge, get_layer_group_cache_key
@@ -24,7 +24,7 @@ class SceneViewset(ModelViewSet):
     model = Scene
     queryset = Scene.objects.all()
     lookup_field = 'slug'
-    permission_classes = (LayerPermission, )
+    permission_classes = (ScenePermission, )
 
     def get_serializer_class(self, ):
         if self.action == 'retrieve':
@@ -128,7 +128,7 @@ class LayerView(APIView):
     def get_layer_structure(self):
         return {
             'title': self.scene.name,
-            'type': self.scene.type,
+            'type': self.scene.category,
             'layersTree': self.get_layers_tree(self.scene),
             'interactions': self.get_interactions(self.layers),
             'map': {
