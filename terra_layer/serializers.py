@@ -5,6 +5,8 @@ from rest_framework.serializers import (
 )
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
+from rest_framework import serializers
+
 
 from django.db import transaction
 
@@ -115,14 +117,11 @@ class LayerSerializer(ModelSerializer):
 
 
 class SceneListSerializer(ModelSerializer):
-    detail_url = SerializerMethodField()
-
-    def get_detail_url(self, obj):
-        return reverse('terralayer:scene-detail', args=[obj.slug])
+    url = serializers.CharField(source="get_absolute_url", read_only=True)
 
     class Meta:
         model = Scene
-        fields = ('name', 'slug', 'category', 'custom_icon', 'detail_url', )
+        fields = ('name', 'slug', 'category', 'custom_icon', 'url')
 
 
 class SceneDetailSerializer(ModelSerializer):

@@ -5,6 +5,8 @@ from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
+from rest_framework.reverse import reverse
+
 
 from django_geosource.models import Source, Field
 
@@ -26,6 +28,10 @@ class Scene(models.Model):
         permissions = (
             ('can_manage_layers', 'Can manage layers'),
         )
+
+    def get_absolute_url(self):
+        return reverse('terralayer:scene-detail', args=[self.slug])
+
 
 
 class LayerGroup(models.Model):
