@@ -79,7 +79,7 @@ class LayerViews(APIView):
                         'type': self.DEFAULT_SOURCE_TYPE,
                         'url': reverse(
                             'geostore:group-tilejson',
-                            args=(layers.first().source.get_layer().layer_groups.first(),)
+                            args=(layers.first().source.get_layer().layer_groups.first().slug,)
                         )
                     }],
                     'layers': self.get_map_layers(layers),
