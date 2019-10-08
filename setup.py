@@ -30,6 +30,6 @@ setup(
         "Django>=2.1,<2.2",
         "djangorestframework>=3.8,<3.9",
         "django_geosource",
-        "terra-common"
+        "terra-common>=0.3"
     ],
 )

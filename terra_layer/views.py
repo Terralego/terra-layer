@@ -27,6 +27,7 @@ class LayerViewset(ModelViewSet):
 
 
 class LayerViews(APIView):
+    permission_classes = ()
     model = Layer
     DEFAULT_SOURCE_NAME = 'terra'
     DEFAULT_SOURCE_TYPE = 'vector'
@@ -77,8 +78,8 @@ class LayerViews(APIView):
                         'id': self.DEFAULT_SOURCE_NAME,
                         'type': self.DEFAULT_SOURCE_TYPE,
                         'url': reverse(
-                            'terra:group-tilejson',
-                            args=(layers.first().source.get_layer().group,)
+                            'geostore:group-tilejson',
+                            args=(layers.first().source.get_layer().layer_groups.first(),)
                         )
                     }],
                     'layers': self.get_map_layers(layers),
@@ -109,7 +110,7 @@ class LayerViews(APIView):
             {
                 'id': layer.layer_identifier,
                 'fetchProperties': {
-                    'url': urlunquote(reverse('terra:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
+                    'url': urlunquote(reverse('geostore:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
                     'id': '_id',
                 },
                 **interaction,
@@ -141,7 +142,7 @@ class LayerViews(APIView):
                 'template': layer.minisheet_template,
                 'fetchProperties': {
                     'url': urlunquote(
-                        reverse('terra:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
+                        reverse('geostore:feature-detail', args=(layer.source.get_layer().pk, '{{id}}'))),
                     'id': '_id',
                 },
             }
