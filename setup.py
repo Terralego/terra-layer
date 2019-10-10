@@ -27,7 +27,7 @@ setup(
         "OSI Approved :: MIT License",
     ],
     install_requires=[
-        "Django>=2.1,<2.2",
+        "Django==2.2.5",
         "djangorestframework>=3.8,<3.9",
         "django_geosource",
         "terra-common>=0.3"
