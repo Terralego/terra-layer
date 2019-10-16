@@ -1,9 +1,13 @@
 from django.conf import settings
 from django.core.cache import cache
-from django.db.models import Prefetch
-from django.http import Http404
+from django.db.models import Prefetch, Q
+from django.http import Http404, QueryDict
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.http import urlunquote
+from django_geosource.models import WMTSSource
+from geostore.models import Layer as GeostoreLayer
+from geostore.tokens import tiles_token_generator
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
@@ -29,6 +33,7 @@ class LayerViewset(ModelViewSet):
 class LayerViews(APIView):
     permission_classes = ()
     model = Layer
+    EXTERNAL_SOURCES_CLASSES = [WMTSSource, ]
     DEFAULT_SOURCE_NAME = 'terra'
     DEFAULT_SOURCE_TYPE = 'vector'
 
@@ -61,40 +66,58 @@ class LayerViews(APIView):
 
         self.view = settings.TERRA_LAYER_VIEWS[slug]
 
-        cache_key = get_layer_group_cache_key(self.view['pk'])
-        return Response(cache.get_or_set(cache_key, self.get_layer_structure))
+        self.layergroup = self.layers.first().source.get_layer().layer_groups.first()
+        self.user_groups = tiles_token_generator.get_groups_intersect(self.request.user, self.layergroup)
+
+        cache_key = get_layer_group_cache_key(self.view['pk'], self.user_groups.values_list('name', flat=True))
+
+        response = cache.get_or_set(cache_key, self.get_response_with_sources)
+        return Response(response)
+
+    def get_response_with_sources(self):
+        layer_structure = self.get_layer_structure()
+
+        tilejson_url =  reverse(
+            'geostore:group-tilejson',
+            args=(self.layergroup.slug,)
+        )
+        querystring = QueryDict(mutable=True)
+        if not self.request.user.is_anonymous:
+            querystring.update({
+                'idb64': tiles_token_generator.token_idb64(self.user_groups, self.layergroup),
+                'token': tiles_token_generator.make_token(self.user_groups, self.layergroup)
+            })
+
+        layer_structure['map']['customStyle']['sources'] = [{
+            'id': self.DEFAULT_SOURCE_NAME,
+            'type': self.DEFAULT_SOURCE_TYPE,
+            'url': f'{tilejson_url}?{querystring.urlencode()}'
+        }, ]
+        return layer_structure
 
     def get_layer_structure(self):
-        layers = self.layers(self.view['pk'])
         return {
             'title': self.view['name'],
             'type': self.view.get('type', 'default'),
             'layersTree': self.get_layers_tree(self.view),
-            'interactions': self.get_interactions(layers),
+            'interactions': self.get_interactions(self.layers),
             'map': {
                 **settings.TERRA_DEFAULT_MAP_SETTINGS,
                 'customStyle': {
-                    'sources': [{
-                        'id': self.DEFAULT_SOURCE_NAME,
-                        'type': self.DEFAULT_SOURCE_TYPE,
-                        'url': reverse(
-                            'geostore:group-tilejson',
-                            args=(layers.first().source.get_layer().layer_groups.first().slug,)
-                        )
-                    }],
-                    'layers': self.get_map_layers(layers),
-                },
+                    'sources': [],
+                    'layers': self.get_map_layers(),
+                }
             }
         }
 
-    def get_map_layers(self, layers):
+    def get_map_layers(self):
         map_layers = []
-        for layer in layers:
+        for layer in self.layers.filter(source__slug__in=self.authorized_sources):
             map_layers += [
                 SourceSerializer.get_object_serializer(layer).data,
                 *[
                     SourceSerializer.get_object_serializer(cs).data
-                    for cs in layer.custom_styles.all()
+                    for cs in layer.custom_styles.filter(source__slug__in=self.authorized_sources)
                 ],
             ]
         return map_layers
@@ -182,6 +205,12 @@ class LayerViews(APIView):
 
         # Add layers of group
         for layer in group.layers.filter(in_tree=True):
+            if (
+                layer.source.slug not in self.authorized_sources
+                or layer.custom_styles.exclude(source__slug__in=self.authorized_sources).exists()
+            ):
+                # Exclude layers with non-authorized sources
+                continue
 
             default_values = {
                 'initialState': {
@@ -265,16 +294,26 @@ class LayerViews(APIView):
                 for field_filter in layer.filters_enabled
             ]
 
-    def layers(self, pk):
+    @cached_property
+    def authorized_sources(self):
+        groups = self.user_groups
+        sources_slug = list(self.layergroup.layers.filter(
+            Q(authorized_groups__isnull=True) | Q(authorized_groups__in=groups)
+            ).values_list('name', flat=True)
+        ) + list(WMTSSource.objects.values_list('slug', flat=True))
+
+        return sources_slug
+
+    @cached_property
+    def layers(self):
         layers = (
-            self.model.objects
-                .filter(group__view=pk)
-                .order_by('order')
-                .select_related('source')
-                .prefetch_related(
-                    'custom_styles__source'
-                )
+            self.model.objects.filter(
+            group__view=self.view['pk'])
+            .order_by('order')
+            .select_related('source')
+            .prefetch_related('custom_styles__source')
         )
+
         if layers:
             return layers
         raise Http404
