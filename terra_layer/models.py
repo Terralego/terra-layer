@@ -10,7 +10,7 @@ from rest_framework.reverse import reverse
 
 from django_geosource.models import Source, Field
 
-from .utils import create_layer_group_cache_key
+from .utils import get_layer_group_cache_key
 
 VIEW_CHOICES = [
     (view["pk"], view["name"]) for slug, view in settings.TERRA_LAYER_VIEWS.items()
@@ -105,7 +105,7 @@ class Layer(models.Model):
 
         # Invalidate cache for layer group
         if self.group:
-            cache.delete(create_layer_group_cache_key(self.group.view))
+            cache.delete(get_layer_group_cache_key(self.group.view))
 
 
 class CustomStyle(models.Model):
