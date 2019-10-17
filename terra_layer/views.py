@@ -23,7 +23,6 @@ from .utils import dict_merge, get_layer_group_cache_key
 class SceneViewset(ModelViewSet):
     model = Scene
     queryset = Scene.objects.all()
-    lookup_field = 'slug'
     permission_classes = (ScenePermission, )
 
     def get_serializer_class(self, ):

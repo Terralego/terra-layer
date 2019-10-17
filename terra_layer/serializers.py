@@ -121,7 +121,7 @@ class SceneListSerializer(ModelSerializer):
 
     class Meta:
         model = Scene
-        fields = ('name', 'slug', 'category', 'custom_icon', 'url')
+        fields = ('id', 'name', 'slug', 'category', 'custom_icon', 'url')
 
 
 class SceneDetailSerializer(ModelSerializer):
