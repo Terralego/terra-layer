@@ -8,29 +8,43 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_geosource', '0009_source_slug'),
-        ('terra_layer', '0020_sublayer'),
+        ("django_geosource", "0009_source_slug"),
+        ("terra_layer", "0020_sublayer"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CustomStyle',
+            name="CustomStyle",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('style', django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
-                ('layer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='custom_styles', to='terra_layer.Layer')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sublayers', to='django_geosource.Source')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("style", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "layer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="custom_styles",
+                        to="terra_layer.Layer",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sublayers",
+                        to="django_geosource.Source",
+                    ),
+                ),
             ],
         ),
-        migrations.RemoveField(
-            model_name='sublayer',
-            name='layer',
-        ),
-        migrations.RemoveField(
-            model_name='sublayer',
-            name='source',
-        ),
-        migrations.DeleteModel(
-            name='SubLayer',
-        ),
+        migrations.RemoveField(model_name="sublayer", name="layer"),
+        migrations.RemoveField(model_name="sublayer", name="source"),
+        migrations.DeleteModel(name="SubLayer"),
     ]

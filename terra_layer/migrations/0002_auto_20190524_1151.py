@@ -6,19 +6,21 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0001_initial'),
-    ]
+    dependencies = [("terra_layer", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='filterfield',
-            name='field',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='filter_field', to='django_geosource.Field'),
+            model_name="filterfield",
+            name="field",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="filter_field",
+                to="django_geosource.Field",
+            ),
         ),
         migrations.AlterField(
-            model_name='filterfield',
-            name='filter_type',
+            model_name="filterfield",
+            name="filter_type",
             field=models.IntegerField(default=0),
         ),
     ]

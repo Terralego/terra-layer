@@ -9,7 +9,7 @@ def migrate_main_field(apps, schema_editor):
     Layer = apps.get_model("terra_layer", "Layer")
     for layer in Layer.objects.all():
         try:
-            field_name = layer.settings.get('filters', {}).pop('mainField', None)
+            field_name = layer.settings.get("filters", {}).pop("mainField", None)
             layer.main_field = layer.source.fields.get(name=field_name)
         except ObjectDoesNotExist:
             layer.main_field = None
@@ -19,15 +19,20 @@ def migrate_main_field(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_geosource', '0014_auto_20190821_1648'),
-        ('terra_layer', '0038_layer_highlight_color'),
+        ("django_geosource", "0014_auto_20190821_1648"),
+        ("terra_layer", "0038_layer_highlight_color"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='layer',
-            name='main_field',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='is_main_of', to='django_geosource.Field'),
+            model_name="layer",
+            name="main_field",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="is_main_of",
+                to="django_geosource.Field",
+            ),
         ),
-        migrations.RunPython(migrate_main_field)
+        migrations.RunPython(migrate_main_field),
     ]

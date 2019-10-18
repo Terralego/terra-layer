@@ -7,19 +7,22 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0028_layergroup_exclusive'),
-    ]
+    dependencies = [("terra_layer", "0028_layergroup_exclusive")]
 
     operations = [
         migrations.AddField(
-            model_name='layergroup',
-            name='selectors',
+            model_name="layergroup",
+            name="selectors",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=list),
         ),
         migrations.AlterField(
-            model_name='layer',
-            name='group',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='layers', to='terra_layer.LayerGroup'),
+            model_name="layer",
+            name="group",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="layers",
+                to="terra_layer.LayerGroup",
+            ),
         ),
     ]

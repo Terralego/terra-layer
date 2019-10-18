@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0037_auto_20190808_1814'),
-    ]
+    dependencies = [("terra_layer", "0037_auto_20190808_1814")]
 
     operations = [
         migrations.AddField(
-            model_name='layer',
-            name='highlight_color',
+            model_name="layer",
+            name="highlight_color",
             field=models.CharField(blank=True, max_length=255),
-        ),
+        )
     ]

@@ -1,4 +1,8 @@
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, ValidationError
+from rest_framework.serializers import (
+    ModelSerializer,
+    PrimaryKeyRelatedField,
+    ValidationError,
+)
 
 from django.db import transaction
 
@@ -6,18 +10,17 @@ from .models import Layer, LayerGroup, FilterField, CustomStyle
 
 
 class FilterFieldSerializer(ModelSerializer):
-    id = PrimaryKeyRelatedField(source='field', read_only=True)
+    id = PrimaryKeyRelatedField(source="field", read_only=True)
 
     class Meta:
         model = FilterField
-        exclude = ('layer', )
+        exclude = ("layer",)
 
 
 class CustomStyleSerializer(ModelSerializer):
-
     class Meta:
         model = CustomStyle
-        exclude = ('layer', )
+        exclude = ("layer",)
 
 
 class LayerSerializer(ModelSerializer):
@@ -29,32 +32,32 @@ class LayerSerializer(ModelSerializer):
         instance = super().create(validated_data)
 
         # Update m2m through field
-        self._update_nested(instance, 'custom_styles', CustomStyleSerializer)
-        self._update_m2m_through(instance, 'fields', FilterFieldSerializer)
+        self._update_nested(instance, "custom_styles", CustomStyleSerializer)
+        self._update_m2m_through(instance, "fields", FilterFieldSerializer)
 
         return instance
 
     def to_internal_value(self, data):
-        data['group'], data['name'] = self._get_layer_group(data)
+        data["group"], data["name"] = self._get_layer_group(data)
         return super().to_internal_value(data)
 
     def to_representation(self, obj):
         return {
             **super().to_representation(obj),
-            'name': self._get_name_path(obj),
-            'view': obj.group.view,
+            "name": self._get_name_path(obj),
+            "view": obj.group.view,
         }
 
     def _get_layer_group(self, data):
-        view = data['view']
+        view = data["view"]
 
         try:
-            group_path, layer_name = data['name'].rsplit('/', 1)
+            group_path, layer_name = data["name"].rsplit("/", 1)
         except ValueError:
-            group_path, layer_name = 'Unknown', data['name']
+            group_path, layer_name = "Unknown", data["name"]
 
         group = None
-        for group_name in group_path.split('/'):
+        for group_name in group_path.split("/"):
             if group:
                 group, _ = group.children.get_or_create(label=group_name)
             else:
@@ -66,11 +69,11 @@ class LayerSerializer(ModelSerializer):
         def get_group_path(group):
             name = group.label
             if group.parent:
-                name = get_group_path(group.parent) + f'/{name}'
+                name = get_group_path(group.parent) + f"/{name}"
             return name
 
         group_path = get_group_path(obj.group)
-        return f'{group_path}/{obj.name}'
+        return f"{group_path}/{obj.name}"
 
     @transaction.atomic
     def update(self, instance, validated_data):
@@ -78,8 +81,8 @@ class LayerSerializer(ModelSerializer):
         instance = super().update(instance, validated_data)
 
         # Update m2m through field
-        self._update_m2m_through(instance, 'fields', FilterFieldSerializer)
-        self._update_nested(instance, 'custom_styles', CustomStyleSerializer)
+        self._update_m2m_through(instance, "fields", FilterFieldSerializer)
+        self._update_nested(instance, "custom_styles", CustomStyleSerializer)
 
         return instance
 
@@ -96,7 +99,7 @@ class LayerSerializer(ModelSerializer):
 
         for value in self.initial_data.get(field, []):
             try:
-                value['field'] = value['id']
+                value["field"] = value["id"]
             except KeyError:
                 raise ValidationError("Fields must contain Source's field id")
 
@@ -106,4 +109,4 @@ class LayerSerializer(ModelSerializer):
 
     class Meta:
         model = Layer
-        fields = '__all__'
+        fields = "__all__"

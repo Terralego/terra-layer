@@ -5,13 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0014_filterfield_label'),
-    ]
+    dependencies = [("terra_layer", "0014_filterfield_label")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='filterfield',
-            name='filter_type',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="filterfield", name="filter_type")]

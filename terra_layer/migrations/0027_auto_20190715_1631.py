@@ -6,18 +6,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0026_layer_group'),
-    ]
+    dependencies = [("terra_layer", "0026_layer_group")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='layer',
-            name='view',
-        ),
+        migrations.RemoveField(model_name="layer", name="view"),
         migrations.AlterField(
-            model_name='layer',
-            name='group',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='terra_layer.LayerGroup'),
+            model_name="layer",
+            name="group",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="terra_layer.LayerGroup",
+            ),
         ),
     ]

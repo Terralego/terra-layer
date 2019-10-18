@@ -6,18 +6,24 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0035_auto_20190723_1418'),
-    ]
+    dependencies = [("terra_layer", "0035_auto_20190723_1418")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='layer',
-            options={'ordering': ('order',), 'permissions': (('can_manage_layers', 'Can manage layers'),)},
+            name="layer",
+            options={
+                "ordering": ("order",),
+                "permissions": (("can_manage_layers", "Can manage layers"),),
+            },
         ),
         migrations.AlterField(
-            model_name='layergroup',
-            name='parent',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='terra_layer.LayerGroup'),
+            model_name="layergroup",
+            name="parent",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="children",
+                to="terra_layer.LayerGroup",
+            ),
         ),
     ]

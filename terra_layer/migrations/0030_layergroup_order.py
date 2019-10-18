@@ -5,14 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0029_auto_20190716_1643'),
-    ]
+    dependencies = [("terra_layer", "0029_auto_20190716_1643")]
 
     operations = [
         migrations.AddField(
-            model_name='layergroup',
-            name='order',
-            field=models.IntegerField(default=0),
-        ),
+            model_name="layergroup", name="order", field=models.IntegerField(default=0)
+        )
     ]

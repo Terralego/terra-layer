@@ -5,18 +5,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0012_auto_20190618_1500'),
-    ]
+    dependencies = [("terra_layer", "0012_auto_20190618_1500")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='layer',
-            name='filter_enable',
-        ),
+        migrations.RemoveField(model_name="layer", name="filter_enable"),
         migrations.AddField(
-            model_name='filterfield',
-            name='filter_enable',
+            model_name="filterfield",
+            name="filter_enable",
             field=models.BooleanField(default=False),
         ),
     ]

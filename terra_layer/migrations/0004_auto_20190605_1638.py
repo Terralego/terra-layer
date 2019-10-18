@@ -5,42 +5,32 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0003_auto_20190528_1629'),
-    ]
+    dependencies = [("terra_layer", "0003_auto_20190528_1629")]
 
     operations = [
         migrations.RenameField(
-            model_name='layer',
-            old_name='filter_fields',
-            new_name='fields',
+            model_name="layer", old_name="filter_fields", new_name="fields"
         ),
-        migrations.RemoveField(
-            model_name='layer',
-            name='table_export_fields',
-        ),
-        migrations.RemoveField(
-            model_name='layer',
-            name='table_fields',
-        ),
+        migrations.RemoveField(model_name="layer", name="table_export_fields"),
+        migrations.RemoveField(model_name="layer", name="table_fields"),
         migrations.AddField(
-            model_name='filterfield',
-            name='exportable',
+            model_name="filterfield",
+            name="exportable",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='filterfield',
-            name='shown',
+            model_name="filterfield",
+            name="shown",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='layer',
-            name='popup_maxzoom',
+            model_name="layer",
+            name="popup_maxzoom",
             field=models.FloatField(default=10),
         ),
         migrations.AddField(
-            model_name='layer',
-            name='popup_minzoom',
+            model_name="layer",
+            name="popup_minzoom",
             field=models.FloatField(default=10),
         ),
     ]

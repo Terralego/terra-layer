@@ -6,18 +6,17 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0030_layergroup_order'),
-    ]
+    dependencies = [("terra_layer", "0030_layergroup_order")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='layergroup',
-            options={'ordering': ['order']},
+            name="layergroup", options={"ordering": ["order"]}
         ),
         migrations.AlterField(
-            model_name='layergroup',
-            name='selectors',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=None, null=True),
+            model_name="layergroup",
+            name="selectors",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                default=None, null=True
+            ),
         ),
     ]

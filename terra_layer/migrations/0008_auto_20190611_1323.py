@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0007_auto_20190611_1110'),
-    ]
+    dependencies = [("terra_layer", "0007_auto_20190611_1110")]
 
     operations = [
         migrations.AlterField(
-            model_name='filterfield',
-            name='filter_type',
+            model_name="filterfield",
+            name="filter_type",
             field=models.CharField(max_length=255),
-        ),
+        )
     ]

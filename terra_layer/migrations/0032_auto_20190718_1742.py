@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0031_auto_20190718_1601'),
-    ]
+    dependencies = [("terra_layer", "0031_auto_20190718_1601")]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='layergroup',
-            unique_together={('view', 'label', 'parent')},
-        ),
+            name="layergroup", unique_together={("view", "label", "parent")}
+        )
     ]

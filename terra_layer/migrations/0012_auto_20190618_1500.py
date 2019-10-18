@@ -6,14 +6,16 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0011_auto_20190612_1721'),
-    ]
+    dependencies = [("terra_layer", "0011_auto_20190612_1721")]
 
     operations = [
         migrations.AlterField(
-            model_name='layer',
-            name='source',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='layers', to='django_geosource.Source'),
-        ),
+            model_name="layer",
+            name="source",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="layers",
+                to="django_geosource.Source",
+            ),
+        )
     ]

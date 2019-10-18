@@ -5,13 +5,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0016_auto_20190625_1436'),
-    ]
+    dependencies = [("terra_layer", "0016_auto_20190625_1436")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='layer',
-            name='legend_enable',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="layer", name="legend_enable")]

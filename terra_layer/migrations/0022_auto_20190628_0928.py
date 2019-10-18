@@ -5,14 +5,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0021_auto_20190627_1513'),
-    ]
+    dependencies = [("terra_layer", "0021_auto_20190627_1513")]
 
     operations = [
         migrations.AlterField(
-            model_name='layer',
-            name='view',
-            field=models.IntegerField(),
-        ),
+            model_name="layer", name="view", field=models.IntegerField()
+        )
     ]

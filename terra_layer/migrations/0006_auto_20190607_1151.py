@@ -6,18 +6,16 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0005_auto_20190606_1635'),
-    ]
+    dependencies = [("terra_layer", "0005_auto_20190606_1635")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='layer',
-            options={'permissions': (('can_manage_layers', 'Can manage layers'),)},
+            name="layer",
+            options={"permissions": (("can_manage_layers", "Can manage layers"),)},
         ),
         migrations.AlterField(
-            model_name='layer',
-            name='layer_style',
+            model_name="layer",
+            name="layer_style",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
         ),
     ]

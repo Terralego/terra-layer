@@ -10,27 +10,33 @@ from django_geosource.models import Source, Field
 
 from .utils import get_layer_group_cache_key
 
-VIEW_CHOICES = [(view['pk'], view['name']) for slug, view in settings.TERRA_LAYER_VIEWS.items()]
+VIEW_CHOICES = [
+    (view["pk"], view["name"]) for slug, view in settings.TERRA_LAYER_VIEWS.items()
+]
 
 
 class LayerGroup(models.Model):
     view = models.IntegerField()
     label = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='children')
+    parent = models.ForeignKey(
+        "self", null=True, on_delete=models.CASCADE, related_name="children"
+    )
     order = models.IntegerField(default=0)
     exclusive = models.BooleanField(default=False)
     selectors = JSONField(null=True, default=None)
     settings = JSONField(default=dict)
 
     class Meta:
-        unique_together = ['view', 'label', 'parent']
-        ordering = ['order']
+        unique_together = ["view", "label", "parent"]
+        ordering = ["order"]
 
 
 class Layer(models.Model):
-    source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='layers')
+    source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name="layers")
 
-    group = models.ForeignKey(LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers")
+    group = models.ForeignKey(
+        LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers"
+    )
     name = models.CharField(max_length=255, blank=False)
     in_tree = models.BooleanField(default=True)
 
@@ -55,7 +61,9 @@ class Layer(models.Model):
     minisheet_template = models.TextField(blank=True)
 
     highlight_color = models.CharField(max_length=255, blank=True)
-    main_field = models.ForeignKey(Field, null=True, on_delete=models.CASCADE, related_name="is_main_of")
+    main_field = models.ForeignKey(
+        Field, null=True, on_delete=models.CASCADE, related_name="is_main_of"
+    )
 
     interactions = JSONField(default=list)
 
@@ -67,13 +75,11 @@ class Layer(models.Model):
 
     @cached_property
     def layer_identifier(self):
-        return md5(f"{self.source.slug}-{self.pk}".encode('utf-8')).hexdigest()
+        return md5(f"{self.source.slug}-{self.pk}".encode("utf-8")).hexdigest()
 
     class Meta:
-        ordering = ('order', )
-        permissions = (
-            ('can_manage_layers', 'Can manage layers'),
-        )
+        ordering = ("order",)
+        permissions = (("can_manage_layers", "Can manage layers"),)
 
     def save(self, **kwargs):
         super().save(**kwargs)
@@ -84,19 +90,27 @@ class Layer(models.Model):
 
 
 class CustomStyle(models.Model):
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name='custom_styles')
-    source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name='sublayers')
+    layer = models.ForeignKey(
+        Layer, on_delete=models.CASCADE, related_name="custom_styles"
+    )
+    source = models.ForeignKey(
+        Source, on_delete=models.CASCADE, related_name="sublayers"
+    )
     style = JSONField(default=dict)
     interactions = JSONField(default=list)
 
     @property
     def layer_identifier(self):
-        return md5(f"{self.source.slug}-{self.source.pk}-{self.pk}".encode('utf-8')).hexdigest()
+        return md5(
+            f"{self.source.slug}-{self.source.pk}-{self.pk}".encode("utf-8")
+        ).hexdigest()
 
 
 class FilterField(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE)
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE, related_name="fields_filters")
+    layer = models.ForeignKey(
+        Layer, on_delete=models.CASCADE, related_name="fields_filters"
+    )
     label = models.CharField(max_length=255, blank=True)
 
     order = models.IntegerField(default=0)
@@ -109,4 +123,4 @@ class FilterField(models.Model):
     shown = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ('order', )
+        ordering = ("order",)

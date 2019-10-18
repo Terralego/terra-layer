@@ -5,18 +5,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0036_auto_20190731_1848'),
-    ]
+    dependencies = [("terra_layer", "0036_auto_20190731_1848")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='filterfield',
-            options={'ordering': ('order',)},
+            name="filterfield", options={"ordering": ("order",)}
         ),
         migrations.AddField(
-            model_name='filterfield',
-            name='order',
-            field=models.IntegerField(default=0),
+            model_name="filterfield", name="order", field=models.IntegerField(default=0)
         ),
     ]

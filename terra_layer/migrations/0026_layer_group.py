@@ -8,24 +8,23 @@ def forwards_func(apps, schema_editor):
     LayerGroup = apps.get_model("terra_layer", "LayerGroup")
     Layer = apps.get_model("terra_layer", "Layer")
 
-
     def get_or_create_group(view, groups):
         try:
-            group_list, group_name = groups.rsplit('/', 1)
+            group_list, group_name = groups.rsplit("/", 1)
             parent = get_or_create_group(view, group_list)
         except ValueError:
             group_name = groups
             parent = None
 
         group, _ = LayerGroup.objects.get_or_create(
-            view=view, label=group_name,
-            defaults={'parent': parent})
+            view=view, label=group_name, defaults={"parent": parent}
+        )
         return group
 
     for layer in Layer.objects.all():
 
         try:
-            groups, name = layer.name.rsplit('/', 1)
+            groups, name = layer.name.rsplit("/", 1)
             group = get_or_create_group(layer.view, groups)
         except ValueError:
             name = layer.name
@@ -38,21 +37,27 @@ def forwards_func(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0025_auto_20190715_1425'),
-    ]
+    dependencies = [("terra_layer", "0025_auto_20190715_1425")]
 
     operations = [
         migrations.AddField(
-            model_name='layer',
-            name='group',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='terra_layer.LayerGroup'),
+            model_name="layer",
+            name="group",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="terra_layer.LayerGroup",
+            ),
         ),
         migrations.RunPython(forwards_func),
         migrations.AlterField(
-            model_name='layer',
-            name='group',
-            field=models.ForeignKey(null=False, on_delete=django.db.models.deletion.CASCADE, to='terra_layer.LayerGroup'),
+            model_name="layer",
+            name="group",
+            field=models.ForeignKey(
+                null=False,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="terra_layer.LayerGroup",
+            ),
             preserve_default=True,
         ),
     ]

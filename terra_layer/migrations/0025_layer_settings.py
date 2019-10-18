@@ -6,14 +6,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0024_customstyle_interactions'),
-    ]
+    dependencies = [("terra_layer", "0024_customstyle_interactions")]
 
     operations = [
         migrations.AddField(
-            model_name='layer',
-            name='settings',
+            model_name="layer",
+            name="settings",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
-        ),
+        )
     ]

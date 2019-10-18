@@ -8,18 +8,40 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('django_geosource', '0009_source_slug'),
-        ('terra_layer', '0018_auto_20190626_0956'),
+        ("django_geosource", "0009_source_slug"),
+        ("terra_layer", "0018_auto_20190626_0956"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SubLayer',
+            name="SubLayer",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('style', django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
-                ('layer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sublayers', to='terra_layer.Layer')),
-                ('source', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sublayers', to='django_geosource.Source')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("style", django.contrib.postgres.fields.jsonb.JSONField(default=dict)),
+                (
+                    "layer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sublayers",
+                        to="terra_layer.Layer",
+                    ),
+                ),
+                (
+                    "source",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sublayers",
+                        to="django_geosource.Source",
+                    ),
+                ),
             ],
-        ),
+        )
     ]

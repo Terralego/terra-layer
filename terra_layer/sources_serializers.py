@@ -5,7 +5,7 @@ from django.utils.functional import cached_property
 from django_geosource.models import Source, WMTSSource
 from rest_framework import serializers
 
-DEFAULT_SOURCE_NAME = 'terra'
+DEFAULT_SOURCE_NAME = "terra"
 
 
 class SourceSerializer(serializers.BaseSerializer):
@@ -16,9 +16,11 @@ class SourceSerializer(serializers.BaseSerializer):
         clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
 
         for _, serializer in clsmembers:
-            if (serializer.__module__ == __name__
-                and serializer.Meta.model is source.__class__):
-                    return serializer(obj)
+            if (
+                serializer.__module__ == __name__
+                and serializer.Meta.model is source.__class__
+            ):
+                return serializer(obj)
 
         return cls(obj)
 
@@ -29,9 +31,9 @@ class SourceSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         return {
             **obj.style,
-            'id': obj.layer_identifier,
-            'source': DEFAULT_SOURCE_NAME,
-            'source-layer': self.source_object.slug,
+            "id": obj.layer_identifier,
+            "source": DEFAULT_SOURCE_NAME,
+            "source-layer": self.source_object.slug,
         }
 
     class Meta:
@@ -42,16 +44,14 @@ class WMTSSourceSerializer(SourceSerializer):
     def to_representation(self, obj):
         return {
             **obj.style,
-            'id': obj.layer_identifier,
-            'type': 'raster',
-            'minzoom': self.source_object.minzoom or 0,
-            'maxzoom': self.source_object.maxzoom or 24,
-            'source': {
-                'type': 'raster',
-                'tileSize': self.source_object.tile_size,
-                'tiles': [
-                    self.source_object.url,
-                ],
+            "id": obj.layer_identifier,
+            "type": "raster",
+            "minzoom": self.source_object.minzoom or 0,
+            "maxzoom": self.source_object.maxzoom or 24,
+            "source": {
+                "type": "raster",
+                "tileSize": self.source_object.tile_size,
+                "tiles": [self.source_object.url],
             },
         }
 
