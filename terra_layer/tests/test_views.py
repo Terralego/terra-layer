@@ -4,8 +4,8 @@ from django.urls import reverse
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.test import APIClient
 
-from django_geosource.models import PostGISSource
-from terra_layer.models import Layer, FilterField
+from django_geosource.models import PostGISSource, FieldTypes
+from terra_layer.models import Layer, LayerGroup, FilterField
 
 UserModel = get_user_model()
 
@@ -13,7 +13,7 @@ UserModel = get_user_model()
 class ModelSourceViewsetTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.default_user = UserModel.objects.get_or_create(**{UserModel.USERNAME_FIELD:'testuser'})[0]
+        self.default_user = UserModel.objects.get_or_create(is_superuser=True, **{UserModel.USERNAME_FIELD:'testuser'})[0]
         self.client.force_authenticate(self.default_user)
 
         self.source = PostGISSource.objects.create(name="test_view",
@@ -26,8 +26,10 @@ class ModelSourceViewsetTestCase(TestCase):
 
     def test_list_view(self):
         # Create many sources and list them
+        group = LayerGroup.objects.create(view=0, label="Test Group")
+
         [
-            Layer.objects.create(view=0, source=self.source)
+            Layer.objects.create(group=group, source=self.source)
             for x in range(5)
         ]
 
@@ -35,67 +37,47 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(response.status_code, HTTP_200_OK)
         self.assertEqual(
             Layer.objects.count(),
-            len(response.json()['results'])
+            len(response.json())
         )
 
     def test_create_layer(self):
-        field = self.source.fields.create(name="test_field", label="test_label", data_type="string")
-        field2 = self.source.fields.create(name="test_field2", label="test_label", data_type="integer")
-
-        filter_field = {
-            'field': field.pk,
-            'filter_type': 42,
-            'filter_settings': {
-                'filter_test': 'filter_setting_value',
-            }
-        }
-
         query = {
             "source": self.source.pk,
             "view": 0,
             "name": "test layer",
 
-            "table_fields": [field.pk, field2.pk],
-            "table_export_fields": [field.pk, ],
+            "table_export_enable": True,
 
-            "filter_enable": True,
-            "filter_fields": [filter_field, ]
+            "filter_enable": False,
         }
 
         response = self.client.post(reverse('terralayer:layer-list'), query)
         self.assertEqual(HTTP_201_CREATED, response.status_code)
 
         response = response.json()
-        self.assertEqual(2, len(response.get('table_fields')))
-        self.assertEqual(1, len(response.get('table_export_fields')))
 
-        self.assertEqual(1, len(response.get('filter_fields')))
-        self.assertDictContainsSubset(filter_field, response.get('filter_fields')[0])
+        self.assertTrue(response.get('table_export_enable'))
+        self.assertFalse(response.get('filter_enable'))
 
     def test_update_layer(self):
-        field = self.source.fields.create(name="test_field", label="test_label", data_type="string")
-        layer = Layer.objects.create(view=0, source=self.source)
-        layer.table_fields.add(field)
-        FilterField.objects.create(layer=layer, field=field, filter_settings={}, filter_type=33)
+        group = LayerGroup.objects.create(view=0, label="Test Group")
 
-        filter_field = {
-            'field': field.pk,
-            'filter_type': 42,
-            'filter_settings': {
-                'filter_test': 'filter_setting_value',
-            }
-        }
+        field = self.source.fields.create(name="test_field", label="test_label", data_type=FieldTypes.String.value)
+        layer = Layer.objects.create(group=group, source=self.source, minisheet_enable=False)
+        FilterField.objects.create(
+            label="test layer fields",
+            layer=layer,
+            field=field,
+            filter_settings={},
+            filter_enable=True)
+
 
         query = {
             "source": self.source.pk,
             "view": 10,
             "name": "test layer",
-
-            "table_fields": [field.pk, ],
-            "table_export_fields": [field.pk, ],
-
+            "minisheet_enable":True,
             "filter_enable": True,
-            "filter_fields": [filter_field, ]
         }
 
         response = self.client.patch(reverse('terralayer:layer-detail', args=[layer.pk, ]), query)
@@ -103,5 +85,4 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(response.status_code, HTTP_200_OK)
 
         response = response.json()
-        self.assertEqual(1, len(response.get('filter_fields')))
-        self.assertDictContainsSubset(filter_field, response.get('filter_fields')[0])
+        self.assertTrue(response.get('minisheet_enable'))

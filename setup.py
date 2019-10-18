@@ -1,35 +1,48 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
-from setuptools import find_packages, setup
+import os
+from setuptools import setup, find_packages
 
+HERE = os.path.abspath(os.path.dirname(__file__))
 
-def read(fname):
-    return open(fname).read()
+README = open(os.path.join(HERE, 'README.md')).read()
+CHANGES = open(os.path.join(HERE, 'CHANGES.md')).read()
 
+test_require = [
+    'factory-boy',
+    'flake8',
+    'coverage',
+]
 
 setup(
-    name="terra_layer",
-    version="0.1",
+    name='terra-layer',
+    version=open(os.path.join(HERE, 'terra_layer', 'VERSION.md')).read().strip(),
+    include_package_data=True,
     author="Makina Corpus",
     author_email="terralego-pypi@makina-corpus.com",
-    description="Terra Layer",
-    url="https://github.com/Terralego/terra-layer",
-    packages=find_packages(
-        exclude=["*.tests", ]
-    ),
-    include_package_data=True,
-    long_description=read("README.md"),
+    description='Geographic data visualizer backend for terra-visu',
+    long_description=README + '\n\n' + CHANGES,
+    description_content_type="text/markdown",
     long_description_content_type="text/markdown",
+    packages=find_packages(),
+    url='https://github.com/Terralego/terra-layer.git',
     classifiers=[
-        "Programming Language :: Python",
-        "Topic :: Software Development",
-        "OSI Approved :: MIT License",
+        'Environment :: Web Environment',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     install_requires=[
         "Django==2.2.5",
         "djangorestframework>=3.8,<3.9",
-        "django_geosource",
+        "django_geosource>=0.3",
         "terra-common>=0.3"
     ],
 )
