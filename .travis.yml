@@ -45,9 +45,9 @@ jobs:
   include:
   - stage: lint
     install:
-    - pip install flake8
+    - pip install black
     script:
-    - flake8 terra_layer
+    - black --check terra_layer
   - stage: deploy
     install: skip
     before_script: skip
