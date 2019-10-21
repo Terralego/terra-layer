@@ -12,16 +12,12 @@ from django_geosource.models import Source, Field
 
 from .utils import get_layer_group_cache_key
 
-VIEW_CHOICES = [
-    (view["pk"], view["name"]) for slug, view in settings.TERRA_LAYER_VIEWS.items()
-]
-
 
 class Scene(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
     category = models.CharField(max_length=255, default="map")
-    custom_icon = models.ImageField(max_length=255, upload_to='icons', null=True, default=None)
+    custom_icon = models.ImageField(max_length=255, upload_to='scene-icons', null=True, default=None)
 
     class Meta:
         permissions = (

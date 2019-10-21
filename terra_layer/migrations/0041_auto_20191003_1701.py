@@ -7,11 +7,15 @@ import django.db.models.deletion
 
 def forward(apps, schema_editor):
     Scene = apps.get_model('terra_layer', 'Scene')
-    for slug, data in settings.TERRA_LAYER_VIEWS.items():
-        Scene.objects.create(
-            slug=slug,
-            name=data['name'],
-        )
+
+    try:
+        for slug, data in settings.TERRA_LAYER_VIEWS.items():
+            Scene.objects.create(
+                slug=slug,
+                name=data['name'],
+            )
+    except AttributeError:
+        print("No default layers' views was found. Don't forget to add some.")
 
 
 class Migration(migrations.Migration):
@@ -28,7 +32,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=255, unique=True)),
                 ('slug', models.SlugField(max_length=255, unique=True)),
                 ('category', models.CharField(default='map', max_length=255)),
-                ('custom_icon', models.ImageField(default=None, max_length=255, null=True, upload_to='icons')),
+                ('custom_icon', models.ImageField(default=None, max_length=255, null=True, upload_to='scene-icons')),
             ],
             options={
                 'permissions': (('can_manage_layers', 'Can manage layers'),),

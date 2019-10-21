@@ -91,7 +91,7 @@ class LayerView(APIView):
             self.request.user, self.layergroup
         )
 
-        cache_key = get_layer_group_cache_key(self.scene['pk'], self.user_groups.values_list('name', flat=True))
+        cache_key = get_layer_group_cache_key(self.scene, self.user_groups.values_list('name', flat=True))
 
         response = cache.get_or_set(cache_key, self.get_response_with_sources)
         return Response(response)
