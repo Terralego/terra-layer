@@ -21,7 +21,6 @@ class Scene(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
     category = models.CharField(max_length=255, default="map")
-    # icon_path allow to handle hack with pre-generated icon whereas custom_icon allow to import custom icon
     custom_icon = models.ImageField(max_length=255, upload_to='icons', null=True, default=None)
 
     class Meta:
