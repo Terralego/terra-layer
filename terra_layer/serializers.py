@@ -18,14 +18,13 @@ class SceneListSerializer(ModelSerializer):
 
     class Meta:
         model = Scene
-        fields = ('id', 'name', 'slug', 'category', 'custom_icon', 'url')
+        fields = ("id", "name", "slug", "category", "custom_icon", "url")
 
 
 class SceneDetailSerializer(ModelSerializer):
-
     class Meta:
         model = Scene
-        fields = '__all__'
+        fields = "__all__"
 
 
 class FilterFieldSerializer(ModelSerializer):
@@ -63,8 +62,8 @@ class LayerSerializer(ModelSerializer):
     def to_representation(self, obj):
         return {
             **super().to_representation(obj),
-            'name': self._get_name_path(obj),
-            'view': SceneDetailSerializer(obj.group.view).data,
+            "name": self._get_name_path(obj),
+            "view": SceneDetailSerializer(obj.group.view).data,
         }
 
     def _get_layer_group(self, data):
@@ -128,4 +127,4 @@ class LayerSerializer(ModelSerializer):
 
     class Meta:
         model = Layer
-        fields = '__all__'
+        fields = "__all__"

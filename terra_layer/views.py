@@ -23,10 +23,10 @@ from .utils import dict_merge, get_layer_group_cache_key
 class SceneViewset(ModelViewSet):
     model = Scene
     queryset = Scene.objects.all()
-    permission_classes = (ScenePermission, )
+    permission_classes = (ScenePermission,)
 
-    def get_serializer_class(self, ):
-        if self.action == 'retrieve':
+    def get_serializer_class(self,):
+        if self.action == "retrieve":
             return SceneDetailSerializer
         return SceneListSerializer
 
@@ -91,7 +91,9 @@ class LayerView(APIView):
             self.request.user, self.layergroup
         )
 
-        cache_key = get_layer_group_cache_key(self.scene, self.user_groups.values_list('name', flat=True))
+        cache_key = get_layer_group_cache_key(
+            self.scene, self.user_groups.values_list("name", flat=True)
+        )
 
         response = cache.get_or_set(cache_key, self.get_response_with_sources)
         return Response(response)
@@ -124,11 +126,11 @@ class LayerView(APIView):
 
     def get_layer_structure(self):
         return {
-            'title': self.scene.name,
-            'type': self.scene.category,
-            'layersTree': self.get_layers_tree(self.scene),
-            'interactions': self.get_interactions(self.layers),
-            'map': {
+            "title": self.scene.name,
+            "type": self.scene.category,
+            "layersTree": self.get_layers_tree(self.scene),
+            "interactions": self.get_interactions(self.layers),
+            "map": {
                 **settings.TERRA_DEFAULT_MAP_SETTINGS,
                 "customStyle": {"sources": [], "layers": self.get_map_layers()},
             },
@@ -220,9 +222,9 @@ class LayerView(APIView):
 
     def get_layers_tree(self, scene):
         layer_tree = []
-        for group in LayerGroup.objects.filter(view=scene, parent=None).prefetch_related(
-                self.prefetch_layers
-        ):
+        for group in LayerGroup.objects.filter(
+            view=scene, parent=None
+        ).prefetch_related(self.prefetch_layers):
             layer_tree.append(self.get_tree_group(group))
         return layer_tree
 

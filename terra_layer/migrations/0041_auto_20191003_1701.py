@@ -7,42 +7,52 @@ import logging
 
 
 def forward(apps, schema_editor):
-    Scene = apps.get_model('terra_layer', 'Scene')
+    Scene = apps.get_model("terra_layer", "Scene")
 
     try:
         for slug, data in settings.TERRA_LAYER_VIEWS.items():
-            Scene.objects.create(
-                slug=slug,
-                name=data['name'],
-            )
+            Scene.objects.create(slug=slug, name=data["name"])
     except AttributeError:
         logging.info("No default layers' views was found. Don't forget to add some.")
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('terra_layer', '0040_filterfield_format_type'),
-    ]
+    dependencies = [("terra_layer", "0040_filterfield_format_type")]
 
     operations = [
         migrations.CreateModel(
-            name='Scene',
+            name="Scene",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, unique=True)),
-                ('slug', models.SlugField(max_length=255, unique=True)),
-                ('category', models.CharField(default='map', max_length=255)),
-                ('custom_icon', models.ImageField(default=None, max_length=255, null=True, upload_to='scene-icons')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255, unique=True)),
+                ("slug", models.SlugField(max_length=255, unique=True)),
+                ("category", models.CharField(default="map", max_length=255)),
+                (
+                    "custom_icon",
+                    models.ImageField(
+                        default=None, max_length=255, null=True, upload_to="scene-icons"
+                    ),
+                ),
             ],
-            options={
-                'permissions': (('can_manage_layers', 'Can manage layers'),),
-            },
+            options={"permissions": (("can_manage_layers", "Can manage layers"),)},
         ),
         migrations.RunPython(forward, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
-            model_name='layergroup',
-            name='view',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='layer_groups', to='terra_layer.Scene'),
+            model_name="layergroup",
+            name="view",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="layer_groups",
+                to="terra_layer.Scene",
+            ),
         ),
     ]

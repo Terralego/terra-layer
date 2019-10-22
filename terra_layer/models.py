@@ -17,20 +17,21 @@ class Scene(models.Model):
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
     category = models.CharField(max_length=255, default="map")
-    custom_icon = models.ImageField(max_length=255, upload_to='scene-icons', null=True, default=None)
+    custom_icon = models.ImageField(
+        max_length=255, upload_to="scene-icons", null=True, default=None
+    )
 
     class Meta:
-        permissions = (
-            ('can_manage_layers', 'Can manage layers'),
-        )
+        permissions = (("can_manage_layers", "Can manage layers"),)
 
     def get_absolute_url(self):
-        return reverse('terralayer:scene-detail', args=[self.slug])
-
+        return reverse("terralayer:scene-detail", args=[self.slug])
 
 
 class LayerGroup(models.Model):
-    view = models.ForeignKey(Scene, on_delete=models.CASCADE, related_name="layer_groups")
+    view = models.ForeignKey(
+        Scene, on_delete=models.CASCADE, related_name="layer_groups"
+    )
     label = models.CharField(max_length=255)
     parent = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="children"
