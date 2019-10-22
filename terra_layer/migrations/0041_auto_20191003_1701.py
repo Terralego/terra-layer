@@ -3,6 +3,7 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
+import logging
 
 
 def forward(apps, schema_editor):
@@ -15,7 +16,7 @@ def forward(apps, schema_editor):
                 name=data['name'],
             )
     except AttributeError:
-        print("No default layers' views was found. Don't forget to add some.")
+        logging.info("No default layers' views was found. Don't forget to add some.")
 
 
 class Migration(migrations.Migration):

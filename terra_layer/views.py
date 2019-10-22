@@ -344,7 +344,7 @@ class LayerView(APIView):
     @cached_property
     def layers(self):
         layers = (
-            self.model.objects.filter(group__view=self.view["pk"])
+            self.model.objects.filter(group__view=self.scene.pk)
             .order_by("order")
             .select_related("source")
             .prefetch_related("custom_styles__source")
