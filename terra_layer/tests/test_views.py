@@ -1,11 +1,17 @@
+from io import BytesIO
+
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from django.test import TestCase
 from django.urls import reverse
+from django_geosource.models import PostGISSource, FieldTypes
+from PIL import Image
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.test import APIClient
 
-from django_geosource.models import PostGISSource, FieldTypes
 from terra_layer.models import Layer, LayerGroup, FilterField, Scene
+
+from .factories import SceneFactory
 
 UserModel = get_user_model()
 
@@ -19,7 +25,7 @@ class ModelSourceViewsetTestCase(TestCase):
         )[0]
         self.client.force_authenticate(self.default_user)
 
-        self.scene = Scene.objects.create(name="test_scene")
+        self.scene = SceneFactory(name="test_scene")
         self.source = PostGISSource.objects.create(
             name="test_view",
             db_name="test",

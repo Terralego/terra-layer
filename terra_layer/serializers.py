@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework.serializers import (
     ModelSerializer,
     PrimaryKeyRelatedField,
@@ -6,9 +7,7 @@ from rest_framework.serializers import (
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
 from rest_framework import serializers
-
-
-from django.db import transaction
+from terra_utils.helpers.responses import get_media_response
 
 from .models import CustomStyle, FilterField, Layer, LayerGroup, Scene
 
@@ -22,6 +21,11 @@ class SceneListSerializer(ModelSerializer):
 
 
 class SceneDetailSerializer(ModelSerializer):
+    icon = serializers.SerializerMethodField()
+
+    def get_icon(self, obj):
+        return obj.custom_icon.url
+
     class Meta:
         model = Scene
         fields = "__all__"
