@@ -5,10 +5,9 @@ from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
-from rest_framework.reverse import reverse
-
-
+from django.utils.text import slugify
 from django_geosource.models import Source, Field
+from rest_framework.reverse import reverse
 
 from .utils import get_layer_group_cache_key
 
@@ -26,6 +25,10 @@ class Scene(models.Model):
 
     def get_absolute_url(self):
         return reverse("terralayer:scene-detail", args=[self.slug])
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class LayerGroup(models.Model):
