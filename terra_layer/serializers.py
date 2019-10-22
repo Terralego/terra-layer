@@ -67,7 +67,10 @@ class LayerSerializer(ModelSerializer):
         }
 
     def _get_layer_group(self, data):
-        view = data["view"]
+        try:
+            view = Scene.objects.get(pk=data["view"])
+        except Scene.DoesNotExist:
+            raise ValidationError("Scene does not exist")
 
         try:
             group_path, layer_name = data["name"].rsplit("/", 1)
