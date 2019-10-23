@@ -24,7 +24,6 @@ class SceneViewset(ModelViewSet):
     model = Scene
     queryset = Scene.objects.all()
     permission_classes = (ScenePermission,)
-    lookup_field = "slug"
 
     def get_serializer_class(self,):
         if self.action == "retrieve":

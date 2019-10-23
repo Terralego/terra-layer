@@ -24,7 +24,7 @@ class Scene(models.Model):
         permissions = (("can_manage_layers", "Can manage layers"),)
 
     def get_absolute_url(self):
-        return reverse("terralayer:scene-detail", args=[self.slug])
+        return reverse("terralayer:scene-detail", args=[self.pk])
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
