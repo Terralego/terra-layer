@@ -79,12 +79,12 @@ class LayerSerializer(ModelSerializer):
         return {
             **super().to_representation(obj),
             "name": self._get_name_path(obj),
-            "view": SceneDetailSerializer(obj.group.view).data,
+            "view": obj.group.view.pk,
         }
 
     def _get_layer_group(self, data):
         try:
-            view = Scene.objects.get(pk=data["view"]["id"])
+            view = Scene.objects.get(pk=data["view"])
         except (Scene.DoesNotExist, KeyError):
             raise ValidationError("Scene does not exist")
 

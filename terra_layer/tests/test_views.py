@@ -61,7 +61,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
         self.assertTrue(response.get("table_export_enable"))
         self.assertFalse(response.get("filter_enable"))
-        self.assertEqual(response["view"]["id"], self.scene.id)
+        self.assertEqual(response["view"], self.scene.id)
 
     def test_update_layer(self):
         group = LayerGroup.objects.create(view=self.scene, label="Test Group")
@@ -96,4 +96,4 @@ class ModelSourceViewsetTestCase(TestCase):
 
         response = response.json()
         self.assertTrue(response.get("minisheet_enable"))
-        self.assertEqual(response["view"]["id"], self.scene.id)
+        self.assertEqual(response["view"], self.scene.id)
