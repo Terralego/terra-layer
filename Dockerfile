@@ -13,4 +13,4 @@ RUN python3.7 -m venv /code/venv
 RUN  /code/venv/bin/pip install --no-cache-dir pip setuptools wheel -U
 
 # Install dev requirements
-RUN /code/venv/bin/pip3 install --no-cache-dir -e . -U
+RUN /code/venv/bin/pip3 install --no-cache-dir -e .[dev] -U

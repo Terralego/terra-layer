@@ -8,7 +8,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(HERE, 'README.md')).read()
 CHANGES = open(os.path.join(HERE, 'CHANGES.md')).read()
 
-test_require = [
+tests_require = [
     'factory-boy',
     'flake8',
     'coverage',
@@ -45,4 +45,7 @@ setup(
         "django_geosource>=0.3",
         "terra-common>=0.3"
     ],
+    extras_require={
+        'dev': tests_require,
+    }
 )
