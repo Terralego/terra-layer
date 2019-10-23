@@ -24,7 +24,8 @@ class SceneDetailSerializer(ModelSerializer):
     icon = serializers.SerializerMethodField()
 
     def get_icon(self, obj):
-        return obj.custom_icon.url
+        if obj.custom_icon:
+            return obj.custom_icon.url
 
     class Meta:
         model = Scene
