@@ -7,17 +7,20 @@ from rest_framework.serializers import (
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
 from rest_framework import serializers
-from terra_utils.helpers.responses import get_media_response
 
 from .models import CustomStyle, FilterField, Layer, LayerGroup, Scene
 
 
 class SceneListSerializer(ModelSerializer):
     url = serializers.CharField(source="get_absolute_url", read_only=True)
+    layers_tree_url = SerializerMethodField()
+
+    def get_layers_tree_url(self, obj):
+        return reverse("terralayer:layerview", args=[obj.slug])
 
     class Meta:
         model = Scene
-        fields = ("id", "name", "slug", "category", "custom_icon", "url")
+        fields = ("id", "name", "slug", "category", "custom_icon", "url", 'layers_tree_url')
 
 
 class SceneDetailSerializer(ModelSerializer):
