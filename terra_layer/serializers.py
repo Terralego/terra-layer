@@ -84,8 +84,8 @@ class LayerSerializer(ModelSerializer):
 
     def _get_layer_group(self, data):
         try:
-            view = Scene.objects.get(pk=data["view"])
-        except Scene.DoesNotExist:
+            view = Scene.objects.get(pk=data["view"]["id"])
+        except (Scene.DoesNotExist, KeyError):
             raise ValidationError("Scene does not exist")
 
         try:
