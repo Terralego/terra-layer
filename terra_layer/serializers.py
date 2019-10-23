@@ -20,7 +20,15 @@ class SceneListSerializer(ModelSerializer):
 
     class Meta:
         model = Scene
-        fields = ("id", "name", "slug", "category", "custom_icon", "url", 'layers_tree_url')
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "category",
+            "custom_icon",
+            "url",
+            "layers_tree_url",
+        )
 
 
 class SceneDetailSerializer(ModelSerializer):
