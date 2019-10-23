@@ -1,11 +1,17 @@
+from io import BytesIO
+
 from django.contrib.auth import get_user_model
+from django.core.files import File
 from django.test import TestCase
 from django.urls import reverse
+from django_geosource.models import PostGISSource, FieldTypes
+from PIL import Image
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.test import APIClient
 
-from django_geosource.models import PostGISSource, FieldTypes
-from terra_layer.models import Layer, LayerGroup, FilterField
+from terra_layer.models import Layer, LayerGroup, FilterField, Scene
+
+from .factories import SceneFactory
 
 UserModel = get_user_model()
 
@@ -13,11 +19,13 @@ UserModel = get_user_model()
 class ModelSourceViewsetTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
+
         self.default_user = UserModel.objects.get_or_create(
             is_superuser=True, **{UserModel.USERNAME_FIELD: "testuser"}
         )[0]
         self.client.force_authenticate(self.default_user)
 
+        self.scene = SceneFactory(name="test_scene")
         self.source = PostGISSource.objects.create(
             name="test_view",
             db_name="test",
@@ -29,7 +37,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
     def test_list_view(self):
         # Create many sources and list them
-        group = LayerGroup.objects.create(view=0, label="Test Group")
+        group = LayerGroup.objects.create(view=self.scene, label="Test Group")
 
         [Layer.objects.create(group=group, source=self.source) for x in range(5)]
 
@@ -40,7 +48,7 @@ class ModelSourceViewsetTestCase(TestCase):
     def test_create_layer(self):
         query = {
             "source": self.source.pk,
-            "view": 0,
+            "view": self.scene.pk,
             "name": "test layer",
             "table_export_enable": True,
             "filter_enable": False,
@@ -53,9 +61,10 @@ class ModelSourceViewsetTestCase(TestCase):
 
         self.assertTrue(response.get("table_export_enable"))
         self.assertFalse(response.get("filter_enable"))
+        self.assertEqual(response["view"], self.scene.id)
 
     def test_update_layer(self):
-        group = LayerGroup.objects.create(view=0, label="Test Group")
+        group = LayerGroup.objects.create(view=self.scene, label="Test Group")
 
         field = self.source.fields.create(
             name="test_field", label="test_label", data_type=FieldTypes.String.value
@@ -73,7 +82,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
         query = {
             "source": self.source.pk,
-            "view": 10,
+            "view": self.scene.pk,
             "name": "test layer",
             "minisheet_enable": True,
             "filter_enable": True,
@@ -87,3 +96,4 @@ class ModelSourceViewsetTestCase(TestCase):
 
         response = response.json()
         self.assertTrue(response.get("minisheet_enable"))
+        self.assertEqual(response["view"], self.scene.id)

@@ -1,12 +1,46 @@
+from django.db import transaction
 from rest_framework.serializers import (
     ModelSerializer,
     PrimaryKeyRelatedField,
     ValidationError,
 )
+from rest_framework.fields import SerializerMethodField
+from rest_framework.reverse import reverse
+from rest_framework import serializers
 
-from django.db import transaction
+from .models import CustomStyle, FilterField, Layer, LayerGroup, Scene
 
-from .models import Layer, LayerGroup, FilterField, CustomStyle
+
+class SceneListSerializer(ModelSerializer):
+    url = serializers.CharField(source="get_absolute_url", read_only=True)
+    layers_tree_url = SerializerMethodField()
+
+    def get_layers_tree_url(self, obj):
+        return reverse("terralayer:layerview", args=[obj.slug])
+
+    class Meta:
+        model = Scene
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "category",
+            "custom_icon",
+            "url",
+            "layers_tree_url",
+        )
+
+
+class SceneDetailSerializer(ModelSerializer):
+    icon = serializers.SerializerMethodField()
+
+    def get_icon(self, obj):
+        if obj.custom_icon:
+            return obj.custom_icon.url
+
+    class Meta:
+        model = Scene
+        fields = "__all__"
 
 
 class FilterFieldSerializer(ModelSerializer):
@@ -45,11 +79,14 @@ class LayerSerializer(ModelSerializer):
         return {
             **super().to_representation(obj),
             "name": self._get_name_path(obj),
-            "view": obj.group.view,
+            "view": obj.group.view.pk,
         }
 
     def _get_layer_group(self, data):
-        view = data["view"]
+        try:
+            view = Scene.objects.get(pk=data["view"])
+        except (Scene.DoesNotExist, KeyError):
+            raise ValidationError("Scene does not exist")
 
         try:
             group_path, layer_name = data["name"].rsplit("/", 1)

@@ -19,12 +19,11 @@ def dict_merge(dct, merge_dct, add_keys=True):
     return dct
 
 
-def get_layer_group_cache_key(pk, extras=[]):
+def get_layer_group_cache_key(scene, extras=[]):
     """
-    :param pk: The pk of the layer group to be cached
-    :type pk: int
+    :param scene: The scene to be cached
     :return: The cache key
     :rtype: string
     """
     extras_joined = "-".join(extras)
-    return f"terra-layer-{pk}-{extras_joined}"
+    return f"terra-layer-{scene.pk}-{extras_joined}"

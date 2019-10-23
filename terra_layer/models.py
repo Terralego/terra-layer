@@ -5,18 +5,36 @@ from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
-
+from django.utils.text import slugify
 from django_geosource.models import Source, Field
+from rest_framework.reverse import reverse
 
 from .utils import get_layer_group_cache_key
 
-VIEW_CHOICES = [
-    (view["pk"], view["name"]) for slug, view in settings.TERRA_LAYER_VIEWS.items()
-]
+
+class Scene(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField(max_length=255, unique=True)
+    category = models.CharField(max_length=255, default="map")
+    custom_icon = models.ImageField(
+        max_length=255, upload_to="scene-icons", null=True, default=None
+    )
+
+    class Meta:
+        permissions = (("can_manage_layers", "Can manage layers"),)
+
+    def get_absolute_url(self):
+        return reverse("terralayer:scene-detail", args=[self.pk])
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class LayerGroup(models.Model):
-    view = models.IntegerField()
+    view = models.ForeignKey(
+        Scene, on_delete=models.CASCADE, related_name="layer_groups"
+    )
     label = models.CharField(max_length=255)
     parent = models.ForeignKey(
         "self", null=True, on_delete=models.CASCADE, related_name="children"
