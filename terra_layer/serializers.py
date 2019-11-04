@@ -16,7 +16,7 @@ class SceneListSerializer(ModelSerializer):
     layers_tree_url = SerializerMethodField()
 
     def get_layers_tree_url(self, obj):
-        return reverse("terralayer:layerview", args=[obj.slug])
+        return reverse("layerview", args=[obj.slug])
 
     class Meta:
         model = Scene

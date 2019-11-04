@@ -13,11 +13,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 
-from .models import Layer, LayerGroup, FilterField, Scene
-from .permissions import LayerPermission, ScenePermission
-from .serializers import LayerSerializer, SceneListSerializer, SceneDetailSerializer
-from .sources_serializers import SourceSerializer
-from .utils import dict_merge, get_layer_group_cache_key
+from ..models import Layer, LayerGroup, FilterField, Scene
+from ..permissions import LayerPermission, ScenePermission
+from ..serializers import LayerSerializer, SceneListSerializer, SceneDetailSerializer
+from ..sources_serializers import SourceSerializer
+from ..utils import dict_merge, get_layer_group_cache_key
 
 
 class SceneViewset(ModelViewSet):

@@ -40,10 +40,12 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     install_requires=[
-        "Django==2.2.5",
+        "Django>=2.2.7",
         "djangorestframework>=3.8,<3.9",
-        "django_geosource>=0.3",
-        "terra-common>=0.3"
+        "django-geosource>=0.3",
+        "django-geostore>=0.3.11",
+        "django-terra-accounts>=0.3.6",
+        "terra-common>=0.3",
     ],
     extras_require={
         'dev': tests_require,

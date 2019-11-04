@@ -39,10 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'django.contrib.staticfiles',
     'rest_framework',
+    'terra_accounts',
     'geostore',
     'django_geosource',
     'terra_layer',
 ]
+
+AUTH_USER_MODEL = 'terra_accounts.TerraUser'
 
 INTERNAL_GEOMETRY_SRID = 4326
 
