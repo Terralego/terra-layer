@@ -20,11 +20,8 @@ class Scene(models.Model):
         max_length=255, upload_to="scene-icons", null=True, default=None
     )
 
-    class Meta:
-        permissions = (("can_manage_layers", "Can manage layers"),)
-
     def get_absolute_url(self):
-        return reverse("terralayer:scene-detail", args=[self.pk])
+        return reverse("scene-detail", args=[self.pk])
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -97,7 +94,6 @@ class Layer(models.Model):
 
     class Meta:
         ordering = ("order",)
-        permissions = (("can_manage_layers", "Can manage layers"),)
 
     def save(self, **kwargs):
         super().save(**kwargs)

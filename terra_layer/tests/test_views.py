@@ -41,7 +41,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
         [Layer.objects.create(group=group, source=self.source) for x in range(5)]
 
-        response = self.client.get(reverse("terralayer:layer-list"))
+        response = self.client.get(reverse("layer-list"))
         self.assertEqual(response.status_code, HTTP_200_OK)
         self.assertEqual(Layer.objects.count(), len(response.json()))
 
@@ -54,7 +54,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "filter_enable": False,
         }
 
-        response = self.client.post(reverse("terralayer:layer-list"), query)
+        response = self.client.post(reverse("layer-list"), query)
         self.assertEqual(HTTP_201_CREATED, response.status_code)
 
         response = response.json()
@@ -88,9 +88,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "filter_enable": True,
         }
 
-        response = self.client.patch(
-            reverse("terralayer:layer-detail", args=[layer.pk]), query
-        )
+        response = self.client.patch(reverse("layer-detail", args=[layer.pk]), query)
 
         self.assertEqual(response.status_code, HTTP_200_OK)
 
