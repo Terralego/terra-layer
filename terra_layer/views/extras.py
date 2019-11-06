@@ -1,18 +1,20 @@
 from django_geosource.views import SourceModelViewset
 from geostore.views import FeatureViewSet, LayerViewSet, LayerGroupViewsSet
 
+from ..permissions import ReadOnly, SourcePermission
+
 
 class GeoSourceModelViewset(SourceModelViewset):
-    pass
+    permission_classes = (SourcePermission,)
 
 
 class GeostoreLayerViewSet(LayerViewSet):
-    pass
+    permission_classes = (ReadOnly,)
 
 
 class GeostoreFeatureViewSet(FeatureViewSet):
-    pass
+    permission_classes = (ReadOnly,)
 
 
 class GeostoreLayerGroupViewsSet(LayerGroupViewsSet):
-    pass
+    permission_classes = (ReadOnly,)

@@ -16,3 +16,15 @@ class ScenePermission(permissions.BasePermission):
         return not request.user.is_anonymous and request.user.has_terra_perm(
             "can_manage_layers"
         )
+
+
+class SourcePermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return not request.user.is_anonymous and request.user.has_terra_perm(
+            "can_manage_sources"
+        )
+
+
+class ReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.method in permissions.SAFE_METHODS
