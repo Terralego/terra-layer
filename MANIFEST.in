@@ -1,0 +1,7 @@
+include *.md
+recursive-include terra_layer *.md
+recursive-include terra_layer *.py
+recursive-exclude test_terralayer *
+recursive-exclude terra_layer/tests/ *
+include terra_layer/tests/factories.py
+include terra_layer/tests/__init__.py
