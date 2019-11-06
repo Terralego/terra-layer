@@ -1,3 +1,10 @@
+0.3.4      (2019-11-06)
+-----------------------
+
+### Fixes
+
+* Fix geostore namespace that is not necessary anymore
+
 0.3.3      (2019-11-06)
 -----------------------
 

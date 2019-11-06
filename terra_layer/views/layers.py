@@ -101,7 +101,7 @@ class LayerView(APIView):
     def get_response_with_sources(self):
         layer_structure = self.get_layer_structure()
 
-        tilejson_url = reverse("geostore:group-tilejson", args=(self.layergroup.slug,))
+        tilejson_url = reverse("group-tilejson", args=(self.layergroup.slug,))
         querystring = QueryDict(mutable=True)
         if not self.request.user.is_anonymous:
             querystring.update(
@@ -163,7 +163,7 @@ class LayerView(APIView):
                 "fetchProperties": {
                     "url": urlunquote(
                         reverse(
-                            "geostore:feature-detail",
+                            "feature-detail",
                             args=(layer.source.get_layer().pk, "{{id}}"),
                         )
                     ),
@@ -200,7 +200,7 @@ class LayerView(APIView):
                 "fetchProperties": {
                     "url": urlunquote(
                         reverse(
-                            "geostore:feature-detail",
+                            "feature-detail",
                             args=(layer.source.get_layer().pk, "{{id}}"),
                         )
                     ),
