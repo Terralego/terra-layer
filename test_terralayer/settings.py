@@ -137,13 +137,17 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
-TERRA_LAYER_VIEWS = {
-    'first': {
-        'name': 'First',
-        'pk': 1,
-    },
-    'second': {
-        'name': 'Second',
-        'pk': 2,
+TERRA_DEFAULT_MAP_SETTINGS = {
+    "accessToken": "<your mapbox access token>",
+    "backgroundStyle": "<background style file>",
+    'center': [-0.655, 43.141], # Default view center
+    'zoom': 7.7, # Default zoom
+    'maxZoom': 19.9,
+    'minZoom': 5,
+    'fitBounds': { # Default bounding box
+        'coordinates': [
+            [-4.850, 46.776],
+            [-0.551, 48.886]
+        ],
     },
 }
