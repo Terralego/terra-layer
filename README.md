@@ -3,17 +3,62 @@
 This django applications aims to provide an API to connect django_geosource to django_geodata.
 It serve an API that provides informations wanted by a frontend to configure data rendering.
 
+## Pre-requisite
+
+You need the last version of docker and docker-compose to execute a dev instance.
+
 ## Set configuration
 
 In Django settings, you must set the different views provided to fronted, like this:
 
-```
-TERRA_LAYER_VIEWS = {
-    'slug-name': {
-        'name': 'Human Name',
-        'pk': 1,
+```python
+TERRA_DEFAULT_MAP_SETTINGS = {
+    "accessToken": "<your mapbox access token>",
+    "backgroundStyle": "<background style file>",
+    'center': [-0.655, 43.141], # Default view center
+    'zoom': 7.7, # Default zoom
+    'maxZoom': 19.9,
+    'minZoom': 5,
+    'fitBounds': { # Default bounding box
+        'coordinates': [
+            [-4.850, 46.776],
+            [-0.551, 48.886]
+        ],
     },
 }
 ```
 
-The dict key is the stored value in view field of layers.
+## To start a dev instance
+
+Define settings you wants in `test_terralayer` django project.
+
+```sh
+docker-compose up
+```
+
+First start should failed as the database need to be initialized. Just launch
+the same command twice.
+
+Then initialize the database:
+
+```sh
+docker-compose run web /code/venv/bin/python3 /code/src/manage.py migrate
+```
+
+You can now edit your code. A django runserver is launched internally so the 
+this is an autoreload server.
+
+You can access to the api on http://localhost:8000/api/
+
+## Test
+
+To test the application, just launch:
+
+```sh
+docker-compose run web /code/venv/bin/python3 /code/src/manage.py test
+```
+
+## Contributing
+
+You must use factoryboy factories to develop your tests. The factories are available 
+at `terra_layer/tests/factories`
