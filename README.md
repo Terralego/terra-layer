@@ -52,7 +52,7 @@ You can access to the api on http://localhost:8000/api/
 
 ## Test
 
-To test the application, just launch:
+To run test suite, just launch:
 
 ```sh
 docker-compose run web /code/venv/bin/python3 /code/src/manage.py test
