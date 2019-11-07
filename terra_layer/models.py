@@ -24,7 +24,8 @@ class Scene(models.Model):
         return reverse("scene-detail", args=[self.pk])
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
+        if not self.slug:
+            self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
 
 

@@ -32,6 +32,7 @@ class SceneListSerializer(ModelSerializer):
 
 
 class SceneDetailSerializer(ModelSerializer):
+    slug = serializers.SlugField(required=False)
     icon = serializers.SerializerMethodField()
 
     def get_icon(self, obj):

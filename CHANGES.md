@@ -1,3 +1,10 @@
+0.3.7      (xxxx-xx-xx)
+-----------------------
+
+### Fix
+
+* slug can now be modified and is optionnal
+
 0.3.6      (2019-11-07)
 -----------------------
 
