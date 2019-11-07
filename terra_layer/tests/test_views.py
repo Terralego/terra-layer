@@ -95,3 +95,30 @@ class ModelSourceViewsetTestCase(TestCase):
         response = response.json()
         self.assertTrue(response.get("minisheet_enable"))
         self.assertEqual(response["view"], self.scene.id)
+
+    def test_create_scene(self):
+        query = {
+            "name": "SceneName",
+            "slug": "myslug",
+            "category": "map",
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        response = response.json()
+
+        self.assertEqual(response.get("name"), "SceneName")
+        self.assertEqual(response.get("slug"), "myslug")
+
+    def test_update_scene(self):
+        query = {"slug": "my-newslug"}
+
+        response = self.client.patch(
+            reverse("scene-detail", args=[self.scene.pk]), query
+        )
+        self.assertEqual(response.status_code, HTTP_200_OK)
+
+        response = response.json()
+
+        self.assertEqual(response.get("slug"), "my-newslug")
