@@ -1,9 +1,13 @@
-0.3.7      (xxxx-xx-xx)
+0.3.7      (2019-11-12)
 -----------------------
 
 ### Fix
 
 * slug can now be modified and is optionnal
+
+### Improves
+
+* Add default layer activation support
 
 0.3.6      (2019-11-07)
 -----------------------

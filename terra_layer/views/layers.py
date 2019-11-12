@@ -254,7 +254,9 @@ class LayerView(APIView):
                 # Exclude layers with non-authorized sources
                 continue
 
-            default_values = {"initialState": {"active": False, "opacity": 1}}
+            default_values = {
+                "initialState": {"active": layer.active_by_default, "opacity": 1}
+            }
 
             main_field = getattr(layer.main_field, "name", None)
 

@@ -62,6 +62,7 @@ class Layer(models.Model):
 
     layer_style = JSONField(default=dict)
     settings = JSONField(default=dict)
+    active_by_default = models.BooleanField(default=False)
 
     legends = JSONField(default=list)
 
