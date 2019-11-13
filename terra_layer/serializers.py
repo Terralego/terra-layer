@@ -97,7 +97,7 @@ class LayerSerializer(ModelSerializer):
         group = None
         for group_name in group_path.split("/"):
             if group:
-                group, _ = group.children.get_or_create(label=group_name)
+                group, _ = group.children.get_or_create(view=view, label=group_name)
             else:
                 group, _ = LayerGroup.objects.get_or_create(view=view, label=group_name)
 
