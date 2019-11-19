@@ -2,7 +2,6 @@ from hashlib import md5
 
 from django.core.cache import cache
 from django.db import models
-from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -19,6 +18,7 @@ class Scene(models.Model):
     custom_icon = models.ImageField(
         max_length=255, upload_to="scene-icons", null=True, default=None
     )
+    order = models.IntegerField(default=0, db_index=True)
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])
@@ -27,6 +27,9 @@ class Scene(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         return super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["order"]
 
 
 class LayerGroup(models.Model):
