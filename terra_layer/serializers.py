@@ -28,6 +28,7 @@ class SceneListSerializer(ModelSerializer):
             "custom_icon",
             "url",
             "layers_tree_url",
+            "order",
         )
 
 

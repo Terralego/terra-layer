@@ -42,6 +42,7 @@ class LayerViewset(ModelViewSet):
         "table_enable",
         "popup_enable",
         "minisheet_enable",
+        "group__view",
     )
     permission_classes = (LayerPermission,)
 
