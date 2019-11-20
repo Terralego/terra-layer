@@ -1,9 +1,17 @@
+0.3.10      (2019-11-20)
+-----------------------
+
+### Improves
+
+* Add layer_dump and layer_load_dump management command to save and restore layers
+
 0.3.9      (2019-11-19)
 -----------------------
 
 ### Improves
 
 * Add default layer activation support
+* Add layer_dump and layer_load_dump management command to save and restore layers
 
 0.3.8      (2019-11-13)
 -----------------------
