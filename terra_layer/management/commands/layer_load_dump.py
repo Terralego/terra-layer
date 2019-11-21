@@ -26,14 +26,20 @@ class Command(BaseCommand):
         fk_fields = (
             (Scene, "view", "slug"),
             (Source, "source", "slug"),
-            (Field, "main_field", "name"),
         )
 
         for klass, field, sfield in fk_fields:
-            data[field] = klass.objects.get(**{sfield: data[field]}).pk
+            if data.get(field):
+                data[field] = klass.objects.get(**{sfield: data[field]}).pk
+
+        if data.get("main_field"):
+            data["main_field"] = source.fields.get(name=data["main_field"]).pk
 
         for field in data["fields"]:
-            field["id"] = source.fields.get(name=field.pop("field")).pk
+            try:
+                field["id"] = source.fields.get(name=field["field"]).pk
+            except Field.DoesNotExist:
+                raise
 
         # Try to find already existing layer
         try:

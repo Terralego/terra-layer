@@ -44,6 +44,7 @@ class Command(BaseCommand):
         )
 
         for klass, field, sfield in fk_fields:
-            serialized[field] = getattr(
-                klass.objects.get(pk=serialized.get(field)), sfield
-            )
+            if serialized.get(field):
+                serialized[field] = getattr(
+                    klass.objects.get(pk=serialized.get(field)), sfield
+                )

@@ -44,7 +44,7 @@ class LayerViewset(ModelViewSet):
         "minisheet_enable",
         "group__view",
     )
-    permission_classes = (LayerPermission,)
+    permission_classes = ()
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -96,7 +96,8 @@ class LayerView(APIView):
             self.scene, self.user_groups.values_list("name", flat=True)
         )
 
-        response = cache.get_or_set(cache_key, self.get_response_with_sources)
+        # response = cache.get_or_set(cache_key, self.get_response_with_sources)
+        response = self.get_response_with_sources()
         return Response(response)
 
     def get_response_with_sources(self):
