@@ -1,3 +1,10 @@
+0.3.12      (2019-11-25)
+-----------------------
+
+### Fixes
+
+* Custom styles must be anonymized on exports to be importables
+
 0.3.11      (2019-11-21)
 -----------------------
 
