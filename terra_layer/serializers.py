@@ -85,6 +85,10 @@ class LayerSerializer(ModelSerializer):
         }
 
     def _get_layer_group(self, data):
+        """ This return the group object from a slashed group path.
+        It's used for retrocompatibility with fronted, but need to be deleted when
+        tree management is implemented.
+        """
         try:
             view = Scene.objects.get(pk=data["view"])
         except (Scene.DoesNotExist, KeyError):
@@ -105,6 +109,8 @@ class LayerSerializer(ModelSerializer):
         return group.pk, layer_name
 
     def _get_name_path(self, obj):
+        """ Return the slashed path of a layer from its group object
+        """
         def get_group_path(group):
             name = group.label
             if group.parent:

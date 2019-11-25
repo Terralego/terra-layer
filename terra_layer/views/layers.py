@@ -51,6 +51,10 @@ class LayerViewset(ModelViewSet):
 
 
 class LayerView(APIView):
+    """ This view generates the LayersTree used to construct the frontend
+    """
+
+
     permission_classes = ()
     model = Layer
     EXTERNAL_SOURCES_CLASSES = [WMTSSource]
@@ -96,15 +100,22 @@ class LayerView(APIView):
             self.scene, self.user_groups.values_list("name", flat=True)
         )
 
-        # response = cache.get_or_set(cache_key, self.get_response_with_sources)
-        response = self.get_response_with_sources()
+        response = cache.get_or_set(cache_key, self.get_response_with_sources)
+
         return Response(response)
 
     def get_response_with_sources(self):
+        """ Return a response object containing the full layersTree with updated
+        user authentication
+        """
+
         layer_structure = self.get_layer_structure()
 
         tilejson_url = reverse("group-tilejson", args=(self.layergroup.slug,))
         querystring = QueryDict(mutable=True)
+
+        # When the user is not anonymous, we provide tokens in the URL to authenticated
+        # it in the MVT endpoint
         if not self.request.user.is_anonymous:
             querystring.update(
                 {
@@ -127,6 +138,8 @@ class LayerView(APIView):
         return layer_structure
 
     def get_layer_structure(self):
+        """ Return the structured layerTree
+        """
         return {
             "title": self.scene.name,
             "type": self.scene.category,
@@ -139,6 +152,8 @@ class LayerView(APIView):
         }
 
     def get_map_layers(self):
+        """ Return sources ifnormations using serializer from sources_serializers module
+        """
         map_layers = []
         for layer in self.layers.filter(source__slug__in=self.authorized_sources):
             map_layers += [
@@ -153,12 +168,17 @@ class LayerView(APIView):
         return map_layers
 
     def get_interactions(self, layers):
+        """ Return interactions for all layers in the scene
+        """
         interactions = []
         for layer in layers:
             interactions += self.get_interactions_for_layer(layer)
         return interactions
 
     def get_formatted_interactions(self, layer):
+        """ Return all interactions of a layer after beeing formatted correctly
+        for the frontend
+        """
         return [
             {
                 "id": layer.layer_identifier,
@@ -177,6 +197,10 @@ class LayerView(APIView):
         ]
 
     def get_interactions_for_layer(self, layer):
+        """ Return formatted interaction of a layer
+
+        It contains, popup, minisheet and custom styles
+        """
         interactions = self.get_formatted_interactions(layer)
         for cs in layer.custom_styles.all():
             interactions += self.get_formatted_interactions(cs)
@@ -217,12 +241,16 @@ class LayerView(APIView):
         return interactions
 
     def get_layers_list_for_layer(self, layer):
+        """ Return list of sublayers of a layer
+        """
         return [
             layer.layer_identifier,
             *[s.layer_identifier for s in layer.custom_styles.all()],
         ]
 
     def get_layers_tree(self, scene):
+        """ Return the full layer tree of a scene object
+        """
         layer_tree = []
         for group in LayerGroup.objects.filter(
             view=scene, parent=None
@@ -231,6 +259,11 @@ class LayerView(APIView):
         return layer_tree
 
     def get_tree_group(self, group):
+        """ Recursive method that return the tree from a LayerGroup element.
+
+        `group.settings` is injected in the group dictionnary, so any setting can be overrided.
+
+        """
         group_content = {
             "group": group.label,
             "exclusive": group.exclusive,
@@ -262,6 +295,7 @@ class LayerView(APIView):
 
             main_field = getattr(layer.main_field, "name", None)
 
+            # Construct the layer object
             layer_object = {
                 **dict_merge(default_values, layer.settings),
                 "label": layer.name,
@@ -277,6 +311,7 @@ class LayerView(APIView):
                 },
             }
 
+            # Set the exportable status of the layer if any filter fields is exportable
             layer_object["filters"]["exportable"] = any(
                 [f["exportable"] for f in layer_object["filters"]["fields"] or []]
             )
@@ -286,7 +321,8 @@ class LayerView(APIView):
         return group_content
 
     def insert_layer_in_path(self, layer_tree, path, layer):
-
+        """ Used to insert a layer in the tree depending of its slashed path
+        """
         try:
             current_path, sub_path = path.split("/", 1)
         except ValueError:
@@ -314,6 +350,8 @@ class LayerView(APIView):
         return layer_tree
 
     def get_filter_fields_for_layer(self, layer):
+        """ Return the filter fields of the layer if table is enabled
+        """
         if layer.table_enable:
             return [
                 {
@@ -326,6 +364,8 @@ class LayerView(APIView):
             ]
 
     def get_filter_forms_for_layer(self, layer):
+        """ Return forms of a layer if filters are enabled
+        """
         if layer.filters_enabled:
             return [
                 {
@@ -338,6 +378,8 @@ class LayerView(APIView):
 
     @cached_property
     def authorized_sources(self):
+        """ Cached property of authorized sources from the authenticated user's groups
+        """
         groups = self.user_groups
         sources_slug = list(
             self.layergroup.layers.filter(
@@ -349,6 +391,8 @@ class LayerView(APIView):
 
     @cached_property
     def layers(self):
+        """ List of layers of the selected scene
+        """
         layers = (
             self.model.objects.filter(group__view=self.scene.pk)
             .order_by("order")
