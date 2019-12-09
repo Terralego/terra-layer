@@ -6,15 +6,15 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.http import urlunquote
 from django_geosource.models import WMTSSource
-from geostore.models import Layer as GeostoreLayer
 from geostore.tokens import tiles_token_generator
+from rest_framework import filters
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 
 from ..models import Layer, LayerGroup, FilterField, Scene
-from ..permissions import LayerPermission, ScenePermission
+from ..permissions import ScenePermission
 from ..serializers import LayerSerializer, SceneListSerializer, SceneDetailSerializer
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
@@ -45,6 +45,8 @@ class LayerViewset(ModelViewSet):
         "group__view",
     )
     permission_classes = ()
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["name", "settings"]
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -53,7 +55,6 @@ class LayerViewset(ModelViewSet):
 class LayerView(APIView):
     """ This view generates the LayersTree used to construct the frontend
     """
-
 
     permission_classes = ()
     model = Layer

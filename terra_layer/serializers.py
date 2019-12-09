@@ -1,12 +1,12 @@
 from django.db import transaction
+from rest_framework import serializers
+from rest_framework.fields import SerializerMethodField
+from rest_framework.reverse import reverse
 from rest_framework.serializers import (
     ModelSerializer,
     PrimaryKeyRelatedField,
     ValidationError,
 )
-from rest_framework.fields import SerializerMethodField
-from rest_framework.reverse import reverse
-from rest_framework import serializers
 
 from .models import CustomStyle, FilterField, Layer, LayerGroup, Scene
 
@@ -111,6 +111,7 @@ class LayerSerializer(ModelSerializer):
     def _get_name_path(self, obj):
         """ Return the slashed path of a layer from its group object
         """
+
         def get_group_path(group):
             name = group.label
             if group.parent:
