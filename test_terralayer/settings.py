@@ -144,3 +144,6 @@ TERRA_DEFAULT_MAP_SETTINGS = {
         "coordinates": [[-4.850, 46.776], [-0.551, 48.886]],
     },
 }
+
+GEOSOURCE_LAYER_CALLBACK = "test_terralayer.callbacks.layer_callback"
+
