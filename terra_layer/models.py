@@ -12,6 +12,10 @@ from .utils import get_layer_group_cache_key
 
 
 class Scene(models.Model):
+    """ A scene is a group of data visualisation in terra-visu.
+    It's also a main menu entry.
+    """
+
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
     category = models.CharField(max_length=255, default="map")
@@ -19,6 +23,7 @@ class Scene(models.Model):
         max_length=255, upload_to="scene-icons", null=True, default=None
     )
     order = models.IntegerField(default=0, db_index=True)
+    tree = JSONField(default=list)
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])
@@ -47,14 +52,14 @@ class LayerGroup(models.Model):
 
     class Meta:
         unique_together = ["view", "label", "parent"]
-        ordering = ["order"]
+        ordering = ["order", "label"]
 
 
 class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name="layers")
 
     group = models.ForeignKey(
-        LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers"
+        LayerGroup, on_delete=models.SET_NULL, null=True, related_name="layers"
     )
     name = models.CharField(max_length=255, blank=False)
     in_tree = models.BooleanField(default=True)
@@ -98,7 +103,7 @@ class Layer(models.Model):
         return md5(f"{self.source.slug}-{self.pk}".encode("utf-8")).hexdigest()
 
     class Meta:
-        ordering = ("order",)
+        ordering = ("order", "name")
 
     def save(self, **kwargs):
         super().save(**kwargs)
@@ -106,6 +111,9 @@ class Layer(models.Model):
         # Invalidate cache for layer group
         if self.group:
             cache.delete(get_layer_group_cache_key(self.group.view))
+
+    def __str__(self):
+        return f"Layer({self.id}) - {self.name}"
 
 
 class CustomStyle(models.Model):

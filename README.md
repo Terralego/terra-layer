@@ -66,3 +66,5 @@ docker-compose run web /code/venv/bin/python3 /code/src/manage.py test
 
 You must use factoryboy factories to develop your tests. The factories are available 
 at `terra_layer/tests/factories`
+
+You must update the CHANGES.md file on each MR and increment version if needed.
