@@ -13,4 +13,3 @@ class SceneFactory(factory.django.DjangoModelFactory):
 class LayerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Layer
-

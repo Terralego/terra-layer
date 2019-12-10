@@ -91,13 +91,13 @@ class LayerView(APIView):
     scene = None
 
     def get(self, request, slug=None, format=None):
-        # Get all scene by default
+        # Get all scene if slug is None
         if slug is None:
             return Response(SceneListSerializer(Scene.objects.all(), many=True).data)
 
         self.scene = get_object_or_404(Scene, slug=slug)
-
         self.layergroup = self.layers.first().source.get_layer().layer_groups.first()
+
         self.user_groups = tiles_token_generator.get_groups_intersect(
             self.request.user, self.layergroup
         )
@@ -112,7 +112,7 @@ class LayerView(APIView):
 
     def get_response_with_sources(self):
         """ Return a response object containing the full layersTree with updated
-        user authentication
+        user authentication.
         """
 
         layer_structure = self.get_layer_structure()
@@ -158,7 +158,7 @@ class LayerView(APIView):
         }
 
     def get_map_layers(self):
-        """ Return sources ifnormations using serializer from sources_serializers module
+        """ Return sources informations using serializer from sources_serializers module
         """
         map_layers = []
         for layer in self.layers.filter(source__slug__in=self.authorized_sources):
@@ -257,23 +257,23 @@ class LayerView(APIView):
     def get_layers_tree(self, scene):
         """ Return the full layer tree of a scene object
         """
-        layer_tree = []
-        for group in LayerGroup.objects.filter(
+        root_group = LayerGroup.objects.prefetch_related(self.prefetch_layers).get(
             view=scene, parent=None
-        ).prefetch_related(self.prefetch_layers):
-            layer_tree.append(self.get_tree_group(group))
-        return layer_tree
+        )
+
+        return self.get_tree_group(root_group)["layers"]
 
     def get_tree_group(self, group):
         """ Recursive method that return the tree from a LayerGroup element.
 
-        `group.settings` is injected in the group dictionnary, so any setting can be overrided.
+        `group.settings` is injected in the group dictionnary, so any setting can be overridden.
 
         """
         group_content = {
             "group": group.label,
             "exclusive": group.exclusive,
             "selectors": group.selectors,
+            "order": group.order,
             "layers": [],
             **group.settings,
         }
@@ -286,74 +286,54 @@ class LayerView(APIView):
 
         # Add layers of group
         for layer in group.layers.filter(in_tree=True):
-            if (
-                layer.source.slug not in self.authorized_sources
-                or layer.custom_styles.exclude(
-                    source__slug__in=self.authorized_sources
-                ).exists()
-            ):
-                # Exclude layers with non-authorized sources
-                continue
+            layer_dict = self.get_layer_dict(layer)
+            if layer_dict:
+                group_content["layers"].append(layer_dict)
 
-            default_values = {
-                "initialState": {"active": layer.active_by_default, "opacity": 1}
-            }
-
-            main_field = getattr(layer.main_field, "name", None)
-
-            # Construct the layer object
-            layer_object = {
-                **dict_merge(default_values, layer.settings),
-                "label": layer.name,
-                "content": layer.description,
-                "layers": self.get_layers_list_for_layer(layer),
-                "legends": layer.legends,
-                "mainField": main_field,
-                "filters": {
-                    "layer": layer.source.slug,
-                    "mainField": main_field,
-                    "fields": self.get_filter_fields_for_layer(layer),
-                    "form": self.get_filter_forms_for_layer(layer),
-                },
-            }
-
-            # Set the exportable status of the layer if any filter fields is exportable
-            layer_object["filters"]["exportable"] = any(
-                [f["exportable"] for f in layer_object["filters"]["fields"] or []]
-            )
-
-            group_content["layers"].append(layer_object)
+        # Need ordering
+        group_content["layers"].sort(key=lambda x: x["order"])
 
         return group_content
 
-    def insert_layer_in_path(self, layer_tree, path, layer):
-        """ Used to insert a layer in the tree depending of its slashed path
-        """
-        try:
-            current_path, sub_path = path.split("/", 1)
-        except ValueError:
-            # It's final path, create it and return
-            current_path = path
-            sub_path = None
+    def get_layer_dict(self, layer):
+        if (
+            layer.source.slug not in self.authorized_sources
+            or layer.custom_styles.exclude(
+                source__slug__in=self.authorized_sources
+            ).exists()
+        ):
+            # Exclude layers with non-authorized sources
+            return None
 
-        try:
-            group_layers = next(
-                filter(
-                    lambda x: "group" in x and x.get("group") == current_path,
-                    layer_tree,
-                )
-            )
-        except StopIteration:
-            # Layer does not exist, create it and follow
-            group_layers = {"group": current_path, "layers": []}
-            layer_tree.append(group_layers)
+        default_values = {
+            "initialState": {"active": layer.active_by_default, "opacity": 1}
+        }
 
-        if sub_path:
-            return self.insert_layer_in_path(group_layers["layers"], sub_path, layer)
-        else:
-            group_layers["layers"].append(layer)
+        main_field = getattr(layer.main_field, "name", None)
 
-        return layer_tree
+        # Construct the layer object
+        layer_object = {
+            **dict_merge(default_values, layer.settings),
+            "label": layer.name,
+            "order": layer.order,
+            "content": layer.description,
+            "layers": self.get_layers_list_for_layer(layer),
+            "legends": layer.legends,
+            "mainField": main_field,
+            "filters": {
+                "layer": layer.source.slug,
+                "mainField": main_field,
+                "fields": self.get_filter_fields_for_layer(layer),
+                "form": self.get_filter_forms_for_layer(layer),
+            },
+        }
+
+        # Set the exportable status of the layer if any filter fields is exportable
+        layer_object["filters"]["exportable"] = any(
+            [f["exportable"] for f in layer_object["filters"]["fields"] or []]
+        )
+
+        return layer_object
 
     def get_filter_fields_for_layer(self, layer):
         """ Return the filter fields of the layer if table is enabled

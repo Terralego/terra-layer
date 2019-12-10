@@ -200,7 +200,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
         layer.refresh_from_db()
 
-        self.assertEqual(layer.group.label, "Unknown")
+        self.assertEqual(layer.group.label, "Root")
 
     def test_create_scene_with_complexe_tree(self):
         layers = [
@@ -248,19 +248,23 @@ class ModelSourceViewsetTestCase(TestCase):
         groups = LayerGroup.objects.filter(view=scene["id"])
         self.assertEqual(len(groups), 4)
 
-        """group1 = LayerGroup.objects.get(view=scene["id"], label="My Group 1")
+        # Get groups
+        group1 = LayerGroup.objects.get(view=scene["id"], label="My Group 1")
         groupsub1 = LayerGroup.objects.get(view=scene["id"], label="Sub group 1")
         group2 = LayerGroup.objects.get(view=scene["id"], label="My group 2")
-        self.assertTrue(group1.order < groupsub1.order)
-        self.assertTrue(groupsub1.order < group2.order)
-        self.assertTrue(group1.order < group2.order)"""
+
+        # Refresh data
+        [layer.refresh_from_db() for layer in layers]
+
+        # Check order
+        self.assertGreater(group2.order, group1.order)
+        self.assertGreater(layers[3].order, groupsub1.order)
 
         # Now test tree generation
         response = self.client.get(reverse("layerview", args=[scene["slug"]]))
         layersTree = response.json()
-        #from pprint import pprint
 
-        #pprint(layersTree)
+        # Root tree test
         self.assertEqual(layersTree["title"], scene["name"])
         self.assertEqual(
             layersTree["layersTree"][0]["group"], scene["tree"][0]["title"]
@@ -268,5 +272,14 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(
             layersTree["layersTree"][1]["group"], scene["tree"][1]["title"]
         )
-        # self.assertEqual(layersTree["layersTree"][2]["group"], layers[5].name)
+        self.assertEqual(layersTree["layersTree"][2]["label"], layers[5].name)
 
+        # Subgroup test
+        self.assertEqual(
+            layersTree["layersTree"][0]["layers"][0]["label"], layers[0].name
+        )
+        # Test final ordering also
+        self.assertEqual(
+            layersTree["layersTree"][0]["layers"][2]["group"],
+            scene["tree"][0]["children"][2]["title"],
+        )

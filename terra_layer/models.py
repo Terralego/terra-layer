@@ -30,38 +30,35 @@ class Scene(models.Model):
 
     def tree2models(self, current_node=None, parent=None, order=0):
 
+        # Init case, we've just launch the process
         if current_node is None:
             current_node = self.tree
-            self.layer_groups.all().delete()
+            self.layer_groups.all().delete()  # Clear all groups to generate brand new one
+
+        if not parent:
+            # Create a default unique parent group that is ignored at export
+            parent = LayerGroup.objects.create(view=self, label="Root")
 
         if isinstance(current_node, list):
-            for child in current_node:
-                self.tree2models(current_node=child, parent=parent)
+            for idx, child in enumerate(current_node):
+                self.tree2models(current_node=child, parent=parent, order=idx)
 
         elif "group" in current_node:
             # Handle groups
-            if parent:  # We are in a subnode
-                group = parent.children.create(
-                    view=self,
-                    label=current_node["title"],
-                    exclusive=current_node.get("exclusive", False),
-                )
-            else:
-                group = LayerGroup.objects.create(
-                    view=self,
-                    label=current_node["title"],
-                    exclusive=current_node.get("exclusive", False),
-                )
+            group = parent.children.create(
+                view=self,
+                label=current_node["title"],
+                exclusive=current_node.get("exclusive", False),
+                order=order,
+            )
 
             self.tree2models(current_node=current_node["children"], parent=group)
 
         elif "geolayer" in current_node:
             # Handle layers
-            if not parent:
-                parent, _ = LayerGroup.objects.get_or_create(view=self, label="Unknown")
-
             layer = Layer.objects.get(pk=current_node["geolayer"])
             layer.group = parent
+            layer.order = order
             layer.save()
 
     def save(self, *args, **kwargs):
