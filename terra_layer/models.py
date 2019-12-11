@@ -52,7 +52,8 @@ class Scene(models.Model):
                 order=order,
             )
 
-            self.tree2models(current_node=current_node["children"], parent=group)
+            if "children" in current_node:
+                self.tree2models(current_node=current_node["children"], parent=group)
 
         elif "geolayer" in current_node:
             # Handle layers
@@ -86,7 +87,6 @@ class LayerGroup(models.Model):
     settings = JSONField(default=dict)
 
     class Meta:
-        unique_together = ["view", "label", "parent"]
         ordering = ["order", "label"]
 
 

@@ -205,7 +205,7 @@ class ModelSourceViewsetTestCase(TestCase):
     def test_create_scene_with_complexe_tree(self):
         layers = [
             Layer.objects.create(source=self.source, name=f"Layer {x}")
-            for x in range(6)
+            for x in range(7)
         ]
 
         COMPLEXE_SCENE_TREE = [
@@ -230,6 +230,11 @@ class ModelSourceViewsetTestCase(TestCase):
                 "children": [{"geolayer": layers[4].id,}],
             },
             {"geolayer": layers[5].id,},
+            {
+                "title": "My group 3",
+                "group": True,
+                "children": [{"geolayer": layers[6].id,}],
+            },
         ]
 
         query = {
@@ -243,10 +248,10 @@ class ModelSourceViewsetTestCase(TestCase):
 
         scene = response.json()
 
-        self.assertEqual(len(scene.get("tree")), 3)
+        self.assertEqual(len(scene.get("tree")), 4)
 
         groups = LayerGroup.objects.filter(view=scene["id"])
-        self.assertEqual(len(groups), 4)
+        self.assertEqual(len(groups), 5)
 
         # Get groups
         group1 = LayerGroup.objects.get(view=scene["id"], label="My Group 1")
@@ -278,8 +283,14 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(
             layersTree["layersTree"][0]["layers"][0]["label"], layers[0].name
         )
+
         # Test final ordering also
         self.assertEqual(
             layersTree["layersTree"][0]["layers"][2]["group"],
             scene["tree"][0]["children"][2]["title"],
+        )
+
+        # Test last group with layer
+        self.assertEqual(
+            layersTree["layersTree"][3]["layers"][0]["label"], layers[6].name
         )

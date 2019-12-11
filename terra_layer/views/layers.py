@@ -25,7 +25,7 @@ class SceneViewset(ModelViewSet):
     permission_classes = (ScenePermission,)
 
     def get_serializer_class(self,):
-        if self.action in ["retrieve", "update", "create"]:
+        if self.action in ["retrieve", "update", "create", "partial_update"]:
             return SceneDetailSerializer
         return SceneListSerializer
 
@@ -261,9 +261,10 @@ class LayerView(APIView):
             view=scene, parent=None
         )
 
-        return self.get_tree_group(root_group)["layers"]
+        # Keep only child of root group
+        return self.get_group_dict(root_group)["layers"]
 
-    def get_tree_group(self, group):
+    def get_group_dict(self, group):
         """ Recursive method that return the tree from a LayerGroup element.
 
         `group.settings` is injected in the group dictionnary, so any setting can be overridden.
@@ -282,7 +283,10 @@ class LayerView(APIView):
         for sub_group in group.children.filter(view=group.view).prefetch_related(
             self.prefetch_layers
         ):
-            group_content["layers"].append(self.get_tree_group(sub_group))
+            group_dict = self.get_group_dict(sub_group)
+            # exclude empty groups
+            if group_dict["layers"]:
+                group_content["layers"].append(group_dict)
 
         # Add layers of group
         for layer in group.layers.filter(in_tree=True):
@@ -290,8 +294,11 @@ class LayerView(APIView):
             if layer_dict:
                 group_content["layers"].append(layer_dict)
 
-        # Need ordering
+        # Group en layer ordering
         group_content["layers"].sort(key=lambda x: x["order"])
+
+        # Remove key order as not part of schema
+        [item.pop("order") for item in group_content["layers"]]
 
         return group_content
 
