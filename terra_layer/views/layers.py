@@ -42,7 +42,7 @@ class LayerViewset(ModelViewSet):
         "table_enable",
         "popup_enable",
         "minisheet_enable",
-        "group__view",
+        "group__view__name",
     )
     permission_classes = ()
     filter_backends = [filters.SearchFilter]
