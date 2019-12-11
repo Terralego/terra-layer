@@ -59,7 +59,19 @@ class CustomStyleSerializer(ModelSerializer):
         exclude = ("layer",)
 
 
-class LayerSerializer(ModelSerializer):
+class LayerListSerializer(ModelSerializer):
+    class Meta:
+        model = Layer
+        fields = ("id", "source", "group", "name", "order", "active_by_default")
+
+    def to_representation(self, obj):
+        return {
+            **super().to_representation(obj),
+            "view": obj.group.view.pk if obj.group else None,
+        }
+
+
+class LayerDetailSerializer(ModelSerializer):
     fields = FilterFieldSerializer(many=True, read_only=True, source="fields_filters")
     custom_styles = CustomStyleSerializer(many=True, read_only=True)
 
@@ -76,7 +88,6 @@ class LayerSerializer(ModelSerializer):
     def to_representation(self, obj):
         return {
             **super().to_representation(obj),
-            "name": obj.name,
             "view": obj.group.view.pk if obj.group else None,
         }
 

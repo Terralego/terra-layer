@@ -14,7 +14,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from ..models import Layer, LayerGroup, FilterField, Scene
 from ..permissions import ScenePermission
-from ..serializers import LayerSerializer, SceneListSerializer, SceneDetailSerializer
+from ..serializers import LayerListSerializer, LayerDetailSerializer, SceneListSerializer, SceneDetailSerializer
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
 
@@ -32,7 +32,6 @@ class SceneViewset(ModelViewSet):
 
 class LayerViewset(ModelViewSet):
     model = Layer
-    serializer_class = LayerSerializer
     ordering_fields = (
         "name",
         "source__name",
@@ -55,6 +54,11 @@ class LayerViewset(ModelViewSet):
 
     def get_queryset(self):
         return self.model.objects.all()
+
+    def get_serializer_class(self,):
+        if self.action in ["retrieve", "update", "create", "partial_update"]:
+            return LayerDetailSerializer
+        return LayerListSerializer
 
 
 class LayerView(APIView):
