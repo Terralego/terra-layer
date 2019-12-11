@@ -11,10 +11,17 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from url_filter.integrations.drf import URLFilterBackend
+from rest_framework.serializers import ValidationError
 
 from ..models import Layer, LayerGroup, FilterField, Scene
-from ..permissions import ScenePermission
-from ..serializers import LayerListSerializer, LayerDetailSerializer, SceneListSerializer, SceneDetailSerializer
+from ..permissions import LayerPermission, ScenePermission
+from ..serializers import (
+    LayerListSerializer,
+    LayerDetailSerializer,
+    SceneListSerializer,
+    SceneDetailSerializer,
+)
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
 
@@ -59,6 +66,11 @@ class LayerViewset(ModelViewSet):
         if self.action in ["retrieve", "update", "create", "partial_update"]:
             return LayerDetailSerializer
         return LayerListSerializer
+
+    def perform_destroy(self, serializer):
+        if serializer.group:  #  Prevent deletion of layer used in any layer tree
+            raise ValidationError("Can't delete a layer linked to a scene")
+        super().perform_destroy(serializer)
 
 
 class LayerView(APIView):
