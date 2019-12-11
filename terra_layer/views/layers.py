@@ -36,6 +36,43 @@ class SceneViewset(ModelViewSet):
             return SceneDetailSerializer
         return SceneListSerializer
 
+    def check_layer_status(self, current_node):
+        """
+        Check all layers in tree to valide existence and scene ownership.
+        Recursive process.
+
+        :param current_node: Current node from the tree
+        """
+
+        for item in current_node:
+            if "geolayer" in item:
+                try:
+                    # Is layer deleted ?
+                    layer = Layer.objects.get(pk=item["geolayer"])
+                except Layer.DoesNotExist:
+                    raise ValidationError(
+                        f"Layer {item['geolayer']} doesn't exists anymore"
+                    )
+
+                # Is layer owned by another scene ?
+                if layer.group and layer.group.view != self:
+                    raise ValidationError(
+                        f"Layer {item['geolayer']} can't be stolen from another scene"
+                    )
+            else:
+                # And we start with the new node
+                self.check_layer_status(item["children"])
+
+    def perform_update(self, serializer):
+        if serializer.is_valid():
+            self.check_layer_status(serializer.validated_data.get("tree", []))
+            serializer.save()
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            self.check_layer_status(serializer.validated_data.get("tree", []))
+            serializer.save()
+
 
 class LayerViewset(ModelViewSet):
     model = Layer
@@ -67,10 +104,10 @@ class LayerViewset(ModelViewSet):
             return LayerDetailSerializer
         return LayerListSerializer
 
-    def perform_destroy(self, serializer):
-        if serializer.group:  #  Prevent deletion of layer used in any layer tree
+    def perform_destroy(self, instance):
+        if instance.group:  #  Prevent deletion of layer used in any layer tree
             raise ValidationError("Can't delete a layer linked to a scene")
-        super().perform_destroy(serializer)
+        super().perform_destroy(instance)
 
 
 class LayerView(APIView):

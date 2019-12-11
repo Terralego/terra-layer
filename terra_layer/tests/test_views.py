@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django_geosource.models import PostGISSource, FieldTypes
 from PIL import Image
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from rest_framework.test import APIClient
 
 from terra_layer.models import Layer, LayerGroup, FilterField, Scene
@@ -294,3 +294,54 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(
             layersTree["layersTree"][3]["layers"][0]["label"], layers[6].name
         )
+
+    def test_validation_error_on_scene_create(self):
+
+        layer = Layer.objects.create(
+            group=None, source=self.source, minisheet_enable=False
+        )
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+
+        # Try to steal a layer from another scene
+        query = {
+            "name": "Another scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
+        # Try to create a tree with a missing view
+        query = {
+            "name": "Yet another scene Name",
+            "category": "map",
+            "tree": [{"geolayer": 20000},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
+    def test_validation_error_on_delete_attached_layer(self):
+
+        layer = Layer.objects.create(
+            group=None, source=self.source, minisheet_enable=False
+        )
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+
+        response = self.client.delete(reverse("layer-detail", kwargs={"pk": layer.id}))
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
