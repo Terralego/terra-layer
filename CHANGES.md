@@ -5,6 +5,8 @@
 
 * Update code documentation
 * Allow layer ordering by view name
+* Allow layer search by name and settings
+* Allow layer filter by source
 
 0.3.12      (2019-11-25)
 -----------------------
