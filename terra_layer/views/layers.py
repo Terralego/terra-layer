@@ -42,7 +42,7 @@ class LayerViewset(ModelViewSet):
         "table_enable",
         "popup_enable",
         "minisheet_enable",
-        "group__view",
+        "group__view__name",
     )
     permission_classes = ()
 
@@ -53,7 +53,6 @@ class LayerViewset(ModelViewSet):
 class LayerView(APIView):
     """ This view generates the LayersTree used to construct the frontend
     """
-
 
     permission_classes = ()
     model = Layer

@@ -111,6 +111,7 @@ class LayerSerializer(ModelSerializer):
     def _get_name_path(self, obj):
         """ Return the slashed path of a layer from its group object
         """
+
         def get_group_path(group):
             name = group.label
             if group.parent:

@@ -1,9 +1,10 @@
-0.3.13      (2019-11-25)
+0.3.13      (2019-12-11)
 -----------------------
 
 ### Improves
 
 * Update code documentation
+* Allow layer ordering by view name
 
 0.3.12      (2019-11-25)
 -----------------------
