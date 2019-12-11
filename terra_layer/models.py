@@ -9,6 +9,7 @@ from django_geosource.models import Source, Field
 from rest_framework.reverse import reverse
 
 from .utils import get_layer_group_cache_key
+from .schema import JSONSchemaValidator, SCENE_LAYERTREE
 
 
 class Scene(models.Model):
@@ -23,7 +24,9 @@ class Scene(models.Model):
         max_length=255, upload_to="scene-icons", null=True, default=None
     )
     order = models.IntegerField(default=0, db_index=True)
-    tree = JSONField(default=list)
+    tree = JSONField(
+        default=list, validators=[JSONSchemaValidator(limit_value=SCENE_LAYERTREE)]
+    )
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])
