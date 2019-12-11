@@ -10,8 +10,10 @@ from geostore.tokens import tiles_token_generator
 from rest_framework import filters
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+from url_filter.integrations.drf import URLFilterBackend
 
 from ..models import Layer, LayerGroup, FilterField, Scene
 from ..permissions import ScenePermission
@@ -34,7 +36,7 @@ class SceneViewset(ModelViewSet):
 class LayerViewset(ModelViewSet):
     model = Layer
     serializer_class = LayerSerializer
-    ordering_fields = filter_fields = (
+    ordering_fields = (
         "source",
         "group",
         "name",
@@ -44,8 +46,12 @@ class LayerViewset(ModelViewSet):
         "minisheet_enable",
         "group__view__name",
     )
+    filter_fields = ("source",)
     permission_classes = ()
-    filter_backends = [filters.SearchFilter]
+    filter_backends = api_settings.DEFAULT_FILTER_BACKENDS + [
+        filters.SearchFilter,
+        URLFilterBackend,
+    ]
     search_fields = ["name", "settings"]
 
     def get_queryset(self):
