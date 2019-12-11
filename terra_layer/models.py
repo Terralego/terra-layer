@@ -32,6 +32,15 @@ class Scene(models.Model):
         return reverse("scene-detail", args=[self.pk])
 
     def tree2models(self, current_node=None, parent=None, order=0):
+        """
+        Generate groups structure from admin layer tree.
+        This is a recursive function to handle each step of process.
+
+        :param current_node: current node of the tree
+        :param parent: The parent group of current node
+        :param order: Current order to keep initial json order
+        :returns: Nothing
+        """
 
         # Init case, we've just launch the process
         if current_node is None:
@@ -90,7 +99,7 @@ class LayerGroup(models.Model):
     settings = JSONField(default=dict)
 
     class Meta:
-        ordering = ["order", "label"]
+        ordering = ["order"]
 
 
 class Layer(models.Model):
