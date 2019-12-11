@@ -162,7 +162,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "category": "map",
             "tree": [
                 {
-                    "title": "Scene Group name",
+                    "label": "Scene Group name",
                     "group": True,
                     "expanded": True,
                     "children": [],
@@ -210,13 +210,13 @@ class ModelSourceViewsetTestCase(TestCase):
 
         COMPLEXE_SCENE_TREE = [
             {
-                "title": "My Group 1",
+                "label": "My Group 1",
                 "group": True,
                 "children": [
                     {"geolayer": layers[0].id},
                     {"geolayer": layers[1].id},
                     {
-                        "title": "Sub group 1",
+                        "label": "Sub group 1",
                         "group": True,
                         "expanded": True,
                         "children": [{"geolayer": layers[2].id,}],
@@ -225,13 +225,13 @@ class ModelSourceViewsetTestCase(TestCase):
                 ],
             },
             {
-                "title": "My group 2",
+                "label": "My group 2",
                 "group": True,
                 "children": [{"geolayer": layers[4].id,}],
             },
             {"geolayer": layers[5].id,},
             {
-                "title": "My group 3",
+                "label": "My group 3",
                 "group": True,
                 "children": [{"geolayer": layers[6].id,}],
             },
@@ -272,10 +272,10 @@ class ModelSourceViewsetTestCase(TestCase):
         # Root tree test
         self.assertEqual(layersTree["title"], scene["name"])
         self.assertEqual(
-            layersTree["layersTree"][0]["group"], scene["tree"][0]["title"]
+            layersTree["layersTree"][0]["group"], scene["tree"][0]["label"]
         )
         self.assertEqual(
-            layersTree["layersTree"][1]["group"], scene["tree"][1]["title"]
+            layersTree["layersTree"][1]["group"], scene["tree"][1]["label"]
         )
         self.assertEqual(layersTree["layersTree"][2]["label"], layers[5].name)
 
@@ -287,7 +287,7 @@ class ModelSourceViewsetTestCase(TestCase):
         # Test final ordering also
         self.assertEqual(
             layersTree["layersTree"][0]["layers"][2]["group"],
-            scene["tree"][0]["children"][2]["title"],
+            scene["tree"][0]["children"][2]["label"],
         )
 
         # Test last group with layer

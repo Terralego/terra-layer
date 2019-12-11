@@ -28,10 +28,10 @@ SCENE_LAYERTREE = {
         "type": "object",
         "title": "Layer tree item",
         "required": [],
-        "dependencies": {"group": ["children", "title"]},
+        "dependencies": {"group": ["children", "label"]},
         "properties": {
-            "title": {
-                "$id": "#/items/properties/title",
+            "label": {
+                "$id": "#/items/properties/label",
                 "type": "string",
                 "title": "The group name",
                 "default": "",

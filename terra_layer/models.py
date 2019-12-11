@@ -59,7 +59,7 @@ class Scene(models.Model):
             # Handle groups
             group = parent.children.create(
                 view=self,
-                label=current_node["title"],
+                label=current_node["label"],
                 exclusive=current_node.get("exclusive", False),
                 order=order,
             )
