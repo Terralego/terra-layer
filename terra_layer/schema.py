@@ -59,6 +59,23 @@ SCENE_LAYERTREE = {
                 "default": False,
                 "examples": [True],
             },
+            "selectors": {
+                "$id": "#/items/properties/selectors",
+                "type": ["array", "null"],
+                "title": "The selectors for this group",
+            },
+            "settings": {
+                "$id": "#/items/properties/settings",
+                "type": "object",
+                "title": "The settings of group",
+            },
+            "group": {
+                "$id": "#/items/properties/exclusive",
+                "type": "boolean",
+                "title": "Is the group exclusive ?",
+                "default": False,
+                "examples": [True],
+            },
             "children": {"$ref": "#"},
         },
     },

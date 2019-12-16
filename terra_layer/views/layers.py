@@ -36,7 +36,7 @@ class SceneViewset(ModelViewSet):
             return SceneDetailSerializer
         return SceneListSerializer
 
-    def check_layer_status(self, current_node):
+    def check_layer_status(self, view_id, current_node):
         """
         Check all layers in tree to valide existence and scene ownership.
         Recursive process.
@@ -55,22 +55,24 @@ class SceneViewset(ModelViewSet):
                     )
 
                 # Is layer owned by another scene ?
-                if layer.group and layer.group.view != self:
+                if layer.group and layer.group.view.id != view_id:
                     raise ValidationError(
                         f"Layer {item['geolayer']} can't be stolen from another scene"
                     )
             else:
                 # And we start with the new node
-                self.check_layer_status(item["children"])
+                self.check_layer_status(view_id, item["children"])
 
     def perform_update(self, serializer):
         if serializer.is_valid():
-            self.check_layer_status(serializer.validated_data.get("tree", []))
+            self.check_layer_status(
+                serializer.instance.id, serializer.validated_data.get("tree", [])
+            )
             serializer.save()
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            self.check_layer_status(serializer.validated_data.get("tree", []))
+            self.check_layer_status(None, serializer.validated_data.get("tree", []))
             serializer.save()
 
 
