@@ -11,11 +11,11 @@ from ..views import (
 
 router = routers.SimpleRouter()
 
-router.register(r"layer", GeostoreLayerViewSet, base_name="layer")
-router.register(r"group", GeostoreLayerGroupViewsSet, base_name="group"),
+router.register(r"layer", GeostoreLayerViewSet, basename="layer")
+router.register(r"group", GeostoreLayerGroupViewsSet, basename="group"),
 
 router.register(
-    r"layer/(?P<layer>[\d\w\-_]+)/feature", GeostoreFeatureViewSet, base_name="feature"
+    r"layer/(?P<layer>[\d\w\-_]+)/feature", GeostoreFeatureViewSet, basename="feature"
 )
 
 urlpatterns = [path("", include(router.urls))]

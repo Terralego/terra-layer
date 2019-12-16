@@ -5,4 +5,4 @@ from ..views import GeoSourceModelViewset
 
 router = routers.SimpleRouter()
 
-router.register(r"", GeoSourceModelViewset, base_name="geosource")
+router.register(r"", GeoSourceModelViewset, basename="geosource")
