@@ -8,8 +8,8 @@ from ..views import LayerViewset, LayerView, SceneViewset, GeoSourceModelViewset
 
 router = routers.SimpleRouter()
 
-router.register(r"geolayer/scene", SceneViewset, base_name="scene")
-router.register(r"geolayer", LayerViewset, base_name="layer")
+router.register(r"geolayer/scene", SceneViewset, basename="scene")
+router.register(r"geolayer", LayerViewset, basename="layer")
 
 # Extras viewsets
 
