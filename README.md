@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/Terralego/terra-layer.svg?branch=master)](https://travis-ci.org/Terralego/terra-layer)
+[![codecov](https://codecov.io/gh/Terralego/terra-layer/branch/master/graph/badge.svg)](https://codecov.io/gh/Terralego/terra-layer)
+[![PyPi version](https://pypip.in/v/terra-layer/badge.png)](https://pypi.org/project/terra-layer/)
+
 # Terra Layer
 
 This django applications aims to provide an API to connect django_geosource to django_geodata.
