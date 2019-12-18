@@ -46,7 +46,6 @@ setup(
         "django-geosource>=0.3",
         "django-geostore>=0.3.11",
         "django-terra-accounts>=0.3.6",
-        "django-url-filter>=0.3.14",
     ],
     extras_require={
         'dev': tests_require,

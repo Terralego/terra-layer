@@ -1,7 +1,9 @@
-0.3.14     (XXXX-XX-XX)
+0.3.14     (2019-12-18)
 -----------------------
 
 * Support python 3.8, django 3.0 and DRF 3.11
+* Improve ordering and filters
+* Drop requirement over url-filter
 
 
 0.3.13      (2019-12-11)
