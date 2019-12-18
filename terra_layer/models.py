@@ -61,6 +61,8 @@ class Scene(models.Model):
                 view=self,
                 label=current_node["label"],
                 exclusive=current_node.get("exclusive", False),
+                selectors=current_node.get("selectors"),
+                settings=current_node.get("settings", {}),
                 order=order,
             )
 
