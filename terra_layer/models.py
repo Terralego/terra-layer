@@ -9,9 +9,14 @@ from django_geosource.models import Source, Field
 from rest_framework.reverse import reverse
 
 from .utils import get_layer_group_cache_key
+from .schema import JSONSchemaValidator, SCENE_LAYERTREE
 
 
 class Scene(models.Model):
+    """ A scene is a group of data visualisation in terra-visu.
+    It's also a main menu entry.
+    """
+
     name = models.CharField(max_length=255, unique=True)
     slug = models.SlugField(max_length=255, unique=True)
     category = models.CharField(max_length=255, default="map")
@@ -19,14 +24,62 @@ class Scene(models.Model):
         max_length=255, upload_to="scene-icons", null=True, default=None
     )
     order = models.IntegerField(default=0, db_index=True)
+    tree = JSONField(
+        default=list, validators=[JSONSchemaValidator(limit_value=SCENE_LAYERTREE)]
+    )
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])
 
+    def tree2models(self, current_node=None, parent=None, order=0):
+        """
+        Generate groups structure from admin layer tree.
+        This is a recursive function to handle each step of process.
+
+        :param current_node: current node of the tree
+        :param parent: The parent group of current node
+        :param order: Current order to keep initial json order
+        :returns: Nothing
+        """
+
+        # Init case, we've just launch the process
+        if current_node is None:
+            current_node = self.tree
+            self.layer_groups.all().delete()  # Clear all groups to generate brand new one
+
+        if not parent:
+            # Create a default unique parent group that is ignored at export
+            parent = LayerGroup.objects.create(view=self, label="Root")
+
+        if isinstance(current_node, list):
+            for idx, child in enumerate(current_node):
+                self.tree2models(current_node=child, parent=parent, order=idx)
+
+        elif "group" in current_node:
+            # Handle groups
+            group = parent.children.create(
+                view=self,
+                label=current_node["label"],
+                exclusive=current_node.get("exclusive", False),
+                order=order,
+            )
+
+            if "children" in current_node:
+                self.tree2models(current_node=current_node["children"], parent=group)
+
+        elif "geolayer" in current_node:
+            # Handle layers
+            layer = Layer.objects.get(pk=current_node["geolayer"])
+            layer.group = parent
+            layer.order = order
+            layer.save()
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        return super().save(*args, **kwargs)
+
+        super().save(*args, **kwargs)
+        self.tree2models()  # Generate LayerGroups according to the tree
 
     class Meta:
         ordering = ["order"]
@@ -46,7 +99,6 @@ class LayerGroup(models.Model):
     settings = JSONField(default=dict)
 
     class Meta:
-        unique_together = ["view", "label", "parent"]
         ordering = ["order"]
 
 
@@ -54,7 +106,7 @@ class Layer(models.Model):
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name="layers")
 
     group = models.ForeignKey(
-        LayerGroup, on_delete=models.CASCADE, null=True, related_name="layers"
+        LayerGroup, on_delete=models.SET_NULL, null=True, related_name="layers"
     )
     name = models.CharField(max_length=255, blank=False)
     in_tree = models.BooleanField(default=True)
@@ -98,7 +150,7 @@ class Layer(models.Model):
         return md5(f"{self.source.slug}-{self.pk}".encode("utf-8")).hexdigest()
 
     class Meta:
-        ordering = ("order",)
+        ordering = ("order", "name")
 
     def save(self, **kwargs):
         super().save(**kwargs)
@@ -106,6 +158,9 @@ class Layer(models.Model):
         # Invalidate cache for layer group
         if self.group:
             cache.delete(get_layer_group_cache_key(self.group.view))
+
+    def __str__(self):
+        return f"Layer({self.id}) - {self.name}"
 
 
 class CustomStyle(models.Model):

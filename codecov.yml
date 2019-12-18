@@ -1,0 +1,3 @@
+ignore:
+    terra_layer/migrations
+    manage.py

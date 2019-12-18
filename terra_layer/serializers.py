@@ -59,7 +59,19 @@ class CustomStyleSerializer(ModelSerializer):
         exclude = ("layer",)
 
 
-class LayerSerializer(ModelSerializer):
+class LayerListSerializer(ModelSerializer):
+    class Meta:
+        model = Layer
+        fields = ("id", "source", "group", "name", "order", "active_by_default")
+
+    def to_representation(self, obj):
+        return {
+            **super().to_representation(obj),
+            "view": obj.group.view.pk if obj.group else None,
+        }
+
+
+class LayerDetailSerializer(ModelSerializer):
     fields = FilterFieldSerializer(many=True, read_only=True, source="fields_filters")
     custom_styles = CustomStyleSerializer(many=True, read_only=True)
 
@@ -73,53 +85,11 @@ class LayerSerializer(ModelSerializer):
 
         return instance
 
-    def to_internal_value(self, data):
-        data["group"], data["name"] = self._get_layer_group(data)
-        return super().to_internal_value(data)
-
     def to_representation(self, obj):
         return {
             **super().to_representation(obj),
-            "name": self._get_name_path(obj),
-            "view": obj.group.view.pk,
+            "view": obj.group.view.pk if obj.group else None,
         }
-
-    def _get_layer_group(self, data):
-        """ This return the group object from a slashed group path.
-        It's used for retrocompatibility with fronted, but need to be deleted when
-        tree management is implemented.
-        """
-        try:
-            view = Scene.objects.get(pk=data["view"])
-        except (Scene.DoesNotExist, KeyError):
-            raise ValidationError("Scene does not exist")
-
-        try:
-            group_path, layer_name = data["name"].rsplit("/", 1)
-        except ValueError:
-            group_path, layer_name = "Unknown", data["name"]
-
-        group = None
-        for group_name in group_path.split("/"):
-            if group:
-                group, _ = group.children.get_or_create(view=view, label=group_name)
-            else:
-                group, _ = LayerGroup.objects.get_or_create(view=view, label=group_name)
-
-        return group.pk, layer_name
-
-    def _get_name_path(self, obj):
-        """ Return the slashed path of a layer from its group object
-        """
-
-        def get_group_path(group):
-            name = group.label
-            if group.parent:
-                name = get_group_path(group.parent) + f"/{name}"
-            return name
-
-        group_path = get_group_path(obj.group)
-        return f"{group_path}/{obj.name}"
 
     @transaction.atomic
     def update(self, instance, validated_data):

@@ -1,3 +1,13 @@
+0.4.0      (2019-12-18)
+-----------------------
+
+### Improves
+
+* Add tree edition support via Scene API
+* Can now have geolayers at tree root
+* Geolayers and groups can be mixed in any order
+
+
 0.3.14     (2019-12-18)
 -----------------------
 
