@@ -1,7 +1,7 @@
 import argparse
 from django.core.management.base import BaseCommand, CommandError
 from terra_layer.models import Layer, Scene, LayerGroup
-from terra_layer.serializers import LayerSerializer
+from terra_layer.serializers import LayerDetailSerializer
 from django_geosource.models import Field, Source
 import json
 
@@ -44,18 +44,52 @@ class Command(BaseCommand):
             except Field.DoesNotExist:
                 raise
 
+        parts = data["name"].split("/")
+        layer_name = parts.pop()
+
         # Try to find already existing layer
         try:
-            _, layer_name = data["name"].rsplit("/", 1)
-            group = LayerGroup.objects.get(view=data["view"], label=data["group"])
-            layer = Layer.objects.get(group=group, name=layer_name)
+            layer = Layer.objects.get(uuid=data["uuid"])
+            exists = True
         except Exception:
             layer = Layer()
+            exists = False
 
-        srlz = LayerSerializer(instance=layer, data=data)
+        del data["group"]  # Remove group as we compute it later
+        data["name"] = layer_name
+
+        srlz = LayerDetailSerializer(instance=layer, data=data)
         try:
             srlz.is_valid(raise_exception=True)
         except Exception as e:
-            raise CommandError(f"A validation error occured with data: {e}")
+            raise CommandError(f"A validation error occurred with data: {e}")
 
         srlz.save()
+
+        scene = Scene.objects.get(id=data["view"])
+        current_node = scene.tree
+
+        # Here we insert layer in tree if not previously existing
+        if not exists:
+            # Add the layer in scene tree
+            # Here we assume that missing groups are added at first position of current node
+            # We create missing group with default exclusive group configuration (should be corrected later if necessary)
+            for part in parts:
+                found = False
+                for g in current_node:
+                    if g.get("group") and g["label"] == part:
+                        current_node = g["children"]
+                        found = True
+                        break
+                if not found:
+                    # Add the missing group
+                    new_group = {"group": True, "label": part, "children": []}
+                    current_node.insert(0, new_group)
+                    current_node = new_group["children"]
+
+            # Node if found (or created) we can add the geolayer now
+            current_node.append(
+                {"geolayer": srlz.instance.id, "label": srlz.instance.name}
+            )
+
+            scene.save()
