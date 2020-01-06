@@ -1,4 +1,5 @@
 from hashlib import md5
+import uuid
 
 from django.core.cache import cache
 from django.db import models
@@ -105,6 +106,7 @@ class LayerGroup(models.Model):
 
 
 class Layer(models.Model):
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
     source = models.ForeignKey(Source, on_delete=models.CASCADE, related_name="layers")
 
     group = models.ForeignKey(
