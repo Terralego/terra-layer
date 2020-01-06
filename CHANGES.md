@@ -4,7 +4,7 @@
 
 ### Improves
 
-* Add uid field for layer to ease import/export
+* Add uuid field for layer to ease import/export
 
 0.4.1      (2019-12-19)
 -----------------------
