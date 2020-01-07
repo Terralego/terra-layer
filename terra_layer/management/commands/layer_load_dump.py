@@ -76,9 +76,9 @@ class Command(BaseCommand):
             # We create missing group with default exclusive group configuration (should be corrected later if necessary)
             for part in parts:
                 found = False
-                for g in current_node:
-                    if g.get("group") and g["label"] == part:
-                        current_node = g["children"]
+                for group in current_node:
+                    if group.get("group") and group["label"] == part:
+                        current_node = group["children"]
                         found = True
                         break
                 if not found:
