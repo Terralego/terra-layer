@@ -1,5 +1,0 @@
-ignore:
-    - "terra_layer/migrations"
-    - "manage.py"
-    - "terra_layer/tests"
-    - "test_terralayer"
