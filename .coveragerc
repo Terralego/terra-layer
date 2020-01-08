@@ -1,0 +1,6 @@
+[report]
+omit =
+    */tests*
+    */migrations*
+    test_terralayer/*
+    manage.py
