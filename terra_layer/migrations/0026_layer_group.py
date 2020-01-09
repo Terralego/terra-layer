@@ -25,9 +25,11 @@ def forwards_func(apps, schema_editor):
 
         try:
             groups, name = layer.name.rsplit("/", 1)
-            group = get_or_create_group(layer.view, groups)
         except ValueError:
             name = layer.name
+            group = get_or_create_group(layer.view, " ")
+        else:
+            group = get_or_create_group(layer.view, groups)
 
         layer.name = name
         layer.group = group
