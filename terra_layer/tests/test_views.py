@@ -1,12 +1,13 @@
-from io import BytesIO
-
 from django.contrib.auth import get_user_model
-from django.core.files import File
 from django.test import TestCase
 from django.urls import reverse
 from django_geosource.models import PostGISSource, FieldTypes
-from PIL import Image
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
+)
 from rest_framework.test import APIClient
 
 from terra_layer.models import Layer, LayerGroup, FilterField, Scene
@@ -98,6 +99,12 @@ class ModelSourceViewsetTestCase(TestCase):
         response = response.json()
         self.assertTrue(response.get("minisheet_enable"))
         self.assertEqual(response["view"], self.scene.id)
+
+    def test_get_scene(self):
+        response = self.client.get(reverse("scene-list"))
+        self.assertEqual(response.status_code, HTTP_200_OK)
+        response = response.json()
+        self.assertEqual(response[0].get("name"), "test_scene")
 
     def test_create_empty_tree_scene(self):
         query = {
@@ -307,7 +314,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "tree": [{"geolayer": layer.id},],
         }
 
-        response = self.client.post(reverse("scene-list"), query)
+        self.client.post(reverse("scene-list"), query)
 
         # Try to steal a layer from another scene
         query = {
@@ -341,7 +348,15 @@ class ModelSourceViewsetTestCase(TestCase):
             "tree": [{"geolayer": layer.id},],
         }
 
-        response = self.client.post(reverse("scene-list"), query)
+        self.client.post(reverse("scene-list"), query)
 
         response = self.client.delete(reverse("layer-detail", kwargs={"pk": layer.id}))
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
+    def test_delete_layer(self):
+        layer = Layer.objects.create(
+            group=None, source=self.source, minisheet_enable=False
+        )
+
+        response = self.client.delete(reverse("layer-detail", kwargs={"pk": layer.id}))
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
