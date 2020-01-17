@@ -10,7 +10,7 @@ from rest_framework.status import (
 )
 from rest_framework.test import APIClient
 
-from terra_layer.models import Layer, LayerGroup, FilterField, Scene
+from terra_layer.models import Layer, LayerGroup, FilterField, Scene, CustomStyle
 
 from .factories import SceneFactory
 
@@ -209,9 +209,48 @@ class ModelSourceViewsetTestCase(TestCase):
 
         self.assertEqual(layer.group.label, "Root")
 
+    def test_layer_view_with_custom_style(self):
+        layer = Layer.objects.create(
+            source=self.source,
+            name=f"Layer",
+            interactions=[
+                {
+                    "id": "terralego-eae-sync",
+                    "interaction": "highlight",
+                    "trigger": "mouseover",
+                },
+            ],
+            minisheet_enable=True,
+            popup_enable=True,
+            highlight_color=True,
+        )
+        CustomStyle.objects.create(
+            layer=layer,
+            source=self.source,
+            interactions=[
+                {"id": "custom_style", "interaction": "highlight", "trigger": "click"},
+            ],
+        )
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        scene = response.json()
+
+        response = self.client.get(reverse("layerview", args=[scene["slug"]]))
+        layersTree = response.json()
+
+        self.assertEqual(len(layersTree["interactions"]), 4)
+
     def test_create_scene_with_complexe_tree(self):
         layers = [
-            Layer.objects.create(source=self.source, name=f"Layer {x}")
+            Layer.objects.create(source=self.source, name=f"Layer {x}",)
             for x in range(7)
         ]
 
