@@ -39,10 +39,7 @@ class Command(BaseCommand):
             data["main_field"] = source.fields.get(name=data["main_field"]).pk
 
         for field in data["fields"]:
-            try:
-                field["id"] = source.fields.get(name=field["field"]).pk
-            except Field.DoesNotExist:
-                raise
+            field["id"] = source.fields.get(name=field["field"]).pk
 
         parts = data["name"].split("/")
         layer_name = parts.pop()
@@ -58,22 +55,22 @@ class Command(BaseCommand):
         del data["group"]  # Remove group as we compute it later
         data["name"] = layer_name
 
-        srlz = LayerDetailSerializer(instance=layer, data=data)
+        layer_detail_serializer = LayerDetailSerializer(instance=layer, data=data)
         try:
-            srlz.is_valid(raise_exception=True)
+            layer_detail_serializer.is_valid(raise_exception=True)
         except Exception as e:
             raise CommandError(f"A validation error occurred with data: {e}")
 
-        srlz.save()
-
-        scene = Scene.objects.get(id=data["view"])
-        current_node = scene.tree
+        layer_detail_serializer.save()
 
         # Here we insert layer in tree if not previously existing
         if not exists:
+
             # Add the layer in scene tree
             # Here we assume that missing groups are added at first position of current node
             # We create missing group with default exclusive group configuration (should be corrected later if necessary)
+            scene = Scene.objects.get(id=data["view"])
+            current_node = scene.tree
             for part in parts:
                 found = False
                 for group in current_node:
@@ -89,7 +86,6 @@ class Command(BaseCommand):
 
             # Node if found (or created) we can add the geolayer now
             current_node.append(
-                {"geolayer": srlz.instance.id, "label": srlz.instance.name}
+                {"geolayer": layer_detail_serializer.instance.id, "label": layer_detail_serializer.instance.name}
             )
-
             scene.save()
