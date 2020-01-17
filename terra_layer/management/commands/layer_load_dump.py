@@ -86,6 +86,9 @@ class Command(BaseCommand):
 
             # Node if found (or created) we can add the geolayer now
             current_node.append(
-                {"geolayer": layer_detail_serializer.instance.id, "label": layer_detail_serializer.instance.name}
+                {
+                    "geolayer": layer_detail_serializer.instance.id,
+                    "label": layer_detail_serializer.instance.name,
+                }
             )
             scene.save()
