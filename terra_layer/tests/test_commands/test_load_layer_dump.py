@@ -1,15 +1,11 @@
-import json
-from io import StringIO
 import os
-from unittest import mock
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 
-from terra_layer.models import CustomStyle, FilterField, Layer, Scene
-from terra_layer.tests import factories
+from terra_layer.models import FilterField, Layer, Scene
 
 from django_geosource.models import PostGISSource, Field
 
@@ -71,7 +67,7 @@ class LayerDumpTestCase(TestCase):
     def test_command_launch_multiple_name_found(self):
         self.maxDiff = None
         self.scene.tree = [
-            {"label": "layer1", "group": True, "expanded": True, "children": [],},
+            {"label": "layer1", "group": True, "expanded": True, "children": []},
         ]
         self.scene.save()
         file = os.path.join(

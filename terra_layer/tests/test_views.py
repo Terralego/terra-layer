@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django_geosource.models import PostGISSource, Source, FieldTypes, Field, WMTSSource
+from django_geosource.models import PostGISSource, Source, FieldTypes, WMTSSource
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
@@ -49,10 +49,6 @@ class ModelSourceViewsetTestCase(TestCase):
 
         response = self.client.get(reverse("layer-list"))
         self.assertEqual(response.status_code, HTTP_200_OK)
-
-        layer_from_group = [
-            layer for layer in response.json() if layer["group"] == group.id
-        ]
 
         self.assertEqual(Layer.objects.count(), len(response.json()))
 
@@ -200,7 +196,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -221,7 +217,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -256,7 +252,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -309,7 +305,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -342,7 +338,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -364,7 +360,7 @@ class ModelSourceViewsetTestCase(TestCase):
         )
 
     def test_layer_view_with_table_enable_no_layer(self):
-        field = self.source.fields.create(
+        self.source.fields.create(
             name="_test_field", label="test_label", data_type=FieldTypes.String.value
         )
         layer = Layer.objects.create(
@@ -373,7 +369,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -401,7 +397,7 @@ class ModelSourceViewsetTestCase(TestCase):
                         "label": "Sub group 1",
                         "group": True,
                         "expanded": True,
-                        "children": [{"geolayer": layers[2].id,}],
+                        "children": [{"geolayer": layers[2].id}],
                     },
                     {"geolayer": layers[3].id},
                 ],
@@ -409,13 +405,13 @@ class ModelSourceViewsetTestCase(TestCase):
             {
                 "label": "My group 2",
                 "group": True,
-                "children": [{"geolayer": layers[4].id,}],
+                "children": [{"geolayer": layers[4].id}],
             },
-            {"geolayer": layers[5].id,},
+            {"geolayer": layers[5].id},
             {
                 "label": "My group 3",
                 "group": True,
-                "children": [{"geolayer": layers[6].id,}],
+                "children": [{"geolayer": layers[6].id}],
             },
         ]
 
@@ -486,7 +482,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         self.client.post(reverse("scene-list"), query)
@@ -495,7 +491,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Another scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -505,7 +501,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Yet another scene Name",
             "category": "map",
-            "tree": [{"geolayer": 20000},],
+            "tree": [{"geolayer": 20000}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -530,7 +526,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         self.client.post(reverse("scene-list"), query)
@@ -592,7 +588,7 @@ class ModelSourceViewsetAnonymousTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -605,7 +601,7 @@ class ModelSourceViewsetAnonymousTestCase(TestCase):
         query = {
             "name": "Scene Name",
             "category": "map",
-            "tree": [{"geolayer": layer.id},],
+            "tree": [{"geolayer": layer.id}],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -635,7 +631,7 @@ class ModelSourceViewsetAnonymousTestCase(TestCase):
             name="no schema point geom", geom_type=GeometryTypes.Point
         )
         response = self.client.post(
-            reverse("feature-list", args=[point_layer.pk,]),
+            reverse("feature-list", args=[point_layer.pk]),
             data={"geom": "POINT(0 0)", "properties": {"toto": "ok"}},
         )
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)

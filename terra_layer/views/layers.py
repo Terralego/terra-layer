@@ -11,7 +11,6 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from url_filter.integrations.drf import URLFilterBackend
 from rest_framework.serializers import ValidationError
 
 from ..models import Layer, LayerGroup, FilterField, Scene

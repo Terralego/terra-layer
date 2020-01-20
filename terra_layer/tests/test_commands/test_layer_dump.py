@@ -8,7 +8,6 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 
 from terra_layer.models import CustomStyle, FilterField, Layer
-from terra_layer.tests import factories
 
 from django_geosource.models import PostGISSource, Field
 

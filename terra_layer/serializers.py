@@ -8,7 +8,7 @@ from rest_framework.serializers import (
     ValidationError,
 )
 
-from .models import CustomStyle, FilterField, Layer, LayerGroup, Scene
+from .models import CustomStyle, FilterField, Layer, Scene
 
 
 class SceneListSerializer(ModelSerializer):

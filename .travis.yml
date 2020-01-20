@@ -47,11 +47,11 @@ jobs:
     before_script: skip
     script:
     - black --check terra_layer
-  #-
-  #  install:
-  #  - pip install flake8
-  #  script:
-  #    - flake8 terra_layer
+  -
+    install:
+    - pip install flake8
+    script:
+      - flake8 terra_layer
 
   - stage: deploy
     install: skip
