@@ -1,16 +1,16 @@
-from hashlib import md5
 import uuid
+from hashlib import md5
 
+from django.contrib.postgres.fields import JSONField
 from django.core.cache import cache
 from django.db import models
-from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
 from django.utils.text import slugify
-from django_geosource.models import Source, Field
+from django_geosource.models import Field, Source
 from rest_framework.reverse import reverse
 
+from .schema import SCENE_LAYERTREE, JSONSchemaValidator
 from .utils import get_layer_group_cache_key
-from .schema import JSONSchemaValidator, SCENE_LAYERTREE
 
 
 class Scene(models.Model):

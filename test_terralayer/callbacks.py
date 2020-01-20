@@ -12,4 +12,3 @@ def layer_callback(geosource):
         group.layers.add(layer)
 
     return layer
-

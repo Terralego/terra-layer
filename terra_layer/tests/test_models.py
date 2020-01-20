@@ -1,8 +1,7 @@
 from django.test import TestCase
+from django_geosource.models import PostGISSource
 
 from terra_layer.models import Layer
-
-from django_geosource.models import PostGISSource
 
 
 class LayerTestCase(TestCase):
