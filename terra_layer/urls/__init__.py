@@ -1,9 +1,9 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from .geostore import urlpatterns as geostore_patterns
+from ..views import LayerView, LayerViewset, SceneViewset
 from .geosource import router as geosource_router
-from ..views import LayerViewset, LayerView, SceneViewset
+from .geostore import urlpatterns as geostore_patterns
 
 router = routers.SimpleRouter()
 

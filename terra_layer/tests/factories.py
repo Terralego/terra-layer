@@ -1,6 +1,6 @@
 import factory
 
-from ..models import Scene, Layer
+from ..models import Layer, Scene
 
 
 class SceneFactory(factory.django.DjangoModelFactory):

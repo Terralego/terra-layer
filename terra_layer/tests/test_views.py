@@ -1,23 +1,22 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django_geosource.models import PostGISSource, Source, FieldTypes, WMTSSource
+from django_geosource.models import FieldTypes, PostGISSource, Source, WMTSSource
+from geostore import GeometryTypes
+from geostore.tests.factories import LayerFactory
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_204_NO_CONTENT,
     HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND,
     HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
 )
 from rest_framework.test import APIClient
 
-from terra_layer.models import Layer, LayerGroup, FilterField, CustomStyle
+from terra_layer.models import CustomStyle, FilterField, Layer, LayerGroup
 
 from .factories import SceneFactory
-
-from geostore.tests.factories import LayerFactory
-from geostore import GeometryTypes
 
 UserModel = get_user_model()
 

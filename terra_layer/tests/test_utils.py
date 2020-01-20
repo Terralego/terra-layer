@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from ..utils import dict_merge
 
 

@@ -3,8 +3,8 @@ All json schema for validation
 """
 
 import django
-from django.core.validators import BaseValidator
 import jsonschema
+from django.core.validators import BaseValidator
 
 
 class JSONSchemaValidator(BaseValidator):

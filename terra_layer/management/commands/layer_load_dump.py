@@ -1,9 +1,11 @@
 import argparse
+import json
+
 from django.core.management.base import BaseCommand, CommandError
+from django_geosource.models import Source
+
 from terra_layer.models import Layer, Scene
 from terra_layer.serializers import LayerDetailSerializer
-from django_geosource.models import Source
-import json
 
 
 class Command(BaseCommand):

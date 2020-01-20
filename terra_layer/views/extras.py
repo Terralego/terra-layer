@@ -1,5 +1,5 @@
 from django_geosource.views import SourceModelViewset
-from geostore.views import FeatureViewSet, LayerViewSet, LayerGroupViewsSet
+from geostore.views import FeatureViewSet, LayerGroupViewsSet, LayerViewSet
 
 from ..permissions import ReadOnly, SourcePermission
 

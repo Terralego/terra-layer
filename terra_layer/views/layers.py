@@ -9,17 +9,17 @@ from django_geosource.models import WMTSSource
 from geostore.tokens import tiles_token_generator
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.serializers import ValidationError
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.serializers import ValidationError
 
-from ..models import Layer, LayerGroup, FilterField, Scene
+from ..models import FilterField, Layer, LayerGroup, Scene
 from ..permissions import LayerPermission, ScenePermission
 from ..serializers import (
-    LayerListSerializer,
     LayerDetailSerializer,
-    SceneListSerializer,
+    LayerListSerializer,
     SceneDetailSerializer,
+    SceneListSerializer,
 )
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
