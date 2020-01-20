@@ -11,7 +11,7 @@ class JSONSchemaValidator(BaseValidator):
     def compare(self, a, b):
         try:
             jsonschema.validate(a, b)
-        except jsonschema.exceptions.ValidationError as e:
+        except jsonschema.exceptions.ValidationError:
             raise django.core.exceptions.ValidationError(
                 "%(value)s failed JSON schema check", params={"value": a}
             )
@@ -68,13 +68,6 @@ SCENE_LAYERTREE = {
                 "$id": "#/items/properties/settings",
                 "type": "object",
                 "title": "The settings of group",
-            },
-            "group": {
-                "$id": "#/items/properties/exclusive",
-                "type": "boolean",
-                "title": "Is the group exclusive ?",
-                "default": False,
-                "examples": [True],
             },
             "children": {"$ref": "#"},
         },

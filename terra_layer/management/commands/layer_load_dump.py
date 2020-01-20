@@ -1,8 +1,8 @@
 import argparse
 from django.core.management.base import BaseCommand, CommandError
-from terra_layer.models import Layer, Scene, LayerGroup
+from terra_layer.models import Layer, Scene
 from terra_layer.serializers import LayerDetailSerializer
-from django_geosource.models import Field, Source
+from django_geosource.models import Source
 import json
 
 
