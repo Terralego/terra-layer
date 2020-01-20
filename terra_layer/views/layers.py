@@ -95,7 +95,7 @@ class LayerViewset(ModelViewSet):
         "popup_enable",
         "minisheet_enable",
     )
-    permission_classes = ()
+    permission_classes = (LayerPermission,)
     search_fields = ["name", "settings"]
 
     def get_queryset(self):
