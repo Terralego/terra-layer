@@ -146,10 +146,6 @@ class LayerView(APIView):
     scene = None
 
     def get(self, request, slug=None, format=None):
-        # Get all scene if slug is None
-        if slug is None:
-            return Response(SceneListSerializer(Scene.objects.all(), many=True).data)
-
         self.scene = get_object_or_404(Scene, slug=slug)
         self.layergroup = self.layers.first().source.get_layer().layer_groups.first()
 
