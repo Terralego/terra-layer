@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from terra_layer.models import Layer, LayerGroup, Scene
-from terra_layer.serializers import LayerSerializer
+from terra_layer.serializers import LayerDetailSerializer
 from django_geosource.models import Field, Source
 import json
 
@@ -19,7 +19,7 @@ class Command(BaseCommand):
         except Layer.DoesNotExist:
             raise CommandError("Layer does not exist")
 
-        serialized = LayerSerializer(self.layer).data
+        serialized = LayerDetailSerializer(self.layer).data
         self.clean_ids(serialized)
 
         self.stdout.write(json.dumps(serialized))
@@ -30,11 +30,11 @@ class Command(BaseCommand):
             serialized.pop(field)
 
         # Clean custom_style id
-        for cs in serialized["custom_styles"]:
+        for cs in serialized.get("custom_styles", []):
             cs.pop("id")
             cs["source"] = Source.objects.get(pk=cs["source"]).slug
 
-        for field in serialized["fields"]:
+        for field in serialized.get("fields", []):
             field.pop("id")
             field["field"] = Field.objects.get(pk=field["field"]).name
 

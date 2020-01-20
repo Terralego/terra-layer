@@ -1,17 +1,23 @@
-from io import BytesIO
-
 from django.contrib.auth import get_user_model
-from django.core.files import File
 from django.test import TestCase
 from django.urls import reverse
-from django_geosource.models import PostGISSource, FieldTypes
-from PIL import Image
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from django_geosource.models import PostGISSource, Source, FieldTypes, Field, WMTSSource
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_204_NO_CONTENT,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_403_FORBIDDEN,
+)
 from rest_framework.test import APIClient
 
-from terra_layer.models import Layer, LayerGroup, FilterField, Scene
+from terra_layer.models import Layer, LayerGroup, FilterField, CustomStyle
 
 from .factories import SceneFactory
+
+from geostore.tests.factories import LayerFactory
+from geostore import GeometryTypes
 
 UserModel = get_user_model()
 
@@ -98,6 +104,12 @@ class ModelSourceViewsetTestCase(TestCase):
         response = response.json()
         self.assertTrue(response.get("minisheet_enable"))
         self.assertEqual(response["view"], self.scene.id)
+
+    def test_get_scene(self):
+        response = self.client.get(reverse("scene-list"))
+        self.assertEqual(response.status_code, HTTP_200_OK)
+        response = response.json()
+        self.assertEqual(response[0].get("name"), "test_scene")
 
     def test_create_empty_tree_scene(self):
         query = {
@@ -202,9 +214,179 @@ class ModelSourceViewsetTestCase(TestCase):
 
         self.assertEqual(layer.group.label, "Root")
 
+    def test_layer_view_with_source_model(self):
+        source = Source.objects.create(geom_type=10, name="test_view_2",)
+        layer = Layer.objects.create(source=source, name=f"Layer", id=1,)
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+        scene = response.json()
+
+        response = self.client.get(reverse("layerview", args=[scene["slug"]]))
+
+        json_response = response.json()
+        self.assertEqual(
+            json_response["map"]["customStyle"]["layers"],
+            [
+                {
+                    "id": "5f3f90d2aa8a14d5bb88c2f0bbf44610",
+                    "source": "terra",
+                    "source-layer": "test_view_2",
+                }
+            ],
+        )
+
+    def test_layer_view_with_wmtsource(self):
+        source = WMTSSource.objects.create(
+            name="Titi",
+            geom_type=1,
+            tile_size=256,
+            minzoom=14,
+            maxzoom=15,
+            url="http://www.test.test",
+        )
+        layer = Layer.objects.create(source=source, name=f"Layer", id=1,)
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+        scene = response.json()
+
+        response = self.client.get(reverse("layerview", args=[scene["slug"]]))
+
+        json_response = response.json()
+        self.assertEqual(
+            json_response["map"]["customStyle"]["layers"],
+            [
+                {
+                    "id": "282d40e1ab9a059aa9d6eff431407e76",
+                    "type": "raster",
+                    "minzoom": 14,
+                    "maxzoom": 15,
+                    "source": {
+                        "type": "raster",
+                        "tileSize": 256,
+                        "tiles": ["http://www.test.test"],
+                    },
+                }
+            ],
+        )
+
+    def test_layer_view_with_custom_style(self):
+        layer = Layer.objects.create(
+            source=self.source,
+            name=f"Layer",
+            interactions=[
+                {
+                    "id": "terralego-eae-sync",
+                    "interaction": "highlight",
+                    "trigger": "mouseover",
+                },
+            ],
+            minisheet_enable=True,
+            popup_enable=True,
+            highlight_color=True,
+        )
+        CustomStyle.objects.create(
+            layer=layer,
+            source=self.source,
+            interactions=[
+                {"id": "custom_style", "interaction": "highlight", "trigger": "click"},
+            ],
+        )
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        scene = response.json()
+
+        response = self.client.get(reverse("layerview", args=[scene["slug"]]))
+        layersTree = response.json()
+
+        self.assertEqual(len(layersTree["interactions"]), 4)
+
+    def test_layer_view_with_table_enable(self):
+        field = self.source.fields.create(
+            name="_test_field", label="test_label", data_type=FieldTypes.String.value
+        )
+        layer = Layer.objects.create(
+            source=self.source, name=f"Layer", table_enable=True,
+        )
+        FilterField.objects.create(
+            label="test layer fields",
+            layer=layer,
+            field=field,
+            filter_settings={},
+            filter_enable=True,
+            shown=True,
+            format_type="test",
+            exportable=True,
+        )
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        scene = response.json()
+
+        response = self.client.get(reverse("layerview", args=[scene["slug"]]))
+        layersTree = response.json()
+
+        self.assertEqual(
+            layersTree["layersTree"][0]["filters"]["fields"][0],
+            {
+                "value": "_test_field",
+                "label": "test layer fields",
+                "exportable": True,
+                "format_type": "test",
+            },
+        )
+
+    def test_layer_view_with_table_enable_no_layer(self):
+        field = self.source.fields.create(
+            name="_test_field", label="test_label", data_type=FieldTypes.String.value
+        )
+        layer = Layer.objects.create(
+            source=self.source, name=f"Layer", table_enable=True,
+        )
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_201_CREATED)
+
+        scene = response.json()
+        layer.delete()
+        response = self.client.get(reverse("layerview", args=[scene["slug"]]))
+        self.assertEqual(response.status_code, HTTP_404_NOT_FOUND)
+
     def test_create_scene_with_complexe_tree(self):
         layers = [
-            Layer.objects.create(source=self.source, name=f"Layer {x}")
+            Layer.objects.create(source=self.source, name=f"Layer {x}",)
             for x in range(7)
         ]
 
@@ -307,7 +489,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "tree": [{"geolayer": layer.id},],
         }
 
-        response = self.client.post(reverse("scene-list"), query)
+        self.client.post(reverse("scene-list"), query)
 
         # Try to steal a layer from another scene
         query = {
@@ -329,6 +511,16 @@ class ModelSourceViewsetTestCase(TestCase):
         response = self.client.post(reverse("scene-list"), query)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
 
+        # Try to create a tree with a wrong schema, group should be true or false
+        query = {
+            "name": "Yet another scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id, "group": 3}],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
     def test_validation_error_on_delete_attached_layer(self):
 
         layer = Layer.objects.create(
@@ -341,7 +533,109 @@ class ModelSourceViewsetTestCase(TestCase):
             "tree": [{"geolayer": layer.id},],
         }
 
-        response = self.client.post(reverse("scene-list"), query)
+        self.client.post(reverse("scene-list"), query)
 
         response = self.client.delete(reverse("layer-detail", kwargs={"pk": layer.id}))
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+
+    def test_delete_layer(self):
+        layer = Layer.objects.create(
+            group=None, source=self.source, minisheet_enable=False
+        )
+
+        response = self.client.delete(reverse("layer-detail", kwargs={"pk": layer.id}))
+        self.assertEqual(response.status_code, HTTP_204_NO_CONTENT)
+
+
+class ModelSourceViewsetAnonymousTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.default_user = UserModel.objects.get_or_create(
+            is_superuser=False, **{UserModel.USERNAME_FIELD: "testuser"}
+        )[0]
+        self.client.force_authenticate(self.default_user)
+
+        self.scene = SceneFactory(name="test_scene")
+        self.source = PostGISSource.objects.create(
+            name="test_view",
+            db_name="test",
+            db_password="test",
+            db_host="localhost",
+            geom_type=1,
+            refresh=-1,
+        )
+
+    def test_list_view_no_permission(self):
+        group = LayerGroup.objects.create(view=self.scene, label="Test Group")
+
+        [Layer.objects.create(group=group, source=self.source) for x in range(5)]
+
+        response = self.client.get(reverse("layer-list"))
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+    def test_create_layer_no_permission(self):
+        query = {
+            "source": self.source.pk,
+            "name": "test layer",
+            "table_export_enable": True,
+            "filter_enable": False,
+        }
+
+        response = self.client.post(reverse("layer-list"), query)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+    def test_scene_list_no_permission(self):
+        layer = Layer.objects.create(
+            source=self.source, name=f"Layer", table_enable=True,
+        )
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+    def test_source_list_no_permission(self):
+        layer = Layer.objects.create(
+            source=self.source, name=f"Layer", table_enable=True,
+        )
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": [{"geolayer": layer.id},],
+        }
+
+        response = self.client.post(reverse("scene-list"), query)
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+    def test_source_creation_no_permission(self):
+        source_example = {
+            "_type": "PostGISSource",
+            "name": "Test Source",
+            "db_username": "username",
+            "db_name": "dbname",
+            "db_host": "hostname.com",
+            "query": "SELECT 1",
+            "geom_field": "geom",
+            "refresh": -1,
+            "geom_type": 1,
+        }
+        response = self.client.post(
+            reverse("geosource:geosource-list"),
+            {**source_example, "db_password": "test_password"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+    def test_geostore_no_permission(self):
+        point_layer = LayerFactory(
+            name="no schema point geom", geom_type=GeometryTypes.Point
+        )
+        response = self.client.post(
+            reverse("feature-list", args=[point_layer.pk,]),
+            data={"geom": "POINT(0 0)", "properties": {"toto": "ok"}},
+        )
+        self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
