@@ -36,6 +36,7 @@ class Command(BaseCommand):
 
         for field in serialized.get("fields", []):
             field.pop("id")
+            field.pop("sourceFieldId")
             field["field"] = Field.objects.get(pk=field["field"]).name
 
         fk_fields = (
