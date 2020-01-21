@@ -46,11 +46,11 @@ class SceneDetailSerializer(ModelSerializer):
 
 
 class FilterFieldSerializer(ModelSerializer):
-    id = PrimaryKeyRelatedField(source="field", read_only=True)
+    sourceFieldId = PrimaryKeyRelatedField(source="field", read_only=True)
 
     class Meta:
         model = FilterField
-        exclude = ("layer",)
+        exclude = ("layer", "order")
 
 
 class CustomStyleSerializer(ModelSerializer):
@@ -113,11 +113,13 @@ class LayerDetailSerializer(ModelSerializer):
     def _update_m2m_through(self, instance, field, serializer):
         getattr(instance, field).clear()
 
-        for value in self.initial_data.get(field, []):
+        for index, value in enumerate(self.initial_data.get(field, [])):
             try:
                 value["field"] = value["id"]
             except KeyError:
                 raise ValidationError("Fields must contain Source's field id")
+
+            value["order"] = index  # Add order field
 
             obj = serializer(data=value)
             if obj.is_valid(raise_exception=True):
