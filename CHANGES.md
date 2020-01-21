@@ -1,3 +1,20 @@
+0.4.3      (2019-01-21)
+-----------------------
+
+### Fixes
+
+* Fix field ordering bug
+* Fix migration bug on Group
+* Add permission on layers
+* Remove code slug is None
+
+### Quality
+
+* Increase coverage
+* Add a lot of tests
+* Add flake8 pipeline travis
+* Fix coveragerc
+
 0.4.2      (2019-01-07)
 -----------------------
 
