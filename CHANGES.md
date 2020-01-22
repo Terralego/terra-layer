@@ -1,3 +1,11 @@
+
+0.4.4      (2019-01-22)
+-----------------------
+
+### Fixes
+
+* Remove id to source field translation for fields
+
 0.4.3      (2019-01-21)
 -----------------------
 
