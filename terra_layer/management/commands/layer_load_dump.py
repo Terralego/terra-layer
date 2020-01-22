@@ -39,7 +39,7 @@ class Command(BaseCommand):
             data["main_field"] = source.fields.get(name=data["main_field"]).pk
 
         for field in data["fields"]:
-            field["id"] = source.fields.get(name=field["field"]).pk
+            field["field"] = source.fields.get(name=field["field"]).pk
 
         parts = data["name"].split("/")
         layer_name = parts.pop()

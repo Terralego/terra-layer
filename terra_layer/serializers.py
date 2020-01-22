@@ -2,11 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
-from rest_framework.serializers import (
-    ModelSerializer,
-    PrimaryKeyRelatedField,
-    ValidationError,
-)
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
 from .models import CustomStyle, FilterField, Layer, Scene
 
@@ -114,11 +110,6 @@ class LayerDetailSerializer(ModelSerializer):
         getattr(instance, field).clear()
 
         for index, value in enumerate(self.initial_data.get(field, [])):
-            try:
-                value["field"] = value["id"]
-            except KeyError:
-                raise ValidationError("Fields must contain Source's field id")
-
             value["order"] = index  # Add order field
 
             obj = serializer(data=value)
