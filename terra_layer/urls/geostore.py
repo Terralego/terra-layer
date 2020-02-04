@@ -8,7 +8,7 @@ from ..views import (
 )
 
 
-router = routers.SimpleRouter()
+router = routers.DefaultRouter()
 
 router.register(r"layer", GeostoreLayerViewSet, basename="layer")
 router.register(r"group", GeostoreLayerGroupViewsSet, basename="group"),
