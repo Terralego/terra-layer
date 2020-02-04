@@ -1,3 +1,9 @@
+0.4.5      (2019-02-04)
+-----------------------
+
+### Fixes
+
+* Replace SimpleRouteur by DefaultRouter that handle `format` param
 
 0.4.4      (2019-01-22)
 -----------------------
