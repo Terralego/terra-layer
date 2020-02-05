@@ -70,6 +70,7 @@ class LayerListSerializer(ModelSerializer):
 class LayerDetailSerializer(ModelSerializer):
     fields = FilterFieldSerializer(many=True, read_only=True, source="fields_filters")
     custom_styles = CustomStyleSerializer(many=True, read_only=True)
+    group = PrimaryKeyRelatedField(read_only=True)
 
     @transaction.atomic
     def create(self, validated_data):
