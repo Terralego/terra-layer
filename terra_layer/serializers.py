@@ -46,7 +46,7 @@ class FilterFieldSerializer(ModelSerializer):
 
     class Meta:
         model = FilterField
-        exclude = ("layer", "order")
+        exclude = ("layer",)
 
 
 class CustomStyleSerializer(ModelSerializer):
