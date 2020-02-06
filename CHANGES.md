@@ -1,3 +1,11 @@
+0.4.6      (2019-02-06)
+-----------------------
+
+### Fixes
+
+* Field order was not saved
+* Don't save layer group on write 
+
 0.4.5      (2019-02-04)
 -----------------------
 
