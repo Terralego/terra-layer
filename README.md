@@ -17,8 +17,8 @@ In Django settings, you must set the different views provided to fronted, like t
 
 ```python
 TERRA_DEFAULT_MAP_SETTINGS = {
-    "accessToken": "<your mapbox access token>",
-    "backgroundStyle": "<background style file>",
+    'accessToken': '<your mapbox access token>',
+    'backgroundStyle': '<background style file>',
     'center': [-0.655, 43.141], # Default view center
     'zoom': 7.7, # Default zoom
     'maxZoom': 19.9,
@@ -46,7 +46,7 @@ the same command twice.
 Then initialize the database:
 
 ```sh
-docker-compose run web /code/venv/bin/python3 /code/src/manage.py migrate
+docker-compose run --rm web /code/venv/bin/python3 /code/src/manage.py migrate
 ```
 
 You can now edit your code. A django runserver is launched internally so the 
@@ -59,7 +59,7 @@ You can access to the api on http://localhost:8000/api/
 To run test suite, just launch:
 
 ```sh
-docker-compose run web /code/venv/bin/python3 /code/src/manage.py test
+docker-compose run --rm web /code/venv/bin/python3 /code/src/manage.py test
 ```
 
 ## Contributing
