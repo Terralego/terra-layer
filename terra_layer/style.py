@@ -14,7 +14,7 @@ def _flatten(l):
     return list(reduce(lambda x, y: x + y, l))
 
 
-def min_max(geo_layer, property):
+def get_min_max(geo_layer, property):
     """
     Return the max and the min value of a property.
     """
@@ -39,14 +39,17 @@ def min_max(geo_layer, property):
             return [None, None]
 
 
-def discretize_quantile(geo_layer, property, class_number):
+def discretize_quantile(geo_layer, property, class_count):
+    """
+    Compute Quantile class boundaries from a layer property.
+    """
     with connection.cursor() as cursor:
         cursor.execute('''
             WITH
             ntiles AS (
                 SELECT
                     (properties->>%(property)s)::numeric AS value,
-                    ntile(%(class_number)s) OVER (ORDER BY (properties->>%(property)s)::numeric) AS ntile
+                    ntile(%(class_count)s) OVER (ORDER BY (properties->>%(property)s)::numeric) AS ntile
                 FROM
                     geostore_feature
                 WHERE
@@ -63,17 +66,22 @@ def discretize_quantile(geo_layer, property, class_number):
                 ntile
             ''', {
             'property': property,
-            'class_number': class_number,
+            'class_count': class_count,
             'layer_id': geo_layer.id,
         })
         rows = cursor.fetchall()
         if rows:
-            return list(map(lambda r: r[0], rows)) + [rows[-1][1]]
+            # Each class start + last class end
+            return [r[0] for r in rows] + [rows[-1][1]]
         else:
-            return [0 + 1 * i for i in range(0, class_number)]
+            return [0 + 1 * i for i in range(0, class_count)]
 
 
-def discretize_jenks(geo_layer, property, class_number):
+def discretize_jenks(geo_layer, property, class_count):
+    """
+    Compute Jenks class boundaries from a layer property.
+    Note: Use PostGIS ST_ClusterKMeans() as k-means function.
+    """
     with connection.cursor() as cursor:
         cursor.execute('''
             WITH
@@ -82,7 +90,7 @@ def discretize_jenks(geo_layer, property, class_number):
                     (properties->>%(property)s)::numeric AS property,
                     ST_ClusterKMeans(
                         ST_MakePoint((properties->>%(property)s)::numeric, 0),
-                        least(%(class_number)s, (SELECT count(*) FROM geostore_feature WHERE layer_id = %(layer_id)s))::integer
+                        least(%(class_count)s, (SELECT count(*) FROM geostore_feature WHERE layer_id = %(layer_id)s))::integer
                     ) OVER () AS class_id
                 FROM
                     geostore_feature
@@ -101,37 +109,46 @@ def discretize_jenks(geo_layer, property, class_number):
                 max
             ''', {
             'property': property,
-            'class_number': class_number,
+            'class_count': class_count,
             'layer_id': geo_layer.id,
         })
         rows = cursor.fetchall()
         if rows:
-            return list(map(lambda r: r[0], rows)) + [rows[-1][1]]
+            # # Each class start + last class end
+            return [r[0] for r in rows] + [rows[-1][1]]
         else:
-            return [0 + 1 * i for i in range(0, class_number)]
+            return [0 + 1 * i for i in range(0, class_count)]
 
 
-def discretize_equal_interval(geo_layer, property, class_number):
-    min, max = min_max(geo_layer, property)
+def discretize_equal_interval(geo_layer, property, class_count):
+    """
+    Compute QuantiEqual Interval class boundaries from a layer property.
+    """
+    min, max = get_min_max(geo_layer, property)
     if min is not None and max is not None and isinstance(min, numbers.Number):
-        delta = (max - min) / class_number
-        return [min + delta * i for i in range(0, class_number + 1)]
+        delta = (max - min) / class_count
+        return [min + delta * i for i in range(0, class_count + 1)]
     else:
-        return [0 + 1 * i for i in range(0, class_number)]
+        return [0 + 1 * i for i in range(0, class_count)]
 
 
-def discretize(geo_layer, property, method, class_number):
+def discretize(geo_layer, property, method, class_count):
+    """
+    Select a method to compute class boundaries.
+    Compute (len(class_count) + 1) boundaries.
+    Note, can returns less boundaries than requested if lesser values in property than class_count
+    """
     if method == 'quantile':
-        return discretize_quantile(geo_layer, property, class_number)
+        return discretize_quantile(geo_layer, property, class_count)
     elif method == 'jenks':
-        return discretize_jenks(geo_layer, property, class_number)
+        return discretize_jenks(geo_layer, property, class_count)
     elif method == 'equal_interval':
-        return discretize_equal_interval(geo_layer, property, class_number)
+        return discretize_equal_interval(geo_layer, property, class_count)
     else:
         raise ValueError(f'Unknow discretize method "{method}"')
 
 
-def steps_style(property, boundaries, colors):
+def gen_style_steps(property, boundaries, colors):
     """
     Assume len(boundaries) <= len(colors) - 1
     """
@@ -142,31 +159,43 @@ def steps_style(property, boundaries, colors):
     ] + _flatten(zip(boundaries[1:], colors[1:]))
 
 
-def steps_legend(boundaries, colors):
-    size = len(boundaries)
-    return list(map(lambda index: {
+def gen_legend_steps(boundaries, colors):
+    """
+    Generate a discrete legend.
+    """
+    size = len(boundaries) - 1
+    return [{
         'color': colors[index],
-        'label': f'[{boundaries[index]} – {boundaries[index+1]}' + (']' if index + 1 == size - 1 else ')'),
+        'label': f'[{boundaries[index]} – {boundaries[index+1]}' + (']' if index + 1 == size else ')'),
         'shape': 'square',
-    }, range(0, size - 1)))
+    } for index in range(size)]
 
 
-def interpolate_style(property, boundaries, values):
+def gen_style_interpolate(property, boundaries, values):
+    """
+    Build a Mapbox GL Style interpolation expression.
+    """
     return [
         'interpolate', 'linear',
         ['get', property]
     ] + _flatten(zip(boundaries, values))
 
 
-def circle_legend(boundaries, sizes):
-    return list(map(lambda bs: {
-        'radius': bs[1],
-        'label': f'{bs[0]}',
+def gen_legend_circle(boundaries, sizes):
+    """
+    Generate a circle legend.
+    """
+    return [{
+        'radius': s,
+        'label': f'{b}',
         'shape': 'circle',
-    }, zip(boundaries, sizes)))
+    } for b, s in zip(boundaries, sizes)]
 
 
-def layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
+def gen_layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
+    """
+    Build a Mapbox GL Style layer for pylygon fill.
+    """
     return {
         'type': 'fill',
         'paint': {
@@ -176,7 +205,10 @@ def layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR)
     }
 
 
-def layer_circle(radius, fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
+def gen_layer_circle(radius, fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
+    """
+    Build a Mapbox GL Style layer for circle.
+    """
     return {
         'type': 'circle',
         'paint': {
@@ -186,7 +218,10 @@ def layer_circle(radius, fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STR
     }
 
 
-def generator(layer, config):
+def generate_style_from_wizard(layer, config):
+    """
+    Return a Mapbox GL Style and a Legend from a wizard setting.
+    """
     geo_layer = layer.source.get_layer()
     symbology = config['symbology']
     property = config['property']
@@ -201,11 +236,11 @@ def generator(layer, config):
         # }
         colors = config['fill_color']
         boundaries = discretize(geo_layer, property, config['method'], len(colors))
-        style = layer_fill(
-            fill_color=steps_style(property, boundaries, colors),
+        style = gen_layer_fill(
+            fill_color=gen_style_steps(property, boundaries, colors),
             stroke_color=config.get('stroke_color', DEFAULT_STROKE_COLOR),
         )
-        legend = steps_legend(boundaries, colors)
+        legend = gen_legend_steps(boundaries, colors)
         return {'style': style, 'legend': legend}
 
     elif symbology == 'circle':
@@ -216,14 +251,14 @@ def generator(layer, config):
         #     "fill_color": "#0000cc",
         #     "stroke_color": "#ffffff",
         # }
-        boundaries = [0, min_max(geo_layer, property)[1]]
+        boundaries = [0, get_min_max(geo_layer, property)[1]]
         sizes = [0, config['max_diameter']]
-        style = layer_circle(
-            radius=interpolate_style(property, boundaries, sizes),
+        style = gen_layer_circle(
+            radius=gen_style_interpolate(property, boundaries, sizes),
             fill_color=config.get('fill_color', DEFAULT_FILL_COLOR),
             stroke_color=config.get('stroke_color', DEFAULT_STROKE_COLOR),
         )
-        legend = circle_legend(boundaries, sizes)
+        legend = gen_legend_circle(boundaries, sizes)
         return {'style': style, 'legend': legend}
 
     else:
