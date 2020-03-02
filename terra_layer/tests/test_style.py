@@ -39,6 +39,24 @@ class StyleTestCase(TestCase):
 
         self.assertEqual(style.get_min_max(geo_layer, 'a'), [1.0, 2.0])
 
+    def test_circle_boundaries_100(self):
+        min = 1
+        max = 100
+        size = 100
+        candidates = style.circle_boundaries_candidate(min, max)
+        candidates = [max] + candidates + [min]
+        boundaries = style.circle_boundaries_filter_values(candidates, min, max, size / 20)
+        self.assertEqual(boundaries, [100, 50, 25, 10, 5, 2.5])
+
+    def test_circle_boundaries_1(self):
+        min = 1
+        max = 1
+        size = 100
+        candidates = style.circle_boundaries_candidate(min, max)
+        candidates = [max] + candidates + [min]
+        boundaries = style.circle_boundaries_filter_values(candidates, min, max, size / 20)
+        self.assertEqual(boundaries, [1])
+
     def test_empty(self):
         geo_layer = self.source.get_layer()
         geo_layer.layer_style_wizard = {}
@@ -208,7 +226,7 @@ class StyleTestCase(TestCase):
     def test_2circle(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
-        self._feature_factory(geo_layer, a=2),
+        self._feature_factory(geo_layer, a=128),
 
         self.layer.layer_style_wizard = {
             "property": "a",
@@ -224,20 +242,36 @@ class StyleTestCase(TestCase):
             'paint': {
                 'circle-radius': [
                     'interpolate', 'linear',
-                    ['get', 'a'],
+                    ['sqrt', ['/', ['get', 'a'], ['pi']]],
                     0, 0,
-                    2.0, 200
+                    128.0, 200
                 ],
                 'circle-stroke-color': '#ffffff',
             }
         })
         self.assertEqual(self.layer.legends, [{
-            'radius': 0,
-            'label': '0',
+            'radius': 7.8125,
+            'label': '5.0',
             'shape': 'circle'
         }, {
-            'radius': 200,
-            'label': '2.0',
+            'radius': 15.625,
+            'label': '10.0',
+            'shape': 'circle'
+        }, {
+            'radius': 39.0625,
+            'label': '25.0',
+            'shape': 'circle'
+        }, {
+            'radius': 78.125,
+            'label': '50.0',
+            'shape': 'circle'
+        }, {
+            'radius': 156.25,
+            'label': '100.0',
+            'shape': 'circle'
+        }, {
+            'radius': 200.0,
+            'label': '128.0',
             'shape': 'circle'
         }])
 

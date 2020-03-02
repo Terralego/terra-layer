@@ -1,5 +1,6 @@
 from django.db import connection
 import numbers
+import math
 from functools import reduce
 
 DEFAULT_FILL_COLOR = '#0000cc'
@@ -27,6 +28,32 @@ def get_min_max(geo_layer, property):
                 geostore_feature
             WHERE
                 layer_id = %(layer_id)s
+            ''', {
+            'property': property,
+            'layer_id': geo_layer.id
+        })
+        row = cursor.fetchone()
+        if row:
+            min, max = row
+            return [min, max]
+        else:
+            return [None, None]
+
+
+def get_positive_min_max(geo_layer, property):
+    """
+    Return the max and the min value of a property.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute('''
+            SELECT
+                min((properties->>%(property)s)::numeric) AS min, -----------------------------
+                max((properties->>%(property)s)::numeric) AS max -----------------------------
+            FROM
+                geostore_feature
+            WHERE
+                layer_id = %(layer_id)s AND
+                (properties->>%(property)s)::numeric > 0
             ''', {
             'property': property,
             'layer_id': geo_layer.id
@@ -148,13 +175,17 @@ def discretize(geo_layer, property, method, class_count):
         raise ValueError(f'Unknow discretize method "{method}"')
 
 
-def gen_style_steps(property, boundaries, colors):
+def get_property_style(property):
+    return ['get', property]
+
+
+def gen_style_steps(expression, boundaries, colors):
     """
     Assume len(boundaries) <= len(colors) - 1
     """
     return [
         'step',
-        ['get', property],
+        expression,
         colors[0]
     ] + _flatten(zip(boundaries[1:], colors[1:]))
 
@@ -171,25 +202,114 @@ def gen_legend_steps(boundaries, colors):
     } for index in range(size)]
 
 
-def gen_style_interpolate(property, boundaries, values):
+def gen_style_interpolate(expression, boundaries, values):
     """
     Build a Mapbox GL Style interpolation expression.
     """
     return [
         'interpolate', 'linear',
-        ['get', property]
+        expression
     ] + _flatten(zip(boundaries, values))
 
 
-def gen_legend_circle(boundaries, sizes):
+# Implementation of Self-Adjusting Legends for Proportional Symbol Maps
+# https://pdfs.semanticscholar.org/d3f9/2bbd24ae83af6c101e5caacbd3e830d99272.pdf
+
+def circle_boundaries_candidate(min, max):
+    if min == 0:
+        raise ValueError('Minimum value should be > 0')
+
+    # array of base values in decreasing order in the range [1,10)
+    bases = [5, 2.5, 1]
+    # an index into the bases array
+    base_id = 0
+    # array that will hold the candidate values
+    values = []
+    # scale the minimum and maximum such that the minimum is > 1
+    scale = 1  # scale factor
+    min_s = min  # scaled minimum
+    max_s = max  # scaled maximum
+    while min_s < 1:
+        min_s *= 10
+        max_s *= 10
+        scale /= 10
+
+    # Compute the number of digits of the integral part of the scaled maximum
+    ndigits = math.floor(math.log10(max_s))
+
+    # Find the index into the bases array for the first limit smaller than max_s
+    for i in range(0, len(bases)):
+        if (max_s / 10**ndigits) >= bases[i]:
+            base_id = i
+            break
+
+    while True:
+        v = bases[base_id] * (10 ** ndigits)
+        # stop the loop if the value is smaller than min_s
+        if (v <= min_s):
+            break
+
+        # otherwise store v in the values array
+        values.append(v / scale)
+        # switch to the next base
+        base_id += 1
+        if base_id == len(bases):
+            base_id = 0
+            ndigits = ndigits - 1
+
+    return values
+
+
+def circle_boundaries_value_to_symbol_height(value, max_value, max_size):
+    return 2 * math.sqrt(value * max_size / max_value / math.pi)
+
+
+def circle_boundaries_filter_values(values, max_value, max_size, dmin):
+    # array that will hold the filtered values
+    filtered_values = []
+    # add the maximum value
+    filtered_values.append(values[0])
+    # remember the height of the previously added value
+    previous_height = circle_boundaries_value_to_symbol_height(values[0], max_value, max_size)
+    # find the height and value of the smallest acceptable symbol
+    last_height = 0
+    last_value_id = len(values) - 1
+    while last_value_id >= 0:
+        last_height = circle_boundaries_value_to_symbol_height(values[last_value_id], max_value, max_size)
+        if last_height > dmin:
+            break
+        last_value_id -= 1
+
+    # loop over all values that are large enough
+    for limit_id in range(1, last_value_id + 1):
+        v = values[limit_id - 1]
+        # compute the height of the symbol
+        h = circle_boundaries_value_to_symbol_height(v, max_value, max_size)
+        # do not draw the symbol if it is too close to the smallest symbol (but is not the smallest limit itself)
+        if h - last_height < dmin and limit_id != last_value_id:
+            continue
+        # do not draw the symbol if it is too close to the previously drawn symbol
+        if previous_height - h < dmin:
+            continue
+        filtered_values.append(v)
+        # remember the height of the last drawn symbol
+        previous_height = h
+
+    return filtered_values
+
+
+def gen_legend_circle(min, max, size):
     """
     Generate a circle legend.
     """
+    candidates = circle_boundaries_candidate(min, max)
+    candidates = [max] + candidates + [min]
+    boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)[::-1]
     return [{
-        'radius': s,
+        'radius': b * size / max,
         'label': f'{b}',
         'shape': 'circle',
-    } for b, s in zip(boundaries, sizes)]
+    } for b in boundaries]
 
 
 def gen_layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
@@ -237,7 +357,7 @@ def generate_style_from_wizard(layer, config):
         colors = config['fill_color']
         boundaries = discretize(geo_layer, property, config['method'], len(colors))
         style = gen_layer_fill(
-            fill_color=gen_style_steps(property, boundaries, colors),
+            fill_color=gen_style_steps(get_property_style(property), boundaries, colors),
             stroke_color=config.get('stroke_color', DEFAULT_STROKE_COLOR),
         )
         legend = gen_legend_steps(boundaries, colors)
@@ -251,14 +371,16 @@ def generate_style_from_wizard(layer, config):
         #     "fill_color": "#0000cc",
         #     "stroke_color": "#ffffff",
         # }
-        boundaries = [0, get_min_max(geo_layer, property)[1]]
+        mm = get_positive_min_max(geo_layer, property)
+        boundaries = [0, mm[1]]
         sizes = [0, config['max_diameter']]
+        radius = ['sqrt', ['/', get_property_style(property), ['pi']]]
         style = gen_layer_circle(
-            radius=gen_style_interpolate(property, boundaries, sizes),
+            radius=gen_style_interpolate(radius, boundaries, sizes),
             fill_color=config.get('fill_color', DEFAULT_FILL_COLOR),
             stroke_color=config.get('stroke_color', DEFAULT_STROKE_COLOR),
         )
-        legend = gen_legend_circle(boundaries, sizes)
+        legend = gen_legend_circle(mm[0], mm[1], sizes[1])
         return {'style': style, 'legend': legend}
 
     else:
