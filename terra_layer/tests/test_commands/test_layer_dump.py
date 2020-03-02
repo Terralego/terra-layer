@@ -46,6 +46,7 @@ class LayerDumpTestCase(TestCase):
                 "order": 0,
                 "description": "",
                 "layer_style": {},
+                "layer_style_wizard": {},
                 "settings": {},
                 "active_by_default": False,
                 "legends": [],

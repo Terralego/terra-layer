@@ -11,6 +11,7 @@ from rest_framework.reverse import reverse
 
 from .utils import get_layer_group_cache_key
 from .schema import JSONSchemaValidator, SCENE_LAYERTREE
+from .style import generator as style_generator
 
 
 class Scene(models.Model):
@@ -145,6 +146,7 @@ class Layer(models.Model):
     description = models.TextField(blank=True)
 
     layer_style = JSONField(default=dict)
+    layer_style_wizard = JSONField(default=dict)
     settings = JSONField(default=dict)
     active_by_default = models.BooleanField(default=False)
 
@@ -187,6 +189,11 @@ class Layer(models.Model):
         # Invalidate cache for layer group
         if self.group:
             cache.delete(get_layer_group_cache_key(self.group.view))
+
+        if self.layer_style_wizard:
+            style_legend = style_generator(self, self.layer_style_wizard)
+            self.layer_style = style_legend['style']
+            self.legends = style_legend['legend']
 
     def __str__(self):
         return f"Layer({self.id}) - {self.name}"
