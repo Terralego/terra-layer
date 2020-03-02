@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 from .utils import get_layer_group_cache_key
 from .schema import JSONSchemaValidator, SCENE_LAYERTREE
-from .style import generator as style_generator
+from .style import generate_style_from_wizard
 
 
 class Scene(models.Model):
@@ -191,7 +191,7 @@ class Layer(models.Model):
             cache.delete(get_layer_group_cache_key(self.group.view))
 
         if self.layer_style_wizard:
-            style_legend = style_generator(self, self.layer_style_wizard)
+            style_legend = generate_style_from_wizard(self, self.layer_style_wizard)
             self.layer_style = style_legend['style']
             self.legends = style_legend['legend']
 

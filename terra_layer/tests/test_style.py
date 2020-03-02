@@ -32,12 +32,12 @@ class StyleTestCase(TestCase):
             properties=properties,
         )
 
-    def test_min_max(self):
+    def test_get_min_max(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.assertEqual(style.min_max(geo_layer, 'a'), [1.0, 2.0])
+        self.assertEqual(style.get_min_max(geo_layer, 'a'), [1.0, 2.0])
 
     def test_empty(self):
         geo_layer = self.source.get_layer()
@@ -241,7 +241,7 @@ class StyleTestCase(TestCase):
             'shape': 'circle'
         }])
 
-    def test_equal_interval_gauss(self):
+    def test_graduated_equal_interval(self):
         geo_layer = self.source.get_layer()
 
         random.seed(33)
@@ -289,7 +289,7 @@ class StyleTestCase(TestCase):
             'shape': 'square'
         }])
 
-    def test_quantile_gauss(self):
+    def test_graduated_quantile(self):
         geo_layer = self.source.get_layer()
 
         random.seed(33)
@@ -337,7 +337,7 @@ class StyleTestCase(TestCase):
             'shape': 'square'
         }])
 
-    def test_jenks_gauss(self):
+    def test_graduated_jenks(self):
         geo_layer = self.source.get_layer()
 
         random.seed(33)
