@@ -65,30 +65,5 @@ class Command(BaseCommand):
 
         # Here we insert layer in tree if not previously existing
         if not exists:
-
-            # Add the layer in scene tree
-            # Here we assume that missing groups are added at first position of current node
-            # We create missing group with default exclusive group configuration (should be corrected later if necessary)
             scene = Scene.objects.get(id=data["view"])
-            current_node = scene.tree
-            for part in parts:
-                found = False
-                for group in current_node:
-                    if group.get("group") and group["label"] == part:
-                        current_node = group["children"]
-                        found = True
-                        break
-                if not found:
-                    # Add the missing group
-                    new_group = {"group": True, "label": part, "children": []}
-                    current_node.insert(0, new_group)
-                    current_node = new_group["children"]
-
-            # Node if found (or created) we can add the geolayer now
-            current_node.append(
-                {
-                    "geolayer": layer_detail_serializer.instance.id,
-                    "label": layer_detail_serializer.instance.name,
-                }
-            )
-            scene.save()
+            scene.insert_in_tree(layer_detail_serializer.instance, parts)
