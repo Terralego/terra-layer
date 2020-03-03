@@ -192,8 +192,8 @@ class Layer(models.Model):
 
         if self.layer_style_wizard:
             style_legend = generate_style_from_wizard(self, self.layer_style_wizard)
-            self.layer_style = style_legend['style']
-            self.legends = style_legend['legend']
+            self.layer_style = style_legend["style"]
+            self.legends = style_legend["legend"]
 
     def __str__(self):
         return f"Layer({self.id}) - {self.name}"

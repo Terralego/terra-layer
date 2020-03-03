@@ -3,8 +3,8 @@ import numbers
 import math
 from functools import reduce
 
-DEFAULT_FILL_COLOR = '#0000cc'
-DEFAULT_STROKE_COLOR = '#ffffff'
+DEFAULT_FILL_COLOR = "#0000cc"
+DEFAULT_STROKE_COLOR = "#ffffff"
 
 
 def _flatten(l):
@@ -12,71 +12,66 @@ def _flatten(l):
     Flatten 2-level array.
     [[1,2], [3, 4, 5]] -> [1, 2, 3, 4, 5]
     """
-    return list(reduce(lambda x, y: x + y, l))
+    return list(reduce(lambda x, y: x + y, l or []))
 
 
-def get_min_max(geo_layer, property):
+def get_min_max(geo_layer, field):
     """
     Return the max and the min value of a property.
     """
     with connection.cursor() as cursor:
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT
-                min((properties->>%(property)s)::numeric) AS min, -----------------------------
-                max((properties->>%(property)s)::numeric) AS max -----------------------------
+                min((properties->>%(field)s)::numeric) AS min, -----------------------------
+                max((properties->>%(field)s)::numeric) AS max -----------------------------
             FROM
                 geostore_feature
             WHERE
                 layer_id = %(layer_id)s
-            ''', {
-            'property': property,
-            'layer_id': geo_layer.id
-        })
+            """,
+            {"field": field, "layer_id": geo_layer.id},
+        )
         row = cursor.fetchone()
-        if row:
-            min, max = row
-            return [min, max]
-        else:
-            return [None, None]
+        min, max = row
+        return [min, max]
 
 
-def get_positive_min_max(geo_layer, property):
+def get_positive_min_max(geo_layer, field):
     """
     Return the max and the min value of a property.
     """
     with connection.cursor() as cursor:
-        cursor.execute('''
+        cursor.execute(
+            """
             SELECT
-                min((properties->>%(property)s)::numeric) AS min, -----------------------------
-                max((properties->>%(property)s)::numeric) AS max -----------------------------
+                min((properties->>%(field)s)::numeric) AS min, -----------------------------
+                max((properties->>%(field)s)::numeric) AS max -----------------------------
             FROM
                 geostore_feature
             WHERE
                 layer_id = %(layer_id)s AND
-                (properties->>%(property)s)::numeric > 0
-            ''', {
-            'property': property,
-            'layer_id': geo_layer.id
-        })
+                (properties->>%(field)s)::numeric > 0
+            """,
+            {"field": field, "layer_id": geo_layer.id},
+        )
         row = cursor.fetchone()
-        if row:
-            min, max = row
-            return [min, max]
-        else:
-            return [None, None]
+        min, max = row
+        return [min, max]
 
 
-def discretize_quantile(geo_layer, property, class_count):
+def discretize_quantile(geo_layer, field, class_count):
     """
     Compute Quantile class boundaries from a layer property.
     """
     with connection.cursor() as cursor:
-        cursor.execute('''
+        cursor.execute(
+            """
             WITH
             ntiles AS (
                 SELECT
-                    (properties->>%(property)s)::numeric AS value,
-                    ntile(%(class_count)s) OVER (ORDER BY (properties->>%(property)s)::numeric) AS ntile
+                    (properties->>%(field)s)::numeric AS value,
+                    ntile(%(class_count)s) OVER (ORDER BY (properties->>%(field)s)::numeric) AS ntile
                 FROM
                     geostore_feature
                 WHERE
@@ -91,32 +86,31 @@ def discretize_quantile(geo_layer, property, class_count):
                 ntile
             ORDER BY
                 ntile
-            ''', {
-            'property': property,
-            'class_count': class_count,
-            'layer_id': geo_layer.id,
-        })
+            """,
+            {"field": field, "class_count": class_count, "layer_id": geo_layer.id},
+        )
         rows = cursor.fetchall()
         if rows:
             # Each class start + last class end
             return [r[0] for r in rows] + [rows[-1][1]]
         else:
-            return [0 + 1 * i for i in range(0, class_count)]
+            return []
 
 
-def discretize_jenks(geo_layer, property, class_count):
+def discretize_jenks(geo_layer, field, class_count):
     """
     Compute Jenks class boundaries from a layer property.
     Note: Use PostGIS ST_ClusterKMeans() as k-means function.
     """
     with connection.cursor() as cursor:
-        cursor.execute('''
+        cursor.execute(
+            """
             WITH
             kmeans AS (
                 SELECT
-                    (properties->>%(property)s)::numeric AS property,
+                    (properties->>%(field)s)::numeric AS field,
                     ST_ClusterKMeans(
-                        ST_MakePoint((properties->>%(property)s)::numeric, 0),
+                        ST_MakePoint((properties->>%(field)s)::numeric, 0),
                         least(%(class_count)s, (SELECT count(*) FROM geostore_feature WHERE layer_id = %(layer_id)s))::integer
                     ) OVER () AS class_id
                 FROM
@@ -125,8 +119,8 @@ def discretize_jenks(geo_layer, property, class_count):
                     layer_id = %(layer_id)s
             )
             SELECT
-                min(property) AS min,
-                max(property) AS max
+                min(field) AS min,
+                max(field) AS max
             FROM
                 kmeans
             GROUP BY
@@ -134,60 +128,54 @@ def discretize_jenks(geo_layer, property, class_count):
             ORDER BY
                 min,
                 max
-            ''', {
-            'property': property,
-            'class_count': class_count,
-            'layer_id': geo_layer.id,
-        })
+            """,
+            {"field": field, "class_count": class_count, "layer_id": geo_layer.id},
+        )
         rows = cursor.fetchall()
         if rows:
             # # Each class start + last class end
             return [r[0] for r in rows] + [rows[-1][1]]
         else:
-            return [0 + 1 * i for i in range(0, class_count)]
+            return []
 
 
-def discretize_equal_interval(geo_layer, property, class_count):
+def discretize_equal_interval(geo_layer, field, class_count):
     """
     Compute QuantiEqual Interval class boundaries from a layer property.
     """
-    min, max = get_min_max(geo_layer, property)
+    min, max = get_min_max(geo_layer, field)
     if min is not None and max is not None and isinstance(min, numbers.Number):
         delta = (max - min) / class_count
         return [min + delta * i for i in range(0, class_count + 1)]
     else:
-        return [0 + 1 * i for i in range(0, class_count)]
+        return []
 
 
-def discretize(geo_layer, property, method, class_count):
+def discretize(geo_layer, field, method, class_count):
     """
     Select a method to compute class boundaries.
     Compute (len(class_count) + 1) boundaries.
     Note, can returns less boundaries than requested if lesser values in property than class_count
     """
-    if method == 'quantile':
-        return discretize_quantile(geo_layer, property, class_count)
-    elif method == 'jenks':
-        return discretize_jenks(geo_layer, property, class_count)
-    elif method == 'equal_interval':
-        return discretize_equal_interval(geo_layer, property, class_count)
+    if method == "quantile":
+        return discretize_quantile(geo_layer, field, class_count)
+    elif method == "jenks":
+        return discretize_jenks(geo_layer, field, class_count)
+    elif method == "equal_interval":
+        return discretize_equal_interval(geo_layer, field, class_count)
     else:
         raise ValueError(f'Unknow discretize method "{method}"')
 
 
-def get_property_style(property):
-    return ['get', property]
+def get_field_style(field):
+    return ["get", field]
 
 
 def gen_style_steps(expression, boundaries, colors):
     """
     Assume len(boundaries) <= len(colors) - 1
     """
-    return [
-        'step',
-        expression,
-        colors[0]
-    ] + _flatten(zip(boundaries[1:], colors[1:]))
+    return ["step", expression, colors[0]] + _flatten(zip(boundaries[1:], colors[1:]))
 
 
 def gen_legend_steps(boundaries, colors):
@@ -195,29 +183,33 @@ def gen_legend_steps(boundaries, colors):
     Generate a discrete legend.
     """
     size = len(boundaries) - 1
-    return [{
-        'color': colors[index],
-        'label': f'[{boundaries[index]} – {boundaries[index+1]}' + (']' if index + 1 == size else ')'),
-        'shape': 'square',
-    } for index in range(size)]
+    return [
+        {
+            "color": colors[index],
+            "label": f"[{boundaries[index]} – {boundaries[index+1]}"
+            + ("]" if index + 1 == size else ")"),
+            "shape": "square",
+        }
+        for index in range(size)
+    ]
 
 
 def gen_style_interpolate(expression, boundaries, values):
     """
     Build a Mapbox GL Style interpolation expression.
     """
-    return [
-        'interpolate', 'linear',
-        expression
-    ] + _flatten(zip(boundaries, values))
+    return ["interpolate", ["linear"], expression] + _flatten(zip(boundaries, values))
 
 
 # Implementation of Self-Adjusting Legends for Proportional Symbol Maps
 # https://pdfs.semanticscholar.org/d3f9/2bbd24ae83af6c101e5caacbd3e830d99272.pdf
 
+
 def circle_boundaries_candidate(min, max):
-    if min == 0:
-        raise ValueError('Minimum value should be > 0')
+    if min is None or max is None:
+        return []
+    elif min <= 0:
+        raise ValueError("Minimum value should be > 0")
 
     # array of base values in decreasing order in the range [1,10)
     bases = [5, 2.5, 1]
@@ -239,14 +231,14 @@ def circle_boundaries_candidate(min, max):
 
     # Find the index into the bases array for the first limit smaller than max_s
     for i in range(0, len(bases)):
-        if (max_s / 10**ndigits) >= bases[i]:
+        if (max_s / 10 ** ndigits) >= bases[i]:
             base_id = i
             break
 
     while True:
         v = bases[base_id] * (10 ** ndigits)
         # stop the loop if the value is smaller than min_s
-        if (v <= min_s):
+        if v <= min_s:
             break
 
         # otherwise store v in the values array
@@ -265,17 +257,24 @@ def circle_boundaries_value_to_symbol_height(value, max_value, max_size):
 
 
 def circle_boundaries_filter_values(values, max_value, max_size, dmin):
+    if not values or max_value is None or max_size is None:
+        return []
+
     # array that will hold the filtered values
     filtered_values = []
     # add the maximum value
     filtered_values.append(values[0])
     # remember the height of the previously added value
-    previous_height = circle_boundaries_value_to_symbol_height(values[0], max_value, max_size)
+    previous_height = circle_boundaries_value_to_symbol_height(
+        values[0], max_value, max_size
+    )
     # find the height and value of the smallest acceptable symbol
     last_height = 0
     last_value_id = len(values) - 1
     while last_value_id >= 0:
-        last_height = circle_boundaries_value_to_symbol_height(values[last_value_id], max_value, max_size)
+        last_height = circle_boundaries_value_to_symbol_height(
+            values[last_value_id], max_value, max_size
+        )
         if last_height > dmin:
             break
         last_value_id -= 1
@@ -305,11 +304,10 @@ def gen_legend_circle(min, max, size):
     candidates = circle_boundaries_candidate(min, max)
     candidates = [max] + candidates + [min]
     boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)[::-1]
-    return [{
-        'radius': b * size / max,
-        'label': f'{b}',
-        'shape': 'circle',
-    } for b in boundaries]
+    return [
+        {"radius": b * size / max, "label": f"{b}", "shape": "circle"}
+        for b in boundaries
+    ]
 
 
 def gen_layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
@@ -317,24 +315,20 @@ def gen_layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_CO
     Build a Mapbox GL Style layer for pylygon fill.
     """
     return {
-        'type': 'fill',
-        'paint': {
-            'fill-color': fill_color,
-            'fill-outline-color': stroke_color,
-        }
+        "type": "fill",
+        "paint": {"fill-color": fill_color, "fill-outline-color": stroke_color},
     }
 
 
-def gen_layer_circle(radius, fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
+def gen_layer_circle(
+    radius, fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR
+):
     """
     Build a Mapbox GL Style layer for circle.
     """
     return {
-        'type': 'circle',
-        'paint': {
-            'circle-radius': radius,
-            'circle-stroke-color': stroke_color,
-        }
+        "type": "circle",
+        "paint": {"circle-radius": radius, "circle-stroke-color": stroke_color},
     }
 
 
@@ -343,45 +337,51 @@ def generate_style_from_wizard(layer, config):
     Return a Mapbox GL Style and a Legend from a wizard setting.
     """
     geo_layer = layer.source.get_layer()
-    symbology = config['symbology']
-    property = config['property']
+    symbology = config["symbology"]
+    field = config["field"]
 
-    if symbology == 'graduated':
+    if symbology == "graduated":
         # {
-        #     "property": "my_property",
+        #     "field": "my_field",
         #     "symbology": "graduated",
         #     "method": "equal_interval",
         #     "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
         #     "stroke_color": "#ffffff",
         # }
-        colors = config['fill_color']
-        boundaries = discretize(geo_layer, property, config['method'], len(colors))
-        style = gen_layer_fill(
-            fill_color=gen_style_steps(get_property_style(property), boundaries, colors),
-            stroke_color=config.get('stroke_color', DEFAULT_STROKE_COLOR),
-        )
-        legend = gen_legend_steps(boundaries, colors)
-        return {'style': style, 'legend': legend}
+        colors = config["fill_color"]
+        boundaries = discretize(geo_layer, field, config["method"], len(colors))
+        if boundaries:
+            style = gen_layer_fill(
+                fill_color=gen_style_steps(get_field_style(field), boundaries, colors),
+                stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
+            )
+            legend = gen_legend_steps(boundaries, colors)
+            return {"style": style, "legend": legend}
+        else:
+            return {"style": {}, "legend": []}
 
-    elif symbology == 'circle':
+    elif symbology == "circle":
         # {
-        #    "property": "my_property",
+        #    "field": "my_field",
         #     "symbology": "circle",
         #     "max_diameter": 200,
         #     "fill_color": "#0000cc",
         #     "stroke_color": "#ffffff",
         # }
-        mm = get_positive_min_max(geo_layer, property)
-        boundaries = [0, mm[1]]
-        sizes = [0, config['max_diameter']]
-        radius = ['sqrt', ['/', get_property_style(property), ['pi']]]
-        style = gen_layer_circle(
-            radius=gen_style_interpolate(radius, boundaries, sizes),
-            fill_color=config.get('fill_color', DEFAULT_FILL_COLOR),
-            stroke_color=config.get('stroke_color', DEFAULT_STROKE_COLOR),
-        )
-        legend = gen_legend_circle(mm[0], mm[1], sizes[1])
-        return {'style': style, 'legend': legend}
+        mm = get_positive_min_max(geo_layer, field)
+        if mm[0] is not None and mm[1] is not None:
+            boundaries = [0, mm[1]]
+            sizes = [0, config["max_diameter"]]
+            radius = ["sqrt", ["/", get_field_style(field), ["pi"]]]
+            style = gen_layer_circle(
+                radius=gen_style_interpolate(radius, boundaries, sizes),
+                fill_color=config.get("fill_color", DEFAULT_FILL_COLOR),
+                stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
+            )
+            legend = gen_legend_circle(mm[0], mm[1], sizes[1])
+            return {"style": style, "legend": legend}
+        else:
+            return {"style": {}, "legend": []}
 
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
