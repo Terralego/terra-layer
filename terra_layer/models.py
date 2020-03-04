@@ -184,21 +184,18 @@ class Layer(models.Model):
         ordering = ("order", "name")
 
     def save(self, **kwargs):
+        if self.layer_style_wizard:
+            style, legend_addition = generate_style_from_wizard(
+                self, self.layer_style_wizard
+            )
+            self.layer_style = style
+            self.legends[0].update(legend_addition)
+
         super().save(**kwargs)
 
         # Invalidate cache for layer group
         if self.group:
             cache.delete(get_layer_group_cache_key(self.group.view))
-
-        if self.layer_style_wizard:
-            style_legend = generate_style_from_wizard(self, self.layer_style_wizard)
-            self.layer_style = style_legend["style"]
-            if style_legend and style_legend["legend_items"]:
-                self.legends = [
-                    {"items": style_legend["legend_items"], "title": self.name}
-                ]
-            else:
-                self.legends = []
 
     def __str__(self):
         return f"Layer({self.id}) - {self.name}"
