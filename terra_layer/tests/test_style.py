@@ -22,7 +22,9 @@ class StyleTestCase(TestCase):
             refresh=-1,
         )
         self.layer = Layer.objects.create(
-            source=self.source, name="foo", uuid="91c60192-9060-4bf6-b0de-818c5a362d89",
+            source=self.source,
+            name="my_layer_name",
+            uuid="91c60192-9060-4bf6-b0de-818c5a362d89",
         )
 
     def _feature_factory(self, geo_layer, **properties):
@@ -216,6 +218,7 @@ class StyleTestCase(TestCase):
                         1.75,
                         "#000000",
                     ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -223,10 +226,31 @@ class StyleTestCase(TestCase):
         self.assertEqual(
             self.layer.legends,
             [
-                {"color": "#aa0000", "label": "[1.0 – 1.25)", "shape": "square"},
-                {"color": "#770000", "label": "[1.25 – 1.5)", "shape": "square"},
-                {"color": "#330000", "label": "[1.5 – 1.75)", "shape": "square"},
-                {"color": "#000000", "label": "[1.75 – 2.0]", "shape": "square"},
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "label": "[1.0 – 1.25)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#770000",
+                            "label": "[1.25 – 1.5)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#330000",
+                            "label": "[1.5 – 1.75)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "label": "[1.75 – 2.0]",
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
 
@@ -258,6 +282,7 @@ class StyleTestCase(TestCase):
                         2.0,
                         "#330000",
                     ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -265,8 +290,13 @@ class StyleTestCase(TestCase):
         self.assertEqual(
             self.layer.legends,
             [
-                {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
-                {"color": "#770000", "label": "[2.0 – 2.0]", "shape": "square"},
+                {
+                    "items": [
+                        {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
+                        {"color": "#770000", "label": "[2.0 – 2.0]", "shape": "square"},
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
 
@@ -298,6 +328,7 @@ class StyleTestCase(TestCase):
                         2,
                         "#330000",
                     ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -305,8 +336,13 @@ class StyleTestCase(TestCase):
         self.assertEqual(
             self.layer.legends,
             [
-                {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
-                {"color": "#770000", "label": "[2.0 – 2.0]", "shape": "square"},
+                {
+                    "items": [
+                        {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
+                        {"color": "#770000", "label": "[2.0 – 2.0]", "shape": "square"},
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
 
@@ -351,19 +387,27 @@ class StyleTestCase(TestCase):
                         128.0,
                         200,
                     ],
+                    "circle-fill-color": "#0000cc",
+                    "circle-fill-opacity": 0.4,
                     "circle-stroke-color": "#ffffff",
+                    "circle-stroke-width": 2,
                 },
             },
         )
         self.assertEqual(
             self.layer.legends,
             [
-                {"radius": 7.8125, "label": "5.0", "shape": "circle"},
-                {"radius": 15.625, "label": "10.0", "shape": "circle"},
-                {"radius": 39.0625, "label": "25.0", "shape": "circle"},
-                {"radius": 78.125, "label": "50.0", "shape": "circle"},
-                {"radius": 156.25, "label": "100.0", "shape": "circle"},
-                {"radius": 200.0, "label": "128.0", "shape": "circle"},
+                {
+                    "items": [
+                        {"radius": 7.8125, "label": "5.0", "shape": "circle"},
+                        {"radius": 15.625, "label": "10.0", "shape": "circle"},
+                        {"radius": 39.0625, "label": "25.0", "shape": "circle"},
+                        {"radius": 78.125, "label": "50.0", "shape": "circle"},
+                        {"radius": 156.25, "label": "100.0", "shape": "circle"},
+                        {"radius": 200.0, "label": "128.0", "shape": "circle"},
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
 
@@ -399,6 +443,7 @@ class StyleTestCase(TestCase):
                         7.554067900041074,
                         "#000000",
                     ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -407,25 +452,30 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
-                    "color": "#aa0000",
-                    "label": "[-15.554792351427212 – -7.851838934271116)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#770000",
-                    "label": "[-7.851838934271116 – -0.14888551711502096)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#330000",
-                    "label": "[-0.14888551711502096 – 7.554067900041074)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#000000",
-                    "label": "[7.554067900041074 – 15.25702131719717]",
-                    "shape": "square",
-                },
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "label": "[-15.554792351427212 – -7.851838934271116)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#770000",
+                            "label": "[-7.851838934271116 – -0.14888551711502096)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#330000",
+                            "label": "[-0.14888551711502096 – 7.554067900041074)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "label": "[7.554067900041074 – 15.25702131719717]",
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
 
@@ -461,6 +511,7 @@ class StyleTestCase(TestCase):
                         3.186540376312785,
                         "#000000",
                     ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -469,25 +520,30 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
-                    "color": "#aa0000",
-                    "label": "[-15.554792351427212 – -3.3519812305068184)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#770000",
-                    "label": "[-3.3519812305068184 – -0.011475353898097245)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#330000",
-                    "label": "[-0.011475353898097245 – 3.186540376312785)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#000000",
-                    "label": "[3.186540376312785 – 15.25702131719717]",
-                    "shape": "square",
-                },
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "label": "[-15.554792351427212 – -3.3519812305068184)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#770000",
+                            "label": "[-3.3519812305068184 – -0.011475353898097245)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#330000",
+                            "label": "[-0.011475353898097245 – 3.186540376312785)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "label": "[3.186540376312785 – 15.25702131719717]",
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
 
@@ -523,6 +579,7 @@ class StyleTestCase(TestCase):
                         5.727211814984125,
                         "#000000",
                     ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -531,24 +588,29 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
-                    "color": "#aa0000",
-                    "label": "[-15.554792351427212 – -4.292341999003442)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#770000",
-                    "label": "[-4.292341999003442 – 0.5740581144424383)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#330000",
-                    "label": "[0.5740581144424383 – 5.727211814984125)",
-                    "shape": "square",
-                },
-                {
-                    "color": "#000000",
-                    "label": "[5.727211814984125 – 15.25702131719717]",
-                    "shape": "square",
-                },
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "label": "[-15.554792351427212 – -4.292341999003442)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#770000",
+                            "label": "[-4.292341999003442 – 0.5740581144424383)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#330000",
+                            "label": "[0.5740581144424383 – 5.727211814984125)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "label": "[5.727211814984125 – 15.25702131719717]",
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
             ],
         )
