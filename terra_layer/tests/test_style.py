@@ -384,7 +384,7 @@ class StyleTestCase(TestCase):
                         ["sqrt", ["/", ["get", "a"], ["pi"]]],
                         0,
                         0,
-                        128.0,
+                        6.383076486422923,
                         200,
                     ],
                     "circle-fill-color": "#0000cc",

@@ -200,9 +200,7 @@ def gen_style_interpolate(expression, boundaries, values):
     """
     Build a Mapbox GL Style interpolation expression.
     """
-    return ["interpolate", ["linear"], expression] + _flatten(
-        zip([math.sqrt(b / math.pi) for b in boundaries], values)
-    )
+    return ["interpolate", ["linear"], expression] + _flatten(zip(boundaries, values))
 
 
 # Implementation of Self-Adjusting Legends for Proportional Symbol Maps
@@ -396,7 +394,7 @@ def generate_style_from_wizard(layer, config):
         """
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
-            boundaries = [0, mm[1]]
+            boundaries = [0, math.sqrt(mm[1] / math.pi)(mm[1])]
             sizes = [0, config["max_diameter"] / 2]
 
             radius_base = ["sqrt", ["/", get_field_style(field), ["pi"]]]
