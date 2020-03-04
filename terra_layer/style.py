@@ -6,7 +6,7 @@ from functools import reduce
 DEFAULT_FILL_COLOR = "#0000cc"
 DEFAULT_FILL_OPACITY = 0.4
 DEFAULT_STROKE_COLOR = "#ffffff"
-DEFAULT_STROKE_WIDTH = 2
+DEFAULT_STROKE_WIDTH = 0.3
 
 
 def _flatten(l):
@@ -155,9 +155,9 @@ def discretize_equal_interval(geo_layer, field, class_count):
 
 def discretize(geo_layer, field, method, class_count):
     """
-    Select a method to compute class boundaries.
-    Compute (len(class_count) + 1) boundaries.
-    Note, can returns less boundaries than requested if lesser values in property than class_count
+    Select a method to compute class boundaries.
+    Compute (len(class_count) + 1) boundaries.
+    Note, can returns less boundaries than requested if lesser values in property than class_count
     """
     if method == "quantile":
         return discretize_quantile(geo_layer, field, class_count)
@@ -193,14 +193,16 @@ def gen_legend_steps(boundaries, colors):
             "shape": "square",
         }
         for index in range(size)
-    ]
+    ][::-1]
 
 
 def gen_style_interpolate(expression, boundaries, values):
     """
     Build a Mapbox GL Style interpolation expression.
     """
-    return ["interpolate", ["linear"], expression] + _flatten(zip(boundaries, values))
+    return ["interpolate", ["linear"], expression] + _flatten(
+        zip([math.sqrt(b / math.pi) for b in boundaries], values)
+    )
 
 
 # Implementation of Self-Adjusting Legends for Proportional Symbol Maps
@@ -299,7 +301,7 @@ def circle_boundaries_filter_values(values, max_value, max_size, dmin):
     return filtered_values
 
 
-def gen_legend_circle(min, max, size):
+def gen_legend_circle(min, max, size, color):
     """
     Generate a circle legend.
     """
@@ -307,8 +309,8 @@ def gen_legend_circle(min, max, size):
     candidates = [max] + candidates + [min]
     boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)[::-1]
     return [
-        {"radius": b * size / max, "label": f"{b}", "shape": "circle"}
-        for b in boundaries
+        {"diameter": b * size / max, "label": f"{b}", "shape": "circle", "color": color}
+        for b in boundaries[::-1]  # Reverse boundaries to have correct zindex
     ]
 
 
@@ -331,21 +333,18 @@ def gen_layer_fill(
 
 
 def gen_layer_circle(
-    radius,
-    fill_color=DEFAULT_FILL_COLOR,
-    fill_opacity=DEFAULT_FILL_OPACITY,
-    stroke_color=DEFAULT_STROKE_COLOR,
-    stroke_width=DEFAULT_STROKE_WIDTH,
+    radius, sort_key, fill_color, fill_opacity, stroke_color, stroke_width
 ):
     """
     Build a Mapbox GL Style layer for circle.
     """
     return {
         "type": "circle",
+        "layout": {"circle-sort-key": ["-", sort_key]},
         "paint": {
             "circle-radius": radius,
-            "circle-fill-color": fill_color,
-            "circle-fill-opacity": fill_opacity,
+            "circle-color": fill_color,
+            "circle-opacity": fill_opacity,
             "circle-stroke-color": stroke_color,
             "circle-stroke-width": stroke_width,
         },
@@ -361,14 +360,15 @@ def generate_style_from_wizard(layer, config):
     field = config["field"]
 
     if symbology == "graduated":
-        # {
-        #     "field": "my_field",
-        #     "symbology": "graduated",
-        #     "method": "equal_interval",
-        #     "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
-        #     "fill_opacity": 0.5,
-        #     "stroke_color": "#ffffff",
-        # }
+        """ config = {
+             "field": "my_field",
+             "symbology": "graduated",
+             "method": "equal_interval",
+             "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
+             "fill_opacity": 0.5,
+             "stroke_color": "#ffffff",
+         }
+        """
         colors = config["fill_color"]
         boundaries = discretize(geo_layer, field, config["method"], len(colors))
         if boundaries:
@@ -377,37 +377,52 @@ def generate_style_from_wizard(layer, config):
                 fill_opacity=config.get("fill_opacity", DEFAULT_FILL_OPACITY),
                 stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
             )
-            legend_items = gen_legend_steps(boundaries, colors)
-            return {"style": style, "legend_items": legend_items}
+
+            legend_addition = {"items": gen_legend_steps(boundaries, colors)}
+            return (style, legend_addition)
         else:
-            return {"style": {}, "legend_items": []}
+            return ({}, [])
 
     elif symbology == "circle":
-        # {
-        #    "field": "my_field",
-        #     "symbology": "circle",
-        #     "max_diameter": 200,
-        #     "fill_color": "#0000cc",
-        #     "fill_opacity": 0.5,
-        #     "stroke_color": "#ffffff",
-        #     "stroke_width": 2,
-        # }
+        """ config = {
+            "field": "my_field",
+            "symbology": "circle",
+            "max_diameter": 200,
+            "fill_color": "#0000cc",
+            "fill_opacity": 0.5,
+            "stroke_color": "#ffffff",
+            "stroke_width": 1,
+        }
+        """
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
             boundaries = [0, mm[1]]
-            sizes = [0, config["max_diameter"]]
-            radius = ["sqrt", ["/", get_field_style(field), ["pi"]]]
+            sizes = [0, config["max_diameter"] / 2]
+
+            radius_base = ["sqrt", ["/", get_field_style(field), ["pi"]]]
+            radius = gen_style_interpolate(radius_base, boundaries, sizes)
+
             style = gen_layer_circle(
-                radius=gen_style_interpolate(radius, boundaries, sizes),
+                radius=radius,
+                sort_key=get_field_style(field),
                 fill_color=config.get("fill_color", DEFAULT_FILL_COLOR),
                 fill_opacity=config.get("fill_opacity", DEFAULT_FILL_OPACITY),
                 stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
                 stroke_width=config.get("stroke_width", DEFAULT_STROKE_WIDTH),
             )
-            legend_items = gen_legend_circle(mm[0], mm[1], sizes[1])
-            return {"style": style, "legend_items": legend_items}
+
+            legend_addition = {
+                "items": gen_legend_circle(
+                    mm[0],
+                    mm[1],
+                    config["max_diameter"],
+                    config.get("fill_color", DEFAULT_FILL_COLOR),
+                ),
+                "stackedCircles": True,
+            }
+            return (style, legend_addition)
         else:
-            return {"style": {}, "legend_items": []}
+            return ({}, [])
 
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
