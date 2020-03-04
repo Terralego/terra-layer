@@ -4,7 +4,9 @@ import math
 from functools import reduce
 
 DEFAULT_FILL_COLOR = "#0000cc"
+DEFAULT_FILL_OPACITY = 0.4
 DEFAULT_STROKE_COLOR = "#ffffff"
+DEFAULT_STROKE_WIDTH = 2
 
 
 def _flatten(l):
@@ -310,25 +312,43 @@ def gen_legend_circle(min, max, size):
     ]
 
 
-def gen_layer_fill(fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR):
+def gen_layer_fill(
+    fill_color=DEFAULT_FILL_COLOR,
+    fill_opacity=DEFAULT_FILL_OPACITY,
+    stroke_color=DEFAULT_STROKE_COLOR,
+):
     """
     Build a Mapbox GL Style layer for pylygon fill.
     """
     return {
         "type": "fill",
-        "paint": {"fill-color": fill_color, "fill-outline-color": stroke_color},
+        "paint": {
+            "fill-color": fill_color,
+            "fill-opacity": fill_opacity,
+            "fill-outline-color": stroke_color,
+        },
     }
 
 
 def gen_layer_circle(
-    radius, fill_color=DEFAULT_FILL_COLOR, stroke_color=DEFAULT_STROKE_COLOR
+    radius,
+    fill_color=DEFAULT_FILL_COLOR,
+    fill_opacity=DEFAULT_FILL_OPACITY,
+    stroke_color=DEFAULT_STROKE_COLOR,
+    stroke_width=DEFAULT_STROKE_WIDTH,
 ):
     """
     Build a Mapbox GL Style layer for circle.
     """
     return {
         "type": "circle",
-        "paint": {"circle-radius": radius, "circle-stroke-color": stroke_color},
+        "paint": {
+            "circle-radius": radius,
+            "circle-fill-color": fill_color,
+            "circle-fill-opacity": fill_opacity,
+            "circle-stroke-color": stroke_color,
+            "circle-stroke-width": stroke_width,
+        },
     }
 
 
@@ -346,6 +366,7 @@ def generate_style_from_wizard(layer, config):
         #     "symbology": "graduated",
         #     "method": "equal_interval",
         #     "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
+        #     "fill_opacity": 0.5,
         #     "stroke_color": "#ffffff",
         # }
         colors = config["fill_color"]
@@ -353,12 +374,13 @@ def generate_style_from_wizard(layer, config):
         if boundaries:
             style = gen_layer_fill(
                 fill_color=gen_style_steps(get_field_style(field), boundaries, colors),
+                fill_opacity=config.get("fill_opacity", DEFAULT_FILL_OPACITY),
                 stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
             )
-            legend = gen_legend_steps(boundaries, colors)
-            return {"style": style, "legend": legend}
+            legend_items = gen_legend_steps(boundaries, colors)
+            return {"style": style, "legend_items": legend_items}
         else:
-            return {"style": {}, "legend": []}
+            return {"style": {}, "legend_items": []}
 
     elif symbology == "circle":
         # {
@@ -366,7 +388,9 @@ def generate_style_from_wizard(layer, config):
         #     "symbology": "circle",
         #     "max_diameter": 200,
         #     "fill_color": "#0000cc",
+        #     "fill_opacity": 0.5,
         #     "stroke_color": "#ffffff",
+        #     "stroke_width": 2,
         # }
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
@@ -376,12 +400,14 @@ def generate_style_from_wizard(layer, config):
             style = gen_layer_circle(
                 radius=gen_style_interpolate(radius, boundaries, sizes),
                 fill_color=config.get("fill_color", DEFAULT_FILL_COLOR),
+                fill_opacity=config.get("fill_opacity", DEFAULT_FILL_OPACITY),
                 stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
+                stroke_width=config.get("stroke_width", DEFAULT_STROKE_WIDTH),
             )
-            legend = gen_legend_circle(mm[0], mm[1], sizes[1])
-            return {"style": style, "legend": legend}
+            legend_items = gen_legend_circle(mm[0], mm[1], sizes[1])
+            return {"style": style, "legend_items": legend_items}
         else:
-            return {"style": {}, "legend": []}
+            return {"style": {}, "legend_items": []}
 
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
