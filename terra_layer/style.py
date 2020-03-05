@@ -193,7 +193,7 @@ def gen_legend_steps(boundaries, colors):
             "shape": "square",
         }
         for index in range(size)
-    ][::-1]
+    ]
 
 
 def gen_style_interpolate(expression, boundaries, values):
@@ -305,10 +305,10 @@ def gen_legend_circle(min, max, size, color):
     """
     candidates = circle_boundaries_candidate(min, max)
     candidates = [max] + candidates + [min]
-    boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)[::-1]
+    boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
     return [
         {"diameter": b * size / max, "label": f"{b}", "shape": "circle", "color": color}
-        for b in boundaries[::-1]  # Reverse boundaries to have correct zindex
+        for b in boundaries
     ]
 
 
@@ -376,10 +376,12 @@ def generate_style_from_wizard(layer, config):
                 stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
             )
 
-            legend_addition = {"items": gen_legend_steps(boundaries, colors)}
+            legend_addition = {
+                "items": gen_legend_steps(boundaries, colors)[::-1],
+            }
             return (style, legend_addition)
         else:
-            return ({}, [])
+            return ({}, {})
 
     elif symbology == "circle":
         """ config = {
@@ -394,7 +396,7 @@ def generate_style_from_wizard(layer, config):
         """
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
-            boundaries = [0, math.sqrt(mm[1] / math.pi)(mm[1])]
+            boundaries = [0, math.sqrt(mm[1] / math.pi)]
             sizes = [0, config["max_diameter"] / 2]
 
             radius_base = ["sqrt", ["/", get_field_style(field), ["pi"]]]
@@ -420,7 +422,7 @@ def generate_style_from_wizard(layer, config):
             }
             return (style, legend_addition)
         else:
-            return ({}, [])
+            return ({}, {})
 
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')

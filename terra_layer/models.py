@@ -188,8 +188,12 @@ class Layer(models.Model):
             style, legend_addition = generate_style_from_wizard(
                 self, self.layer_style_wizard
             )
+            legend_addition["title"] = self.name
             self.layer_style = style
-            self.legends[0].update(legend_addition)
+            if not self.legends:
+                self.legends = [legend_addition]
+            else:
+                self.legends[0].update(legend_addition)
 
         super().save(**kwargs)
 

@@ -139,7 +139,7 @@ class StyleTestCase(TestCase):
         self.assertEqual(self.layer.layer_style, {})
         self.assertEqual(self.layer.legends, [])
 
-    def test_1feature(self):
+    def test_no_wizard(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
 
@@ -160,7 +160,7 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, {})
-        self.assertEqual(self.layer.legends, [])
+        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_0graduated_quantile(self):
         self.layer.layer_style_wizard = {
@@ -173,7 +173,7 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, {})
-        self.assertEqual(self.layer.legends, [])
+        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_0graduated_jenks(self):
         self.layer.layer_style_wizard = {
@@ -186,7 +186,32 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, {})
-        self.assertEqual(self.layer.legends, [])
+        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+
+    def test_update_wizard(self):
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "method": "jenks",
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        self.layer.save()
+
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+
+        self.layer.layer_style_wizard = {
+            "field": "b",
+            "symbology": "graduated",
+            "method": "jenks",
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        self.layer.save()
+
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_2equal_interval(self):
         geo_layer = self.source.get_layer()
@@ -229,13 +254,8 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "color": "#aa0000",
-                            "label": "[1.0 – 1.25)",
-                            "shape": "square",
-                        },
-                        {
-                            "color": "#770000",
-                            "label": "[1.25 – 1.5)",
+                            "color": "#000000",
+                            "label": "[1.75 – 2.0]",
                             "shape": "square",
                         },
                         {
@@ -244,8 +264,13 @@ class StyleTestCase(TestCase):
                             "shape": "square",
                         },
                         {
-                            "color": "#000000",
-                            "label": "[1.75 – 2.0]",
+                            "color": "#770000",
+                            "label": "[1.25 – 1.5)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#aa0000",
+                            "label": "[1.0 – 1.25)",
                             "shape": "square",
                         },
                     ],
@@ -292,8 +317,8 @@ class StyleTestCase(TestCase):
             [
                 {
                     "items": [
-                        {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
                         {"color": "#770000", "label": "[2.0 – 2.0]", "shape": "square"},
+                        {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
                     ],
                     "title": "my_layer_name",
                 }
@@ -338,8 +363,8 @@ class StyleTestCase(TestCase):
             [
                 {
                     "items": [
-                        {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
                         {"color": "#770000", "label": "[2.0 – 2.0]", "shape": "square"},
+                        {"color": "#aa0000", "label": "[1.0 – 2.0)", "shape": "square"},
                     ],
                     "title": "my_layer_name",
                 }
@@ -357,7 +382,7 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, {})
-        self.assertEqual(self.layer.legends, [])
+        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_2circle(self):
         geo_layer = self.source.get_layer()
@@ -377,6 +402,7 @@ class StyleTestCase(TestCase):
             self.layer.layer_style,
             {
                 "type": "circle",
+                "layout": {"circle-sort-key": ["-", ["get", "a"]]},
                 "paint": {
                     "circle-radius": [
                         "interpolate",
@@ -385,27 +411,59 @@ class StyleTestCase(TestCase):
                         0,
                         0,
                         6.383076486422923,
-                        200,
+                        100,
                     ],
-                    "circle-fill-color": "#0000cc",
-                    "circle-fill-opacity": 0.4,
+                    "circle-color": "#0000cc",
+                    "circle-opacity": 0.4,
                     "circle-stroke-color": "#ffffff",
-                    "circle-stroke-width": 2,
+                    "circle-stroke-width": 0.3,
                 },
             },
         )
+        self.maxDiff = None
         self.assertEqual(
             self.layer.legends,
             [
                 {
                     "items": [
-                        {"radius": 7.8125, "label": "5.0", "shape": "circle"},
-                        {"radius": 15.625, "label": "10.0", "shape": "circle"},
-                        {"radius": 39.0625, "label": "25.0", "shape": "circle"},
-                        {"radius": 78.125, "label": "50.0", "shape": "circle"},
-                        {"radius": 156.25, "label": "100.0", "shape": "circle"},
-                        {"radius": 200.0, "label": "128.0", "shape": "circle"},
+                        {
+                            "diameter": 200.0,
+                            "label": "128.0",
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 156.25,
+                            "label": "100.0",
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 78.125,
+                            "label": "50.0",
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 39.0625,
+                            "label": "25.0",
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 15.625,
+                            "label": "10.0",
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 7.8125,
+                            "label": "5.0",
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
                     ],
+                    "stackedCircles": True,
                     "title": "my_layer_name",
                 }
             ],
@@ -454,13 +512,8 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "color": "#aa0000",
-                            "label": "[-15.554792351427212 – -7.851838934271116)",
-                            "shape": "square",
-                        },
-                        {
-                            "color": "#770000",
-                            "label": "[-7.851838934271116 – -0.14888551711502096)",
+                            "color": "#000000",
+                            "label": "[7.554067900041074 – 15.25702131719717]",
                             "shape": "square",
                         },
                         {
@@ -469,8 +522,13 @@ class StyleTestCase(TestCase):
                             "shape": "square",
                         },
                         {
-                            "color": "#000000",
-                            "label": "[7.554067900041074 – 15.25702131719717]",
+                            "color": "#770000",
+                            "label": "[-7.851838934271116 – -0.14888551711502096)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#aa0000",
+                            "label": "[-15.554792351427212 – -7.851838934271116)",
                             "shape": "square",
                         },
                     ],
@@ -522,13 +580,8 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "color": "#aa0000",
-                            "label": "[-15.554792351427212 – -3.3519812305068184)",
-                            "shape": "square",
-                        },
-                        {
-                            "color": "#770000",
-                            "label": "[-3.3519812305068184 – -0.011475353898097245)",
+                            "color": "#000000",
+                            "label": "[3.186540376312785 – 15.25702131719717]",
                             "shape": "square",
                         },
                         {
@@ -537,8 +590,13 @@ class StyleTestCase(TestCase):
                             "shape": "square",
                         },
                         {
-                            "color": "#000000",
-                            "label": "[3.186540376312785 – 15.25702131719717]",
+                            "color": "#770000",
+                            "label": "[-3.3519812305068184 – -0.011475353898097245)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#aa0000",
+                            "label": "[-15.554792351427212 – -3.3519812305068184)",
                             "shape": "square",
                         },
                     ],
@@ -590,13 +648,8 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "color": "#aa0000",
-                            "label": "[-15.554792351427212 – -4.292341999003442)",
-                            "shape": "square",
-                        },
-                        {
-                            "color": "#770000",
-                            "label": "[-4.292341999003442 – 0.5740581144424383)",
+                            "color": "#000000",
+                            "label": "[5.727211814984125 – 15.25702131719717]",
                             "shape": "square",
                         },
                         {
@@ -605,8 +658,13 @@ class StyleTestCase(TestCase):
                             "shape": "square",
                         },
                         {
-                            "color": "#000000",
-                            "label": "[5.727211814984125 – 15.25702131719717]",
+                            "color": "#770000",
+                            "label": "[-4.292341999003442 – 0.5740581144424383)",
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#aa0000",
+                            "label": "[-15.554792351427212 – -4.292341999003442)",
                             "shape": "square",
                         },
                     ],
