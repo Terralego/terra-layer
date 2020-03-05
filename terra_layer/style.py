@@ -8,6 +8,26 @@ DEFAULT_FILL_OPACITY = 0.4
 DEFAULT_STROKE_COLOR = "#ffffff"
 DEFAULT_STROKE_WIDTH = 0.3
 
+DEFAULT_STYLE_GRADUADED = {
+    "type": "fill",
+    "paint": {
+        "fill-color": DEFAULT_FILL_COLOR,
+        "fill-opacity": DEFAULT_FILL_OPACITY,
+        "fill-outline-color": DEFAULT_STROKE_COLOR,
+    },
+}
+
+DEFAULT_STYLE_CIRCLE = {
+    "type": "circle",
+    "paint": {
+        "circle-radius": 30,
+        "circle-color": DEFAULT_FILL_COLOR,
+        "circle-opacity": DEFAULT_FILL_OPACITY,
+        "circle-stroke-color": DEFAULT_STROKE_COLOR,
+        "circle-stroke-width": DEFAULT_STROKE_WIDTH,
+    },
+}
+
 
 def _flatten(l):
     """
@@ -381,7 +401,7 @@ def generate_style_from_wizard(layer, config):
             }
             return (style, legend_addition)
         else:
-            return ({}, {})
+            return (DEFAULT_STYLE_GRADUADED, {})
 
     elif symbology == "circle":
         """ config = {
@@ -422,7 +442,7 @@ def generate_style_from_wizard(layer, config):
             }
             return (style, legend_addition)
         else:
-            return ({}, {})
+            return (DEFAULT_STYLE_CIRCLE, {})
 
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
