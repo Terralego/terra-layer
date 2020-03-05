@@ -159,7 +159,7 @@ class StyleTestCase(TestCase):
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, {})
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_0graduated_quantile(self):
@@ -172,7 +172,7 @@ class StyleTestCase(TestCase):
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, {})
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_0graduated_jenks(self):
@@ -185,7 +185,7 @@ class StyleTestCase(TestCase):
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, {})
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_update_wizard(self):
@@ -381,7 +381,7 @@ class StyleTestCase(TestCase):
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, {})
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_CIRCLE)
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_2circle(self):
