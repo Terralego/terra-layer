@@ -363,7 +363,10 @@ class LayerView(APIView):
             return None
 
         default_values = {
-            "initialState": {"active": layer.active_by_default, "opacity": layer.settings.get('default_opacity', 100) / 100}
+            "initialState": {
+                "active": layer.active_by_default,
+                "opacity": layer.settings.get("default_opacity", 100) / 100,
+            }
         }
 
         main_field = getattr(layer.main_field, "name", None)
