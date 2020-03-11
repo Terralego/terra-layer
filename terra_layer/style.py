@@ -275,7 +275,7 @@ def circle_boundaries_candidate(min, max):
 
 
 def circle_boundaries_value_to_symbol_height(value, max_value, max_size):
-    return 2 * math.sqrt(value * max_size / max_value / math.pi)
+    return math.sqrt(value / math.pi) * (max_size / math.sqrt(max_value / math.pi))
 
 
 def circle_boundaries_filter_values(values, max_value, max_size, dmin):
@@ -325,7 +325,7 @@ def gen_legend_circle(min, max, size, color):
     """
     candidates = circle_boundaries_candidate(min, max)
     candidates = [max] + candidates + [min]
-    boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
+    boundaries = circle_boundaries_filter_values(candidates, max, size, size / 20)
 
     r = size / math.sqrt(max / math.pi)
     return [
