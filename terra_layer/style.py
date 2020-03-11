@@ -326,8 +326,15 @@ def gen_legend_circle(min, max, size, color):
     candidates = circle_boundaries_candidate(min, max)
     candidates = [max] + candidates + [min]
     boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
+
+    r = size / math.sqrt(max / math.pi)
     return [
-        {"diameter": b * size / max, "label": f"{b}", "shape": "circle", "color": color}
+        {
+            "diameter": math.sqrt(b / math.pi) * r,
+            "label": f"{b}",
+            "shape": "circle",
+            "color": color,
+        }
         for b in boundaries
     ]
 
