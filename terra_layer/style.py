@@ -209,7 +209,7 @@ def gen_legend_steps(boundaries, colors):
     return [
         {
             "color": colors[index],
-            "label": {
+            "boundaries" : {
                 "lower": {"value": boundaries[index], "included": True},
                 "upper": {
                     "value": boundaries[index + 1],
@@ -339,7 +339,7 @@ def gen_legend_circle(min, max, size, color):
     return [
         {
             "diameter": math.sqrt(b / math.pi) * r,
-            "label": {"lower": {"value": b}},
+            "boundaries": {"lower": {"value": b}},
             "shape": "circle",
             "color": color,
         }
@@ -410,7 +410,7 @@ def generate_style_from_wizard(layer, config):
             boundaries = discretize(geo_layer, field, config["method"], len(colors))
         else:
             raise ValueError(
-                'With symbology "graduated", "boundaries" or "method" should be provided'
+                'With "graduated" symbology, "boundaries" or "method" should be provided'
             )
 
         if boundaries:
