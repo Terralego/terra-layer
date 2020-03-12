@@ -78,28 +78,37 @@ class Scene(models.Model):
             layer.order = order
             layer.save()
 
-    def insert_in_tree(self, layer, parts):
+    def insert_in_tree(self, layer, parts, group_config=None):
         """ Add the layer in tree. Each parts are a group name to find inside the tree.
             Here we assume that missing groups are added at first position of current node
             We create missing group with default exclusive group configuration (should be corrected later if necessary)
         """
 
+        group_config = group_config or {}
+
         current_node = self.tree
+        last_group = None
         for part in parts:
             found = False
+            # Search in groups
             for group in current_node:
                 if group.get("group") and group["label"] == part:
+                    last_group = group
                     current_node = group["children"]
                     found = True
                     break
             if not found:
-                # Add the missing group
+                # Add the missing group part
                 new_group = {"group": True, "label": part, "children": []}
-                current_node.insert(0, new_group)
+                # current_node.insert(0, new_group)
+                current_node.append(new_group)
+                last_group = new_group
                 current_node = new_group["children"]
 
         # Node if found (or created) we can add the geolayer now
         current_node.append({"geolayer": layer.id, "label": layer.name})
+        # And update tho config
+        last_group.update(group_config)
 
         self.save()
 
