@@ -213,6 +213,70 @@ class StyleTestCase(TestCase):
         self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
+    def test_boundaries_less(self):
+        geo_layer = self.source.get_layer()
+        self._feature_factory(geo_layer, a=1),
+        self._feature_factory(geo_layer, a=2),
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        with self.assertRaises(ValueError):
+            self.layer.save()
+
+    def test_boundaries(self):
+        geo_layer = self.source.get_layer()
+        self._feature_factory(geo_layer, a=1),
+        self._feature_factory(geo_layer, a=2),
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "boundaries": [0, 10, 20, 30, 40],
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.layer_style,
+            {
+                "type": "fill",
+                "paint": {
+                    "fill-color": [
+                        "step",
+                        ["get", "a"],
+                        "#aa0000",
+                        10,
+                        "#770000",
+                        20,
+                        "#330000",
+                        30,
+                        "#000000",
+                    ],
+                    "fill-opacity": 0.4,
+                    "fill-outline-color": "#ffffff",
+                },
+            },
+        )
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {"color": "#000000", "label": "[30 – 40]", "shape": "square"},
+                        {"color": "#330000", "label": "[20 – 30)", "shape": "square"},
+                        {"color": "#770000", "label": "[10 – 20)", "shape": "square"},
+                        {"color": "#aa0000", "label": "[0 – 10)", "shape": "square"},
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
     def test_2equal_interval(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
@@ -420,7 +484,6 @@ class StyleTestCase(TestCase):
                 },
             },
         )
-        self.maxDiff = None
         self.assertEqual(
             self.layer.legends,
             [
