@@ -462,12 +462,6 @@ class StyleTestCase(TestCase):
                             "shape": "circle",
                             "color": "#0000cc",
                         },
-                        {
-                            "diameter": 27.95084971874737,
-                            "label": "2.5",
-                            "shape": "circle",
-                            "color": "#0000cc",
-                        },
                     ],
                     "stackedCircles": True,
                     "title": "my_layer_name",

@@ -2,6 +2,7 @@ from django.db import connection
 import numbers
 import math
 from functools import reduce
+from terra_layer.settings import STYLE_CIRCLE_MIN_LEGEND_HEIGHT
 
 DEFAULT_FILL_COLOR = "#0000cc"
 DEFAULT_FILL_OPACITY = 0.4
@@ -325,7 +326,9 @@ def gen_legend_circle(min, max, size, color):
     """
     candidates = circle_boundaries_candidate(min, max)
     candidates = [max] + candidates + [min]
-    boundaries = circle_boundaries_filter_values(candidates, max, size, size / 20)
+    boundaries = circle_boundaries_filter_values(
+        candidates, max, size, STYLE_CIRCLE_MIN_LEGEND_HEIGHT
+    )
 
     r = size / math.sqrt(max / math.pi)
     return [
