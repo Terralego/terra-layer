@@ -1,3 +1,8 @@
+import pyexcel
+import tempfile
+
+
+from django.core.management import call_command, get_commands
 from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Prefetch, Q
@@ -63,11 +68,26 @@ class SceneViewset(ModelViewSet):
                 self.check_layer_status(view_id, item["children"])
 
     def perform_update(self, serializer):
+
         if serializer.is_valid():
             self.check_layer_status(
                 serializer.instance.id, serializer.validated_data.get("tree", [])
             )
             serializer.save()
+
+        if 'load_xls' in get_commands():
+            # Handle imported file
+            with tempfile.NamedTemporaryFile(suffix=".xls") as xls_file:
+                for chunk in self.request.FILES['file']:
+                    xls_file.write(chunk)
+
+                xls_file.seek(0)
+
+                call_command('load_xls', scene_name=serializer.instance.name, file=xls_file.name)
+        else:
+            # No file while import file submitted
+            pass
+
 
     def perform_create(self, serializer):
         if serializer.is_valid():
