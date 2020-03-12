@@ -391,14 +391,23 @@ def generate_style_from_wizard(layer, config):
         """ config = {
              "field": "my_field",
              "symbology": "graduated",
-             "method": "equal_interval",
+             "boundaries": [1, 2, 3, 5],
+             "method": "equal_interval",  # How to compute boundaries if not provided
              "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
              "fill_opacity": 0.5,
              "stroke_color": "#ffffff",
-         }
+        }
         """
         colors = config["fill_color"]
-        boundaries = discretize(geo_layer, field, config["method"], len(colors))
+        if "boundaries" in config:
+            boundaries = config["boundaries"]
+        elif "method" in config:
+            boundaries = discretize(geo_layer, field, config["method"], len(colors))
+        else:
+            raise ValueError(
+                'With symbology "graduated", "boundaries" or "method" should be provided'
+            )
+
         if boundaries:
             style = gen_layer_fill(
                 fill_color=gen_style_steps(get_field_style(field), boundaries, colors),
