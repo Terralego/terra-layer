@@ -269,7 +269,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#000000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 30, "included": True},
                                 "upper": {"value": 40, "included": True},
                             },
@@ -277,7 +277,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#330000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 20, "included": True},
                                 "upper": {"value": 30, "included": False},
                             },
@@ -285,7 +285,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 10, "included": True},
                                 "upper": {"value": 20, "included": False},
                             },
@@ -293,7 +293,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 0, "included": True},
                                 "upper": {"value": 10, "included": False},
                             },
@@ -347,7 +347,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#000000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 1.75, "included": True},
                                 "upper": {"value": 2.0, "included": True},
                             },
@@ -355,7 +355,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#330000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 1.5, "included": True},
                                 "upper": {"value": 1.75, "included": False},
                             },
@@ -363,7 +363,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 1.25, "included": True},
                                 "upper": {"value": 1.5, "included": False},
                             },
@@ -371,7 +371,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 1.0, "included": True},
                                 "upper": {"value": 1.25, "included": False},
                             },
@@ -423,7 +423,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 2.0, "included": True},
                                 "upper": {"value": 2.0, "included": True},
                             },
@@ -431,7 +431,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 1.0, "included": True},
                                 "upper": {"value": 2.0, "included": False},
                             },
@@ -483,7 +483,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 2.0, "included": True},
                                 "upper": {"value": 2.0, "included": True},
                             },
@@ -491,7 +491,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 1.0, "included": True},
                                 "upper": {"value": 2.0, "included": False},
                             },
@@ -559,37 +559,37 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "diameter": 200.0,
-                            "label": {"lower": {"value": 128.0}},
+                            "boundaries": {"lower": {"value": 128.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 176.77669529663686,
-                            "label": {"lower": {"value": 100.0}},
+                            "boundaries": {"lower": {"value": 100.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 125.0,
-                            "label": {"lower": {"value": 50.0}},
+                            "boundaries": {"lower": {"value": 50.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 88.38834764831843,
-                            "label": {"lower": {"value": 25.0}},
+                            "boundaries": {"lower": {"value": 25.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 55.90169943749474,
-                            "label": {"lower": {"value": 10.0}},
+                            "boundaries": {"lower": {"value": 10.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 39.528470752104745,
-                            "label": {"lower": {"value": 5.0}},
+                            "boundaries": {"lower": {"value": 5.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
@@ -644,7 +644,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#000000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 7.554067900041074, "included": True},
                                 "upper": {"value": 15.25702131719717, "included": True},
                             },
@@ -652,7 +652,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#330000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -0.14888551711502096,
                                     "included": True,
@@ -666,7 +666,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -7.851838934271116,
                                     "included": True,
@@ -680,7 +680,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -15.554792351427212,
                                     "included": True,
@@ -742,7 +742,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#000000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 3.186540376312785, "included": True},
                                 "upper": {
                                     "value": 15.25702131719717,
@@ -753,7 +753,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#330000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -0.011475353898097245,
                                     "included": True,
@@ -767,7 +767,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -3.3519812305068184,
                                     "included": True,
@@ -781,7 +781,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -15.554792351427212,
                                     "included": True,
@@ -843,7 +843,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#000000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {"value": 5.727211814984125, "included": True},
                                 "upper": {
                                     "value": 15.25702131719717,
@@ -854,7 +854,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#330000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": 0.5740581144424383,
                                     "included": True,
@@ -868,7 +868,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#770000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -4.292341999003442,
                                     "included": True,
@@ -882,7 +882,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#aa0000",
-                            "label": {
+                            "boundaries": {
                                 "lower": {
                                     "value": -15.554792351427212,
                                     "included": True,
