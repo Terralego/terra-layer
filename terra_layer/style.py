@@ -209,8 +209,13 @@ def gen_legend_steps(boundaries, colors):
     return [
         {
             "color": colors[index],
-            "label": f"[{boundaries[index]} – {boundaries[index+1]}"
-            + ("]" if index + 1 == size else ")"),
+            "label": {
+                "lower": {"value": boundaries[index], "included": True},
+                "upper": {
+                    "value": boundaries[index + 1],
+                    "included": index + 1 == size,
+                },
+            },
             "shape": "square",
         }
         for index in range(size)
@@ -334,7 +339,7 @@ def gen_legend_circle(min, max, size, color):
     return [
         {
             "diameter": math.sqrt(b / math.pi) * r,
-            "label": f"{b}",
+            "label": {"lower": {"value": b}},
             "shape": "circle",
             "color": color,
         }
