@@ -262,6 +262,37 @@ class StyleTestCase(TestCase):
         with self.assertRaises(ValueError):
             self.layer.save()
 
+    def test_boundaries_1(self):
+        geo_layer = self.source.get_layer()
+        self._feature_factory(geo_layer, a=1),
+        self._feature_factory(geo_layer, a=2),
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "boundaries": [0],
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        with self.assertRaises(ValueError):
+            self.layer.save()
+
+    def test_boundaries_no_value(self):
+        geo_layer = self.source.get_layer()
+        self._feature_factory(geo_layer, a=1),
+        self._feature_factory(geo_layer, a=2),
+
+        self.layer.layer_style_wizard = {
+            "field": "b",
+            "symbology": "graduated",
+            "method": "quantile",
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        self.layer.save()
+
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+
     def test_boundaries(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),

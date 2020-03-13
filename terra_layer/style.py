@@ -46,8 +46,8 @@ def get_min_max(geo_layer, field):
         cursor.execute(
             """
             SELECT
-                min((properties->>%(field)s)::numeric) AS min, -----------------------------
-                max((properties->>%(field)s)::numeric) AS max -----------------------------
+                min((properties->>%(field)s)::numeric) AS min,
+                max((properties->>%(field)s)::numeric) AS max
             FROM
                 geostore_feature
             WHERE
@@ -68,8 +68,8 @@ def get_positive_min_max(geo_layer, field):
         cursor.execute(
             """
             SELECT
-                min((properties->>%(field)s)::numeric) AS min, -----------------------------
-                max((properties->>%(field)s)::numeric) AS max -----------------------------
+                min((properties->>%(field)s)::numeric) AS min,
+                max((properties->>%(field)s)::numeric) AS max
             FROM
                 geostore_feature
             WHERE
@@ -113,7 +113,7 @@ def discretize_quantile(geo_layer, field, class_count):
             {"field": field, "class_count": class_count, "layer_id": geo_layer.id},
         )
         rows = cursor.fetchall()
-        if rows:
+        if rows and rows[0] and rows[0][0] is not None and rows[0][1] is not None:
             # Each class start + last class end
             return [r[0] for r in rows] + [rows[-1][1]]
         else:
@@ -155,7 +155,7 @@ def discretize_jenks(geo_layer, field, class_count):
             {"field": field, "class_count": class_count, "layer_id": geo_layer.id},
         )
         rows = cursor.fetchall()
-        if rows:
+        if rows and rows[0] and rows[0][0] is not None and rows[0][1] is not None:
             # # Each class start + last class end
             return [r[0] for r in rows] + [rows[-1][1]]
         else:
@@ -442,6 +442,8 @@ def generate_style_from_wizard(layer, config):
         colors = config["fill_color"]
         if "boundaries" in config:
             boundaries = config["boundaries"]
+            if len(boundaries) < 2:
+                raise ValueError('"boundaries" must be at least a list of two values')
         elif "method" in config:
             boundaries = discretize(geo_layer, field, config["method"], len(colors))
         else:
