@@ -107,6 +107,41 @@ class StyleTestCase(TestCase):
         )
         self.assertEqual(boundaries, [])
 
+    def test_round_scale(self):
+        self.assertEqual(style.trunc_scale(111, 3), 111)
+        self.assertEqual(style.trunc_scale(111, 2), 110)
+        self.assertEqual(style.trunc_scale(111, 1), 100)
+
+        self.assertEqual(style.round_scale(111, 3), 111)
+        self.assertEqual(style.round_scale(111, 2), 110)
+        self.assertEqual(style.round_scale(111, 1), 100)
+
+        self.assertEqual(style.round_scale(117, 3), 117)
+        self.assertEqual(style.round_scale(117, 2), 120)
+        self.assertEqual(style.round_scale(117, 1), 100)
+
+        self.assertEqual(style.ceil_scale(117, 3), 117)
+        self.assertEqual(style.ceil_scale(117, 2), 120)
+        self.assertEqual(style.ceil_scale(117, 1), 200)
+
+        self.assertEqual(style.trunc_scale(0.51, 3), 0.51)
+        self.assertEqual(style.trunc_scale(0.51, 2), 0.5)
+        self.assertEqual(style.trunc_scale(0.51, 1), 0)
+
+        self.assertEqual(style.round_scale(0.51, 3), 0.51)
+        self.assertEqual(style.round_scale(0.51, 2), 0.5)
+        self.assertEqual(style.round_scale(0.51, 1), 1)
+
+        self.assertEqual(style.round_scale(0.49, 3), 0.49)
+        self.assertEqual(style.round_scale(0.49, 2), 0.5)
+        self.assertEqual(style.round_scale(0.49, 1), 0)
+
+        self.assertEqual(style.ceil_scale(0.58, 3), 0.58)
+        self.assertEqual(
+            style.ceil_scale(0.58, 2), 0.6000000000000001
+        )  # Got it, exactly what I want
+        self.assertEqual(style.ceil_scale(0.58, 1), 1)
+
     def test_symbology_fail(self):
         self.layer.layer_style_wizard = {
             "field": "a",
@@ -542,7 +577,7 @@ class StyleTestCase(TestCase):
                         ["sqrt", ["/", ["get", "a"], ["pi"]]],
                         0,
                         0,
-                        6.383076486422923,
+                        6.4,
                         100,
                     ],
                     "circle-color": "#0000cc",

@@ -209,7 +209,7 @@ def gen_legend_steps(boundaries, colors):
     return [
         {
             "color": colors[index],
-            "boundaries" : {
+            "boundaries": {
                 "lower": {"value": boundaries[index], "included": True},
                 "upper": {
                     "value": boundaries[index + 1],
@@ -323,6 +323,42 @@ def circle_boundaries_filter_values(values, max_value, max_size, dmin):
         previous_height = h
 
     return filtered_values
+
+
+def lost_scale_digit(n, scale):
+    """
+    Return the number of digit to round
+    """
+    if n == 0:
+        return 1  # Further in compuration 0 dived by 1 will be ok: 0
+    else:
+        return math.trunc(math.log10(n)) + 1 - scale
+
+
+def trunc_scale(n, scale):
+    lost = lost_scale_digit(n, scale)
+    return math.trunc(n / (10 ** lost)) * (10 ** lost)
+
+
+def round_scale(n, scale):
+    lost = lost_scale_digit(n, scale)
+    return round(n / (10 ** lost)) * (10 ** lost)
+
+
+def ceil_scale(n, scale):
+    lost = lost_scale_digit(n, scale)
+    return math.ceil(n / (10 ** lost)) * (10 ** lost)
+
+
+def boundaries_round(boundaries, scale=2):
+    """
+    Round boundaries to human readable number
+    """
+    return (
+        [trunc_scale(boundaries[0], scale)]
+        + [round_scale(b, scale) for b in boundaries[1:-2]]
+        + [ceil_scale(boundaries[-1], scale)]
+    )
 
 
 def gen_legend_circle(min, max, size, color):
@@ -441,6 +477,7 @@ def generate_style_from_wizard(layer, config):
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
             boundaries = [0, math.sqrt(mm[1] / math.pi)]
+            boundaries = boundaries_round(boundaries)
             sizes = [0, config["max_diameter"] / 2]
 
             radius_base = ["sqrt", ["/", get_field_style(field), ["pi"]]]
