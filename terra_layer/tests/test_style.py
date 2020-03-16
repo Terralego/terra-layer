@@ -108,6 +108,8 @@ class StyleTestCase(TestCase):
         self.assertEqual(boundaries, [])
 
     def test_round_scale(self):
+        self.assertEqual(style.trunc_scale(0, 3), 0)
+
         self.assertEqual(style.trunc_scale(111, 3), 111)
         self.assertEqual(style.trunc_scale(111, 2), 110)
         self.assertEqual(style.trunc_scale(111, 1), 100)
@@ -584,6 +586,7 @@ class StyleTestCase(TestCase):
 
     def test_2circle(self):
         geo_layer = self.source.get_layer()
+        self._feature_factory(geo_layer, a=0),
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=129),
 
