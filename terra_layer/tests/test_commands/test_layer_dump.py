@@ -139,6 +139,8 @@ class LayerDumpTestCase(TestCase):
             [
                 {
                     "exportable": False,
+                    "display": True,
+                    "settings": {},
                     "field": "tutu",
                     "filter_enable": False,
                     "filter_settings": {},

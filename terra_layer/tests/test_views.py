@@ -1,3 +1,7 @@
+import io
+import json
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -472,6 +476,44 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(
             layersTree["layersTree"][3]["layers"][0]["label"], layers[6].name
         )
+
+    def test_scene_with_import_file(self):
+        layer = Layer.objects.create(source=self.source)
+
+        SCENE_TREE = [
+            {
+                "label": "My Group 1",
+                "group": True,
+                "children": [{"geolayer": layer.id, "label": ""}],
+            }
+        ]
+
+        query = {
+            "name": "Scene Name",
+            "category": "map",
+            "tree": json.dumps(SCENE_TREE),
+            "file": io.StringIO("a,b,c\n0,0,0"),
+        }
+
+        with patch("terra_layer.views.layers.call_command") as mock_call, patch(
+            "terra_layer.views.layers.get_commands", return_value={"load_xls": "fake"}
+        ):
+            response = self.client.post(
+                reverse("scene-list"), query, format="multipart"
+            )
+            self.assertEqual(response.status_code, HTTP_201_CREATED)
+            self.assertEqual(mock_call.call_args[0], ("load_xls",))
+
+            # Without file
+            del query["file"]
+
+            response = self.client.patch(
+                reverse("scene-detail", args=[response.json()["id"]]),
+                query,
+                format="multipart",
+            )
+
+            self.assertEqual(response.status_code, HTTP_200_OK)
 
     def test_validation_error_on_scene_create(self):
 

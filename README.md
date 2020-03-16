@@ -32,6 +32,17 @@ TERRA_DEFAULT_MAP_SETTINGS = {
 }
 ```
 
+## Add a load xls command
+
+You can define in the project using *terra_layer* a load_xls command that takes
+two parameters:
+
+* -s (--scene-name): receive the scene name.
+* -f (--file): the input xls file to load.
+
+This command is launched when a file is send with a view. See the test project
+for an exemple.
+
 ## To start a dev instance
 
 Define settings you wants in `test_terralayer` django project.
