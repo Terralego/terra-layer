@@ -1,4 +1,16 @@
 
+0.4.8 / 2020-03-16
+==================
+
+  * Add import file process only if load_xls command exists
+  * Add way to specify selectors when inserting in tree
+  * Fix boundaries when no data
+  * Allow to provide manual boundaries for graduated
+  * Fix circle size legend
+  * Add default style on field less layer
+  * Implement auto legend for Proportional Symbol
+  * Add mapbox gl style generator
+
 0.4.7 / 2020-03-10
 ==================
 
