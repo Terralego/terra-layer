@@ -2,12 +2,14 @@ from django.db import connection
 import numbers
 import math
 from functools import reduce
-from terra_layer.settings import STYLE_CIRCLE_MIN_LEGEND_HEIGHT
+from terra_layer.settings import (
+    DEFAULT_CIRCLE_MIN_LEGEND_HEIGHT,
+    DEFAULT_FILL_COLOR,
+    DEFAULT_FILL_OPACITY,
+    DEFAULT_STROKE_COLOR,
+    DEFAULT_STROKE_WIDTH,
+)
 
-DEFAULT_FILL_COLOR = "#0000cc"
-DEFAULT_FILL_OPACITY = 0.4
-DEFAULT_STROKE_COLOR = "#ffffff"
-DEFAULT_STROKE_WIDTH = 0.3
 
 DEFAULT_STYLE_GRADUADED = {
     "type": "fill",
@@ -368,7 +370,7 @@ def gen_legend_circle(min, max, size, color):
     candidates = circle_boundaries_candidate(min, max)
     candidates = [max] + candidates + [min]
     boundaries = circle_boundaries_filter_values(
-        candidates, max, size, STYLE_CIRCLE_MIN_LEGEND_HEIGHT
+        candidates, max, size, DEFAULT_CIRCLE_MIN_LEGEND_HEIGHT
     )
 
     r = size / math.sqrt(max / math.pi)

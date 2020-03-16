@@ -16,6 +16,7 @@ You need the last version of docker and docker-compose to execute a dev instance
 In Django settings, you must set the different views provided to fronted, like this:
 
 ```python
+# Map settings. Sent to mapbox clientside.
 TERRA_DEFAULT_MAP_SETTINGS = {
     'accessToken': '<your mapbox access token>',
     'backgroundStyle': '<background style file>',
@@ -30,15 +31,24 @@ TERRA_DEFAULT_MAP_SETTINGS = {
         ],
     },
 }
+
+# Style and Legend autogeneration
+TERRA_LAYER_STYLE_SETTINGS = {
+    "circle_min_legend_height": 14, # minimum height for circle legend label.
+    "fill_color": "#0000cc", # Default fill color
+    "fill_opacity": 0.4, # Default fill opacity
+    "stroke_color": "#ffffff", # Default stroke color
+    "stroke_width": 0.3, # Default stroke width
+}
 ```
 
 ## Add a load xls command
 
-You can define in the project using *terra_layer* a load_xls command that takes
+You can define in the project using _terra_layer_ a load_xls command that takes
 two parameters:
 
-* -s (--scene-name): receive the scene name.
-* -f (--file): the input xls file to load.
+- -s (--scene-name): receive the scene name.
+- -f (--file): the input xls file to load.
 
 This command is launched when a file is send with a view. See the test project
 for an exemple.
@@ -60,7 +70,7 @@ Then initialize the database:
 docker-compose run --rm web /code/venv/bin/python3 /code/src/manage.py migrate
 ```
 
-You can now edit your code. A django runserver is launched internally so the 
+You can now edit your code. A django runserver is launched internally so the
 this is an autoreload server.
 
 You can access to the api on http://localhost:8000/api/
@@ -75,7 +85,7 @@ docker-compose run --rm web /code/venv/bin/python3 /code/src/manage.py test
 
 ## Contributing
 
-You must use factoryboy factories to develop your tests. The factories are available 
+You must use factoryboy factories to develop your tests. The factories are available
 at `terra_layer/tests/factories`
 
 You must update the CHANGES.md file on each MR and increment version if needed.
