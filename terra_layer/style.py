@@ -478,8 +478,8 @@ def generate_style_from_wizard(layer, config):
         """
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
+            mm = boundaries_round(mm)
             boundaries = [0, math.sqrt(mm[1] / math.pi)]
-            boundaries = boundaries_round(boundaries)
             sizes = [0, config["max_diameter"] / 2]
 
             radius_base = ["sqrt", ["/", get_field_style(field), ["pi"]]]
