@@ -585,7 +585,7 @@ class StyleTestCase(TestCase):
     def test_2circle(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
-        self._feature_factory(geo_layer, a=128),
+        self._feature_factory(geo_layer, a=129),
 
         self.layer.layer_style_wizard = {
             "field": "a",
@@ -608,7 +608,7 @@ class StyleTestCase(TestCase):
                         ["sqrt", ["/", ["get", "a"], ["pi"]]],
                         0,
                         0,
-                        6.4,
+                        6.432750982580687,
                         100,
                     ],
                     "circle-color": "#0000cc",
@@ -625,36 +625,36 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "diameter": 200.0,
-                            "boundaries": {"lower": {"value": 128.0}},
+                            "boundaries": {"lower": {"value": 130}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 176.77669529663686,
+                            "diameter": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 125.0,
+                            "diameter": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 88.38834764831843,
+                            "diameter": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 55.90169943749474,
+                            "diameter": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10.0}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 39.528470752104745,
+                            "diameter": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5.0}},
                             "shape": "circle",
                             "color": "#0000cc",
