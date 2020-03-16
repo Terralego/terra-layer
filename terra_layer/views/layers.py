@@ -1,6 +1,4 @@
-import pyexcel
 import tempfile
-
 
 from django.core.management import call_command, get_commands
 from django.conf import settings
@@ -11,7 +9,9 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.http import urlunquote
 from django_geosource.models import WMTSSource
+
 from geostore.tokens import tiles_token_generator
+
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -67,6 +67,17 @@ class SceneViewset(ModelViewSet):
                 # And we start with the new node
                 self.check_layer_status(view_id, item["children"])
 
+    def handle_import_file(self, scene_name):
+        if "load_xls" in get_commands() and "file" in self.request.FILES:
+            # Handle imported file
+            with tempfile.NamedTemporaryFile(suffix=".xls") as xls_file:
+                for chunk in self.request.FILES["file"]:
+                    xls_file.write(chunk)
+
+                xls_file.seek(0)
+
+                call_command("load_xls", scene_name=scene_name, file=xls_file.name)
+
     def perform_update(self, serializer):
 
         if serializer.is_valid():
@@ -75,24 +86,14 @@ class SceneViewset(ModelViewSet):
             )
             serializer.save()
 
-        if 'load_xls' in get_commands():
-            # Handle imported file
-            with tempfile.NamedTemporaryFile(suffix=".xls") as xls_file:
-                for chunk in self.request.FILES['file']:
-                    xls_file.write(chunk)
-
-                xls_file.seek(0)
-
-                call_command('load_xls', scene_name=serializer.instance.name, file=xls_file.name)
-        else:
-            # No file while import file submitted
-            pass
-
+        self.handle_import_file(serializer.instance.name)
 
     def perform_create(self, serializer):
         if serializer.is_valid():
             self.check_layer_status(None, serializer.validated_data.get("tree", []))
             serializer.save()
+
+        self.handle_import_file(serializer.instance.name)
 
 
 class LayerViewset(ModelViewSet):

@@ -29,6 +29,7 @@ class Scene(models.Model):
     tree = JSONField(
         default=list, validators=[JSONSchemaValidator(limit_value=SCENE_LAYERTREE)]
     )
+    config = JSONField(default=dict)
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])
@@ -100,15 +101,16 @@ class Scene(models.Model):
             if not found:
                 # Add the missing group part
                 new_group = {"group": True, "label": part, "children": []}
-                # current_node.insert(0, new_group)
                 current_node.append(new_group)
                 last_group = new_group
                 current_node = new_group["children"]
 
         # Node if found (or created) we can add the geolayer now
         current_node.append({"geolayer": layer.id, "label": layer.name})
-        # And update tho config
-        last_group.update(group_config)
+
+        if group_config and last_group:
+            # And update tho config
+            last_group.update(group_config)
 
         self.save()
 
@@ -148,6 +150,7 @@ class Layer(models.Model):
         LayerGroup, on_delete=models.SET_NULL, null=True, related_name="layers"
     )
     name = models.CharField(max_length=255, blank=False)
+    # Whether the layer is shown in tree or hidden
     in_tree = models.BooleanField(default=True)
 
     order = models.IntegerField(default=0)
@@ -197,9 +200,9 @@ class Layer(models.Model):
             style, legend_addition = generate_style_from_wizard(
                 self, self.layer_style_wizard
             )
-            legend_addition["title"] = self.name
             self.layer_style = style
             if not self.legends:
+                legend_addition["title"] = self.name
                 self.legends = [legend_addition]
             else:
                 self.legends[0].update(legend_addition)
@@ -244,8 +247,17 @@ class FilterField(models.Model):
     filter_settings = JSONField(default=dict)
     format_type = models.CharField(max_length=255, default=None, null=True)
 
+    # Whether the field can be exported
     exportable = models.BooleanField(default=False)
+
+    # Whether the field is available in the table
     shown = models.BooleanField(default=False)
+
+    # Whether the field is displayed by default in table
+    display = models.BooleanField(default=True)
+
+    # Config for all non handled things
+    settings = JSONField(default=dict)
 
     class Meta:
         ordering = ("order",)
