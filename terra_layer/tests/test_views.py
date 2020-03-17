@@ -360,6 +360,8 @@ class ModelSourceViewsetTestCase(TestCase):
                 "label": "test layer fields",
                 "exportable": True,
                 "format_type": "test",
+                "display": True,
+                "settings": {},
             },
         )
 

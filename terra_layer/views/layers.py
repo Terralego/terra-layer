@@ -426,6 +426,8 @@ class LayerView(APIView):
                     "label": field_filter.label or field_filter.field.label,
                     "exportable": field_filter.exportable,
                     "format_type": field_filter.format_type,
+                    "display": field_filter.display,
+                    "settings": field_filter.settings,
                 }
                 for field_filter in layer.filters_shown
             ]
