@@ -1,4 +1,9 @@
 
+0.4.9 / 2020-03-19
+==================
+
+  * Add missing display and config field properties
+
 0.4.8 / 2020-03-16
 ==================
 
