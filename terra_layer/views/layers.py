@@ -99,6 +99,7 @@ class SceneViewset(ModelViewSet):
 class LayerViewset(ModelViewSet):
     model = Layer
     ordering_fields = (
+        "id",
         "name",
         "source__name",
         "group__view__name",
@@ -109,6 +110,7 @@ class LayerViewset(ModelViewSet):
     filter_fields = (
         "source",
         "group",
+        "view",
         "active_by_default",
         "in_tree",
         "table_enable",
@@ -431,6 +433,7 @@ class LayerView(APIView):
                 }
                 for field_filter in layer.filters_shown
             ]
+        return []
 
     def get_filter_forms_for_layer(self, layer):
         """ Return forms of a layer if filters are enabled
@@ -444,6 +447,7 @@ class LayerView(APIView):
                 }
                 for field_filter in layer.filters_enabled
             ]
+        return []
 
     @cached_property
     def authorized_sources(self):
