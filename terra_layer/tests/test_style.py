@@ -968,3 +968,106 @@ class StyleTestCase(TestCase):
                 }
             ],
         )
+
+    def test_gauss_graduated_jenks_with_none(self):
+        geo_layer = self.source.get_layer()
+
+        random.seed(33)
+        for index in range(0, 1000):
+            self._feature_factory(geo_layer, a=random.gauss(0, 5)),
+        for index in range(0, 10):
+            self._feature_factory(geo_layer, a=None),
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "method": "jenks",
+            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+            "stroke_color": "#ffffff",
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.layer_style,
+            {
+                "type": "fill",
+                "paint": {
+                    "fill-color": [
+                        "step",
+                        ["get", "a"],
+                        "#aa0000",
+                        -4.292341999003442,
+                        "#770000",
+                        0.5740581144424383,
+                        "#330000",
+                        5.727211814984125,
+                        "#000000",
+                    ],
+                    "fill-opacity": 0.4,
+                    "fill-outline-color": "#ffffff",
+                },
+            },
+        )
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#000000",
+                            "boundaries": {
+                                "lower": {"value": 5.727211814984125, "included": True},
+                                "upper": {
+                                    "value": 15.25702131719717,
+                                    "included": True,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#330000",
+                            "boundaries": {
+                                "lower": {
+                                    "value": 0.5740581144424383,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": 5.727211814984125,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#770000",
+                            "boundaries": {
+                                "lower": {
+                                    "value": -4.292341999003442,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": 0.5740581144424383,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {
+                                    "value": -15.554792351427212,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": -4.292341999003442,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )

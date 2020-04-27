@@ -100,7 +100,8 @@ def discretize_quantile(geo_layer, field, class_count):
                 FROM
                     geostore_feature
                 WHERE
-                    layer_id = %(layer_id)s
+                    layer_id = %(layer_id)s AND
+                    (properties->>%(field)s)::numeric IS NOT NULL
             )
             SELECT
                 min(value) AS boundary,
@@ -141,7 +142,8 @@ def discretize_jenks(geo_layer, field, class_count):
                 FROM
                     geostore_feature
                 WHERE
-                    layer_id = %(layer_id)s
+                    layer_id = %(layer_id)s AND
+                    (properties->>%(field)s)::numeric IS NOT NULL
             )
             SELECT
                 min(field) AS min,
