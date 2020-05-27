@@ -8,6 +8,12 @@ from terra_layer.settings import (
     DEFAULT_FILL_OPACITY,
     DEFAULT_STROKE_COLOR,
     DEFAULT_STROKE_WIDTH,
+    DEFAULT_CIRCLE_RADIUS,
+    DEFAULT_NO_VALUE_FILL_COLOR,
+    DEFAULT_NO_VALUE_FILL_OPACITY,
+    DEFAULT_NO_VALUE_STROKE_COLOR,
+    DEFAULT_NO_VALUE_STROKE_WIDTH,
+    DEFAULT_NO_VALUE_CIRCLE_RADIUS,
 )
 
 
@@ -20,15 +26,31 @@ DEFAULT_STYLE_GRADUADED = {
     },
 }
 
+DEFAULT_LEGEND_GRADUADED = {
+    "color": DEFAULT_NO_VALUE_FILL_COLOR,
+    "boundaries": {
+        "lower": {"value": None, "included": True},
+        "upper": {"value": None, "included": True},
+    },
+    "shape": "square",
+}
+
 DEFAULT_STYLE_CIRCLE = {
     "type": "circle",
     "paint": {
-        "circle-radius": 30,
+        "circle-radius": DEFAULT_CIRCLE_RADIUS,
         "circle-color": DEFAULT_FILL_COLOR,
         "circle-opacity": DEFAULT_FILL_OPACITY,
         "circle-stroke-color": DEFAULT_STROKE_COLOR,
         "circle-stroke-width": DEFAULT_STROKE_WIDTH,
     },
+}
+
+DEFAULT_LEGEND_CIRCLE = {
+    "diameter": DEFAULT_NO_VALUE_CIRCLE_RADIUS * 2,
+    "boundaries": {"lower": {"value": None}},
+    "shape": "circle",
+    "color": DEFAULT_NO_VALUE_FILL_COLOR,
 }
 
 
@@ -198,6 +220,13 @@ def get_field_style(field):
     return ["get", field]
 
 
+def get_style_no_value_condition(include_no_value, key, with_value, with_no_value):
+    if include_no_value:
+        return ["case", ["==", ["typeof", key], "number"], with_value, with_no_value]
+    else:
+        return with_value
+
+
 def gen_style_steps(expression, boundaries, colors):
     """
     Assume len(boundaries) <= len(colors) - 1
@@ -205,12 +234,12 @@ def gen_style_steps(expression, boundaries, colors):
     return ["step", expression, colors[0]] + _flatten(zip(boundaries[1:], colors[1:]))
 
 
-def gen_legend_steps(boundaries, colors):
+def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
     """
     Generate a discrete legend.
     """
     size = len(boundaries) - 1
-    return [
+    ret = [
         {
             "color": colors[index],
             "boundaries": {
@@ -224,6 +253,20 @@ def gen_legend_steps(boundaries, colors):
         }
         for index in range(size)
     ]
+
+    if include_no_value:
+        ret += [
+            {
+                "color": no_value_color,
+                "boundaries": {
+                    "lower": {"value": None, "included": True},
+                    "upper": {"value": None, "included": True},
+                },
+                "shape": "square",
+            }
+        ]
+
+    return ret
 
 
 def gen_style_interpolate(expression, boundaries, values):
@@ -365,7 +408,15 @@ def boundaries_round(boundaries, scale=2):
     )
 
 
-def gen_legend_circle(min, max, size, color):
+def gen_legend_circle(
+    min,
+    max,
+    size,
+    color,
+    include_no_value,
+    no_value_circle_radius=DEFAULT_NO_VALUE_CIRCLE_RADIUS,
+    no_value_color=DEFAULT_NO_VALUE_FILL_COLOR,
+):
     """
     Generate a circle legend.
     """
@@ -376,7 +427,7 @@ def gen_legend_circle(min, max, size, color):
     )
 
     r = size / math.sqrt(max / math.pi)
-    return [
+    ret = [
         {
             "diameter": math.sqrt(b / math.pi) * r,
             "boundaries": {"lower": {"value": b}},
@@ -386,11 +437,28 @@ def gen_legend_circle(min, max, size, color):
         for b in boundaries
     ]
 
+    if include_no_value:
+        ret += [
+            {
+                "diameter": no_value_circle_radius * 2,
+                "boundaries": {"lower": {"value": None}},
+                "shape": "circle",
+                "color": no_value_color,
+            }
+        ]
+
+    return ret
+
 
 def gen_layer_fill(
+    key,
     fill_color=DEFAULT_FILL_COLOR,
     fill_opacity=DEFAULT_FILL_OPACITY,
     stroke_color=DEFAULT_STROKE_COLOR,
+    include_no_value=True,
+    no_value_fill_color=DEFAULT_NO_VALUE_FILL_COLOR,
+    no_value_fill_opacity=DEFAULT_NO_VALUE_FILL_OPACITY,
+    no_value_stroke_color=DEFAULT_NO_VALUE_STROKE_COLOR,
 ):
     """
     Build a Mapbox GL Style layer for pylygon fill.
@@ -398,15 +466,32 @@ def gen_layer_fill(
     return {
         "type": "fill",
         "paint": {
-            "fill-color": fill_color,
-            "fill-opacity": fill_opacity,
-            "fill-outline-color": stroke_color,
+            "fill-color": get_style_no_value_condition(
+                include_no_value, key, fill_color, no_value_fill_color
+            ),
+            "fill-opacity": get_style_no_value_condition(
+                include_no_value, key, fill_opacity, no_value_fill_opacity
+            ),
+            "fill-outline-color": get_style_no_value_condition(
+                include_no_value, key, stroke_color, no_value_stroke_color
+            ),
         },
     }
 
 
 def gen_layer_circle(
-    radius, sort_key, fill_color, fill_opacity, stroke_color, stroke_width
+    radius,
+    sort_key,
+    fill_color=DEFAULT_FILL_COLOR,
+    fill_opacity=DEFAULT_FILL_OPACITY,
+    stroke_color=DEFAULT_STROKE_COLOR,
+    stroke_width=DEFAULT_STROKE_WIDTH,
+    include_no_value=True,
+    no_value_fill_color=DEFAULT_NO_VALUE_FILL_COLOR,
+    no_value_fill_opacity=DEFAULT_NO_VALUE_FILL_OPACITY,
+    no_value_stroke_color=DEFAULT_NO_VALUE_STROKE_COLOR,
+    no_value_stroke_width=DEFAULT_NO_VALUE_STROKE_WIDTH,
+    no_value_circle_radius=DEFAULT_NO_VALUE_CIRCLE_RADIUS,
 ):
     """
     Build a Mapbox GL Style layer for circle.
@@ -415,11 +500,21 @@ def gen_layer_circle(
         "type": "circle",
         "layout": {"circle-sort-key": ["-", sort_key]},
         "paint": {
-            "circle-radius": radius,
-            "circle-color": fill_color,
-            "circle-opacity": fill_opacity,
-            "circle-stroke-color": stroke_color,
-            "circle-stroke-width": stroke_width,
+            "circle-radius": get_style_no_value_condition(
+                include_no_value, radius, radius, no_value_circle_radius
+            ),
+            "circle-color": get_style_no_value_condition(
+                include_no_value, radius, fill_color, no_value_fill_color
+            ),
+            "circle-opacity": get_style_no_value_condition(
+                include_no_value, radius, fill_opacity, no_value_fill_opacity
+            ),
+            "circle-stroke-color": get_style_no_value_condition(
+                include_no_value, radius, stroke_color, no_value_stroke_color
+            ),
+            "circle-stroke-width": get_style_no_value_condition(
+                include_no_value, radius, stroke_width, no_value_stroke_width
+            ),
         },
     }
 
@@ -437,10 +532,14 @@ def generate_style_from_wizard(layer, config):
              "field": "my_field",
              "symbology": "graduated",
              "boundaries": [1, 2, 3, 5],
+             "include_no_value": True,  # Show no value features on map and legend
              "method": "equal_interval",  # How to compute boundaries if not provided
              "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
              "fill_opacity": 0.5,
              "stroke_color": "#ffffff",
+             "no_value_fill_color": "#000000",
+             "no_value_fill_opacity": 0,
+             "no_value_stroke_color": "#ffffff",
         }
         """
         colors = config["fill_color"]
@@ -455,31 +554,76 @@ def generate_style_from_wizard(layer, config):
                 'With "graduated" symbology, "boundaries" or "method" should be provided'
             )
 
+        config_with_default = {
+            "fill_opacity": DEFAULT_FILL_OPACITY,
+            "stroke_color": DEFAULT_STROKE_COLOR,
+            "include_no_value": True,
+            "no_value_fill_color": DEFAULT_NO_VALUE_FILL_COLOR,
+            "no_value_fill_opacity": DEFAULT_NO_VALUE_FILL_OPACITY,
+            "no_value_stroke_color": DEFAULT_NO_VALUE_STROKE_COLOR,
+        }
+        config_with_default.update(config)
+
         if boundaries:
+            field_style = get_field_style(field)
             style = gen_layer_fill(
-                fill_color=gen_style_steps(get_field_style(field), boundaries, colors),
-                fill_opacity=config.get("fill_opacity", DEFAULT_FILL_OPACITY),
-                stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
+                field_style,
+                fill_color=gen_style_steps(field_style, boundaries, colors),
+                fill_opacity=config_with_default["fill_opacity"],
+                stroke_color=config_with_default["stroke_color"],
+                include_no_value=config_with_default["include_no_value"],
+                no_value_fill_color=config_with_default["no_value_fill_color"],
+                no_value_fill_opacity=config_with_default["no_value_fill_opacity"],
+                no_value_stroke_color=config_with_default["no_value_stroke_color"],
             )
 
             legend_addition = {
-                "items": gen_legend_steps(boundaries, colors)[::-1],
+                "items": gen_legend_steps(
+                    boundaries,
+                    colors,
+                    config_with_default["include_no_value"],
+                    config_with_default["no_value_fill_color"],
+                )[::-1],
             }
             return (style, legend_addition)
         else:
-            return (DEFAULT_STYLE_GRADUADED, {})
+            return (
+                DEFAULT_STYLE_GRADUADED,
+                {"items": [DEFAULT_LEGEND_GRADUADED]}
+                if config_with_default["include_no_value"]
+                else {},
+            )
 
     elif symbology == "circle":
         """ config = {
             "field": "my_field",
             "symbology": "circle",
+            "include_no_value": False,  # Show no value features on map and legend
             "max_diameter": 200,
             "fill_color": "#0000cc",
             "fill_opacity": 0.5,
             "stroke_color": "#ffffff",
             "stroke_width": 1,
+            "no_value_fill_color": "#000000",
+            "no_value_fill_opacity": 0,
+            "no_value_stroke_color": "#ffffff",
+            "no_value_stroke_width": 1,
         }
         """
+        config_with_default = {
+            "fill_color": DEFAULT_FILL_COLOR,
+            "fill_opacity": DEFAULT_FILL_OPACITY,
+            "stroke_color": DEFAULT_STROKE_COLOR,
+            "stroke_width": DEFAULT_STROKE_WIDTH,
+            "include_no_value": False,
+            "no_value_fill_color": DEFAULT_NO_VALUE_FILL_COLOR,
+            "no_value_fill_opacity": DEFAULT_NO_VALUE_FILL_OPACITY,
+            "no_value_stroke_color": DEFAULT_NO_VALUE_STROKE_COLOR,
+            "no_value_stroke_width": DEFAULT_NO_VALUE_STROKE_WIDTH,
+            "no_value_circle_radius": DEFAULT_NO_VALUE_CIRCLE_RADIUS,
+        }
+        config_with_default.update(config)
+
         mm = get_positive_min_max(geo_layer, field)
         if mm[0] is not None and mm[1] is not None:
             mm = boundaries_round(mm)
@@ -492,10 +636,16 @@ def generate_style_from_wizard(layer, config):
             style = gen_layer_circle(
                 radius=radius,
                 sort_key=get_field_style(field),
-                fill_color=config.get("fill_color", DEFAULT_FILL_COLOR),
-                fill_opacity=config.get("fill_opacity", DEFAULT_FILL_OPACITY),
-                stroke_color=config.get("stroke_color", DEFAULT_STROKE_COLOR),
-                stroke_width=config.get("stroke_width", DEFAULT_STROKE_WIDTH),
+                fill_color=config_with_default["fill_color"],
+                fill_opacity=config_with_default["fill_opacity"],
+                stroke_color=config_with_default["stroke_color"],
+                stroke_width=config_with_default["stroke_width"],
+                include_no_value=config_with_default["include_no_value"],
+                no_value_fill_color=config_with_default["no_value_fill_color"],
+                no_value_fill_opacity=config_with_default["no_value_fill_opacity"],
+                no_value_stroke_color=config_with_default["no_value_stroke_color"],
+                no_value_stroke_width=config_with_default["no_value_stroke_width"],
+                no_value_circle_radius=config_with_default["no_value_circle_radius"],
             )
 
             legend_addition = {
@@ -503,13 +653,19 @@ def generate_style_from_wizard(layer, config):
                     mm[0],
                     mm[1],
                     config["max_diameter"],
-                    config.get("fill_color", DEFAULT_FILL_COLOR),
+                    config_with_default["fill_color"],
+                    config_with_default["include_no_value"],
                 ),
                 "stackedCircles": True,
             }
             return (style, legend_addition)
         else:
-            return (DEFAULT_STYLE_CIRCLE, {})
+            return (
+                DEFAULT_STYLE_CIRCLE,
+                {"items": [DEFAULT_LEGEND_CIRCLE]}
+                if config_with_default["include_no_value"]
+                else {},
+            )
 
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
