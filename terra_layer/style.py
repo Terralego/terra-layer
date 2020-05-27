@@ -32,12 +32,12 @@ DEFAULT_STYLE_CIRCLE = {
 }
 
 
-def _flatten(l):
+def _flatten(levels):
     """
     Flatten 2-level array.
     [[1,2], [3, 4, 5]] -> [1, 2, 3, 4, 5]
     """
-    return list(reduce(lambda x, y: x + y, l or []))
+    return list(reduce(lambda x, y: x + y, levels or []))
 
 
 def get_min_max(geo_layer, field):
