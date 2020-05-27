@@ -31,7 +31,7 @@ class LayerDumpTestCase(TestCase):
         self.maxDiff = None
         layer = Layer.objects.create(
             source=self.source,
-            name=f"Layer_without_custom_style",
+            name="Layer_without_custom_style",
             uuid="91c60192-9060-4bf6-b0de-818c5a362d89",
         )
         call_command("layer_dump", pk=layer.pk)
@@ -76,7 +76,7 @@ class LayerDumpTestCase(TestCase):
         self.maxDiff = None
         layer = Layer.objects.create(
             source=self.source,
-            name=f"Layer_with_custom_style",
+            name="Layer_with_custom_style",
             interactions=[
                 {
                     "id": "terralego-eae-sync",
@@ -120,7 +120,7 @@ class LayerDumpTestCase(TestCase):
 
         layer = Layer.objects.create(
             source=self.source,
-            name=f"Layer_with_custom_style",
+            name="Layer_with_custom_style",
             interactions=[
                 {
                     "id": "terralego-eae-sync",

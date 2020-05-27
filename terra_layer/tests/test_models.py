@@ -18,7 +18,7 @@ class LayerTestCase(TestCase):
             refresh=-1,
         )
         layer = Layer.objects.create(
-            source=source, name=f"foo", uuid="91c60192-9060-4bf6-b0de-818c5a362d89",
+            source=source, name="foo", uuid="91c60192-9060-4bf6-b0de-818c5a362d89",
         )
         self.assertEqual(str(layer), "Layer({}) - foo".format(layer.pk))
 
