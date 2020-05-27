@@ -31,7 +31,7 @@ class LayerDumpTestCase(TestCase):
         self.scene = Scene.objects.create(name="test_scene")
         self.layer = Layer.objects.create(
             source=source,
-            name=f"Layer_with_custom_style",
+            name="Layer_with_custom_style",
             uuid="91c60192-9060-4bf6-b0de-818c5a362d89",
         )
         FilterField.objects.create(label="Test", field=self.field, layer=self.layer)
@@ -75,7 +75,7 @@ class LayerDumpTestCase(TestCase):
         )
         call_command("layer_load_dump", "-file={}".format(file))
         self.scene.refresh_from_db()
-        new_layer = Layer.objects.exclude(name=f"Layer_with_custom_style").get()
+        new_layer = Layer.objects.exclude(name="Layer_with_custom_style").get()
         self.assertEqual(
             self.scene.tree,
             [

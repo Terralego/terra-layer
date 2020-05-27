@@ -216,7 +216,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
     def test_layer_view_with_source_model(self):
         source = Source.objects.create(geom_type=10, name="test_view_2",)
-        layer = Layer.objects.create(source=source, name=f"Layer", id=1,)
+        layer = Layer.objects.create(source=source, name="Layer", id=1,)
 
         query = {
             "name": "Scene Name",
@@ -251,7 +251,7 @@ class ModelSourceViewsetTestCase(TestCase):
             maxzoom=15,
             url="http://www.test.test",
         )
-        layer = Layer.objects.create(source=source, name=f"Layer", id=1,)
+        layer = Layer.objects.create(source=source, name="Layer", id=1,)
 
         query = {
             "name": "Scene Name",
@@ -286,7 +286,7 @@ class ModelSourceViewsetTestCase(TestCase):
     def test_layer_view_with_custom_style(self):
         layer = Layer.objects.create(
             source=self.source,
-            name=f"Layer",
+            name="Layer",
             interactions=[
                 {
                     "id": "terralego-eae-sync",
@@ -327,7 +327,7 @@ class ModelSourceViewsetTestCase(TestCase):
             name="_test_field", label="test_label", data_type=FieldTypes.String.value
         )
         layer = Layer.objects.create(
-            source=self.source, name=f"Layer", table_enable=True,
+            source=self.source, name="Layer", table_enable=True,
         )
         FilterField.objects.create(
             label="test layer fields",
@@ -370,7 +370,7 @@ class ModelSourceViewsetTestCase(TestCase):
             name="_test_field", label="test_label", data_type=FieldTypes.String.value
         )
         layer = Layer.objects.create(
-            source=self.source, name=f"Layer", table_enable=True,
+            source=self.source, name="Layer", table_enable=True,
         )
         query = {
             "name": "Scene Name",
@@ -627,7 +627,7 @@ class ModelSourceViewsetAnonymousTestCase(TestCase):
 
     def test_scene_list_no_permission(self):
         layer = Layer.objects.create(
-            source=self.source, name=f"Layer", table_enable=True,
+            source=self.source, name="Layer", table_enable=True,
         )
         query = {
             "name": "Scene Name",
@@ -640,7 +640,7 @@ class ModelSourceViewsetAnonymousTestCase(TestCase):
 
     def test_source_list_no_permission(self):
         layer = Layer.objects.create(
-            source=self.source, name=f"Layer", table_enable=True,
+            source=self.source, name="Layer", table_enable=True,
         )
         query = {
             "name": "Scene Name",
