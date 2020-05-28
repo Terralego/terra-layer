@@ -270,7 +270,7 @@ def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
     ]
 
     if include_no_value:
-        ret += [
+        ret.append(
             {
                 "color": no_value_color,
                 "boundaries": {
@@ -279,7 +279,7 @@ def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
                 },
                 "shape": "square",
             }
-        ]
+        )
 
     return ret
 
@@ -453,14 +453,14 @@ def gen_legend_circle(
     ]
 
     if include_no_value:
-        ret += [
+        ret.append(
             {
                 "diameter": no_value_circle_radius * 2,
                 "boundaries": {"lower": {"value": None}},
                 "shape": "circle",
                 "color": no_value_color,
             }
-        ]
+        )
 
     return ret
 
