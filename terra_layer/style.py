@@ -429,8 +429,8 @@ def gen_legend_circle(
     size,
     color,
     include_no_value,
-    no_value_circle_radius=DEFAULT_NO_VALUE_CIRCLE_RADIUS,
-    no_value_color=DEFAULT_NO_VALUE_FILL_COLOR,
+    no_value_circle_radius,
+    no_value_color,
 ):
     """
     Generate a circle legend.
@@ -693,6 +693,8 @@ def generate_style_from_wizard(layer, config):
                     config["max_diameter"],
                     config_style["fill_color"],
                     include_no_value,
+                    config_style_no_value["circle_radius"],
+                    config_style_no_value["fill_color"],
                 ),
                 "stackedCircles": True,
             }
