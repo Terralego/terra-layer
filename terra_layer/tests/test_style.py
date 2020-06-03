@@ -158,8 +158,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "__666__",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
         }
 
         with self.assertRaises(ValueError):
@@ -191,8 +193,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -205,8 +209,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -219,8 +225,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -233,8 +241,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -246,8 +256,10 @@ class StyleTestCase(TestCase):
             "field": "b",
             "symbology": "graduated",
             "method": "jenks",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -263,8 +275,10 @@ class StyleTestCase(TestCase):
         self.layer.layer_style_wizard = {
             "field": "a",
             "symbology": "graduated",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         with self.assertRaises(ValueError):
@@ -279,8 +293,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0],
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         with self.assertRaises(ValueError):
@@ -295,8 +311,10 @@ class StyleTestCase(TestCase):
             "field": "b",
             "symbology": "graduated",
             "method": "quantile",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": True,
         }
         self.layer.save()
@@ -316,8 +334,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0, 10, 20, 30, 40],
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -396,8 +416,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0, 10, 20, 30, 40],
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": True,
         }
         self.layer.save()
@@ -498,8 +520,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -577,8 +601,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -638,8 +664,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -695,8 +723,7 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "fill_color": "#0000cc",
-            "stroke_color": "#ffffff",
+            "style": {"fill_color": "#0000cc", "stroke_color": "#ffffff"},
             "include_no_value": False,
         }
         self.layer.save()
@@ -714,8 +741,7 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "fill_color": "#0000cc",
-            "stroke_color": "#ffffff",
+            "style": {"fill_color": "#0000cc", "stroke_color": "#ffffff"},
             "include_no_value": False,
         }
         self.layer.save()
@@ -800,8 +826,7 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "fill_color": "#0000cc",
-            "stroke_color": "#ffffff",
+            "style": {"fill_color": "#0000cc", "stroke_color": "#ffffff"},
             "include_no_value": True,
         }
         self.layer.save()
@@ -919,8 +944,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -1018,8 +1045,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -1120,8 +1149,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
@@ -1224,8 +1255,10 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
-            "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-            "stroke_color": "#ffffff",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
             "include_no_value": False,
         }
         self.layer.save()
