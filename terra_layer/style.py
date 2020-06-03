@@ -544,20 +544,24 @@ def generate_style_from_wizard(layer, config):
 
     if symbology == "graduated":
         """ config = {
-             "field": "my_field",
-             "symbology": "graduated",
-             "boundaries": [1, 2, 3, 5],
-             "include_no_value": True,  # Show no value features on map and legend
-             "method": "equal_interval",  # How to compute boundaries if not provided
-             "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
-             "fill_opacity": 0.5,
-             "stroke_color": "#ffffff",
-             "no_value_fill_color": "#000000",
-             "no_value_fill_opacity": 0,
-             "no_value_stroke_color": "#ffffff",
+            "field": "my_field",
+            "symbology": "graduated",
+            "boundaries": [1, 2, 3, 5],
+            "include_no_value": True,  # Show no value features on map and legend
+            "method": "equal_interval",  # How to compute boundaries if not provided
+            "style": {
+                "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
+                "fill_opacity": 0.5,
+                "stroke_color": "#ffffff",
+            },
+            "no_value_style": {
+                "fill_color": "#000000",
+                "fill_opacity": 0,
+                "stroke_color": "#ffffff",
+            },
         }
         """
-        colors = config["fill_color"]
+        colors = config["style"].get("fill_color") if "style" in config else None
         if "boundaries" in config:
             boundaries = config["boundaries"]
             if len(boundaries) < 2:
@@ -572,14 +576,23 @@ def generate_style_from_wizard(layer, config):
         include_no_value = config.get("include_no_value", False)
 
         if boundaries:
-            config_style = {
-                k: config.get(k, DEFAULT_STYLE[k])
-                for k in ["fill_opacity", "stroke_color"]
-            }
-            config_style_no_value = {
-                k: config.get(f"no_value_{k}", DEFAULT_STYLE_NO_VALUE[k])
-                for k in ["fill_color", "fill_opacity", "stroke_color"]
-            }
+            if "style" in config:
+                config_style = {
+                    k: config["style"].get(k, DEFAULT_STYLE[k])
+                    for k in ["fill_opacity", "stroke_color"]
+                }
+            else:
+                config_style = DEFAULT_STYLE
+
+            if "no_value_style" in config:
+                config_style_no_value = {
+                    k: config["no_value_style"].get(
+                        f"no_value_{k}", DEFAULT_STYLE_NO_VALUE[k]
+                    )
+                    for k in ["fill_color", "fill_opacity", "stroke_color"]
+                }
+            else:
+                config_style_no_value = DEFAULT_STYLE_NO_VALUE
 
             field_style = get_field_style(field)
             style = gen_layer_fill(
@@ -611,14 +624,18 @@ def generate_style_from_wizard(layer, config):
             "symbology": "circle",
             "include_no_value": False,  # Show no value features on map and legend
             "max_diameter": 200,
-            "fill_color": "#0000cc",
-            "fill_opacity": 0.5,
-            "stroke_color": "#ffffff",
-            "stroke_width": 1,
-            "no_value_fill_color": "#000000",
-            "no_value_fill_opacity": 0,
-            "no_value_stroke_color": "#ffffff",
-            "no_value_stroke_width": 1,
+            "style": {
+                "fill_color": "#0000cc",
+                "fill_opacity": 0.5,
+                "stroke_color": "#ffffff",
+                "stroke_width": 1,
+            },
+            "no_value_style": {
+                "fill_color": "#000000",
+                "fill_opacity": 0,
+                "stroke_color": "#ffffff",
+                "stroke_width": 1,
+            },
         }
         """
         include_no_value = config.get("include_no_value", False)
@@ -632,20 +649,34 @@ def generate_style_from_wizard(layer, config):
             radius_base = ["sqrt", ["/", get_field_style(field), ["pi"]]]
             radius = gen_style_interpolate(radius_base, boundaries, sizes)
 
-            config_style = {
-                k: config.get(k, DEFAULT_STYLE[k])
-                for k in ["fill_color", "fill_opacity", "stroke_color", "stroke_width"]
-            }
-            config_style_no_value = {
-                k: config.get(f"no_value_{k}", DEFAULT_STYLE_NO_VALUE[k])
-                for k in [
-                    "fill_color",
-                    "fill_opacity",
-                    "stroke_color",
-                    "stroke_width",
-                    "circle_radius",
-                ]
-            }
+            if "style" in config:
+                config_style = {
+                    k: config["style"].get(k, DEFAULT_STYLE[k])
+                    for k in [
+                        "fill_color",
+                        "fill_opacity",
+                        "stroke_color",
+                        "stroke_width",
+                    ]
+                }
+            else:
+                config_style = DEFAULT_STYLE
+
+            if "no_value_style" in config:
+                config_style_no_value = {
+                    k: config["no_value_style"].get(
+                        f"no_value_{k}", DEFAULT_STYLE_NO_VALUE[k]
+                    )
+                    for k in [
+                        "fill_color",
+                        "fill_opacity",
+                        "stroke_color",
+                        "stroke_width",
+                        "circle_radius",
+                    ]
+                }
+            else:
+                config_style_no_value = DEFAULT_STYLE_NO_VALUE
 
             style = gen_layer_circle(
                 radius=radius,
