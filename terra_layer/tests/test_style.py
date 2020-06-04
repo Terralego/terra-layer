@@ -418,7 +418,7 @@ class StyleTestCase(TestCase):
             "boundaries": [0, 10, 20, 30, 40],
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "stroke_color": "#fffffa",
             },
             "include_no_value": True,
         }
@@ -454,7 +454,7 @@ class StyleTestCase(TestCase):
                     "fill-outline-color": [
                         "case",
                         ["==", ["typeof", ["get", "a"]], "number"],
-                        "#ffffff",
+                        "#fffffa",
                         "#ffffff",
                     ],
                 },
@@ -826,7 +826,7 @@ class StyleTestCase(TestCase):
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "style": {"fill_color": "#0000cc", "stroke_color": "#ffffff"},
+            "style": {"fill_color": "#0000ca", "stroke_color": "#fffffa"},
             "include_no_value": True,
         }
         self.layer.save()
@@ -855,7 +855,7 @@ class StyleTestCase(TestCase):
                     "circle-color": [
                         "case",
                         ["==", ["typeof", interpolate], "number"],
-                        "#0000cc",
+                        "#0000ca",
                         "#000000",
                     ],
                     "circle-opacity": [
@@ -867,7 +867,7 @@ class StyleTestCase(TestCase):
                     "circle-stroke-color": [
                         "case",
                         ["==", ["typeof", interpolate], "number"],
-                        "#ffffff",
+                        "#fffffa",
                         "#ffffff",
                     ],
                     "circle-stroke-width": [
@@ -888,37 +888,37 @@ class StyleTestCase(TestCase):
                             "diameter": 200.0,
                             "boundaries": {"lower": {"value": 130}},
                             "shape": "circle",
-                            "color": "#0000cc",
+                            "color": "#0000ca",
                         },
                         {
                             "diameter": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100.0}},
                             "shape": "circle",
-                            "color": "#0000cc",
+                            "color": "#0000ca",
                         },
                         {
                             "diameter": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50.0}},
                             "shape": "circle",
-                            "color": "#0000cc",
+                            "color": "#0000ca",
                         },
                         {
                             "diameter": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25.0}},
                             "shape": "circle",
-                            "color": "#0000cc",
+                            "color": "#0000ca",
                         },
                         {
                             "diameter": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10.0}},
                             "shape": "circle",
-                            "color": "#0000cc",
+                            "color": "#0000ca",
                         },
                         {
                             "diameter": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5.0}},
                             "shape": "circle",
-                            "color": "#0000cc",
+                            "color": "#0000ca",
                         },
                         {
                             "diameter": 60,
