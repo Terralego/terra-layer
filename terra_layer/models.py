@@ -2,7 +2,7 @@ from hashlib import md5
 import uuid
 
 from django.core.cache import cache
-from django.db import models
+from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -215,6 +215,44 @@ class Layer(models.Model):
 
     def __str__(self):
         return f"Layer({self.id}) - {self.name}"
+
+    @transaction.atomic()
+    def replace_source(self, new_source, fields_matches=None, dry_run=False):
+        fields_matches = fields_matches or {}
+        # update old field if ones from the new source
+        # remove it when not present in the new source
+        for filter_field in self.fields_filters.all():
+            # if not fields_matches provided or found, we check with the filter_field name
+            field_name = fields_matches.get(
+                filter_field.field.name, filter_field.field.name
+            )
+            if new_source.fields.filter(name=field_name).exists():
+                new_field = new_source.fields.get(name=field_name)
+                if dry_run:
+                    print(f"{filter_field.field.name} replaced by {new_field.name}.")
+                else:
+                    filter_field.field = new_field
+            else:
+                if dry_run:
+                    print(f"Old field {field_name} deleted.")
+                else:
+                    filter_field.delete()
+
+        # fields in the new source that don't exist in the old one are created
+        for field in new_source.fields.all():
+            if (
+                not self.fields_filters.filter(field__name=field.name).exists()
+                and field.name not in fields_matches.values()
+            ):
+                if dry_run:
+                    print(f"New FilterField {field.name} created.")
+                else:
+                    self.fields_filters.create(field=field)
+        if dry_run:
+            print(f"{self.source} replaced by {new_source}.")
+        else:
+            self.source = new_source
+            self.save()
 
 
 class CustomStyle(models.Model):
