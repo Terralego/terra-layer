@@ -424,13 +424,7 @@ def boundaries_round(boundaries, scale=2):
 
 
 def gen_legend_circle(
-    min,
-    max,
-    size,
-    color,
-    include_no_value,
-    no_value_circle_radius,
-    no_value_color,
+    min, max, size, color, include_no_value, no_value_circle_radius, no_value_color,
 ):
     """
     Generate a circle legend.
@@ -586,9 +580,7 @@ def generate_style_from_wizard(layer, config):
 
             if "no_value_style" in config:
                 config_style_no_value = {
-                    k: config["no_value_style"].get(
-                        f"no_value_{k}", DEFAULT_STYLE_NO_VALUE[k]
-                    )
+                    k: config["no_value_style"].get(k, DEFAULT_STYLE_NO_VALUE[k])
                     for k in ["fill_color", "fill_opacity", "stroke_color"]
                 }
             else:
@@ -664,9 +656,7 @@ def generate_style_from_wizard(layer, config):
 
             if "no_value_style" in config:
                 config_style_no_value = {
-                    k: config["no_value_style"].get(
-                        f"no_value_{k}", DEFAULT_STYLE_NO_VALUE[k]
-                    )
+                    k: config["no_value_style"].get(k, DEFAULT_STYLE_NO_VALUE[k])
                     for k in [
                         "fill_color",
                         "fill_opacity",
