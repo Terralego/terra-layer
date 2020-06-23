@@ -282,10 +282,14 @@ class LayerView(APIView):
         for cs in layer.custom_styles.all():
             interactions += self.get_formatted_interactions(cs)
 
+        main_field = getattr(layer.main_field, "name", None)
+
         if layer.popup_enable:
             interactions.append(
                 {
                     "id": layer.layer_identifier,
+                    "mainField": main_field,
+                    "clusterLabel": main_field,  # Kept for compatibility purpose
                     "interaction": "displayTooltip",
                     "trigger": "mouseover",
                     "template": layer.popup_template,
@@ -298,6 +302,8 @@ class LayerView(APIView):
         if layer.minisheet_enable:
             settings_interactions = {
                 "id": layer.layer_identifier,
+                "mainField": main_field,
+                "clusterLabel": main_field,  # Kept for compatibility purpose
                 "interaction": "displayDetails",
                 "template": layer.minisheet_template,
                 "fetchProperties": {
