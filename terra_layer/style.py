@@ -374,7 +374,9 @@ def circle_boundaries_candidate(min, max):
             break
 
         # otherwise store v in the values array
-        values.append(v / scale)
+        values.append(
+            v * scale
+        )  # The the paper is false here, need mutiplication, no division
         # switch to the next base
         base_id += 1
         if base_id == len(bases):
