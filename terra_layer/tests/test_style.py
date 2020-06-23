@@ -948,6 +948,62 @@ class StyleTestCase(TestCase):
             ],
         )
 
+    def test_ncircle(self):
+        geo_layer = self.source.get_layer()
+        for a in [106.8, 59.2, 49.4, 0.1, 0]:
+            self._feature_factory(geo_layer, a=a)
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "circle",
+            "max_diameter": 200,
+            "fill_color": "#0000cc",
+            "stroke_color": "#ffffff",
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "diameter": 200.0,
+                            "boundaries": {"lower": {"value": 110}},
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 134.83997249264843,
+                            "boundaries": {"lower": {"value": 50.0}},
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 95.34625892455922,
+                            "boundaries": {"lower": {"value": 25.0}},
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 60.30226891555273,
+                            "boundaries": {"lower": {"value": 10.0}},
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "diameter": 42.64014327112209,
+                            "boundaries": {"lower": {"value": 5.0}},
+                            "shape": "circle",
+                            "color": "#0000cc",
+                        },
+                    ],
+                    "stackedCircles": True,
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
     def test_gauss_graduated_equal_interval(self):
         geo_layer = self.source.get_layer()
 
