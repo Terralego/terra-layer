@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = "update a given layer with a given Source"
 
     def add_arguments(self, parser):
-        parser.add_argument("layer", help="name of the layer")
+        parser.add_argument("layer", type=int, help="pk of the layer")
         parser.add_argument("source", action="store", help="name of the new source")
         parser.add_argument(
             "--matches",
@@ -23,13 +23,13 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-        layer_name = options.get("layer")
+        layer_id = options.get("layer")
         source_name = options.get("source")
         matches = options.get("matches")
         dry_run = options.get("dry_run")
 
-        if not Layer.objects.filter(name=layer_name).exists():
-            self.stdout.write(self.style.ERROR(f"Layer {layer_name} does not exists"))
+        if not Layer.objects.filter(id=layer_id).exists():
+            self.stdout.write(self.style.ERROR(f"Layer {layer_id} does not exists"))
             return
 
         fields_matches = {}
@@ -40,6 +40,6 @@ class Command(BaseCommand):
                     old_name, new_name = row
                     fields_matches[old_name] = new_name
 
-        layer = Layer.objects.get(name=layer_name)
+        layer = Layer.objects.get(id=layer_id)
         source = Source.objects.get(name=source_name)
         layer.replace_source(source, fields_matches, dry_run)

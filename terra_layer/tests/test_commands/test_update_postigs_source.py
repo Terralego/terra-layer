@@ -33,12 +33,12 @@ class UpdatePostgisSourceTestCase(TestCase):
         )
 
     def test_replace_source_method_is_called(self, mocked_replace_source):
-        call_command("update_postgis_source", self.layer.name, self.new_source.name)
+        call_command("update_postgis_source", self.layer.pk, self.new_source.name)
         # no fields matchs file and no dry-run option
         mocked_replace_source.assert_called_with(self.new_source, {}, False)
 
     def test_invalid_layer_does_not_call_replace_source_method(
         self, mocked_replace_source
     ):
-        call_command("update_postgis_source", "wrong_layer_name", self.new_source.name)
+        call_command("update_postgis_source", 42, self.new_source.name)
         mocked_replace_source.assert_not_called()
