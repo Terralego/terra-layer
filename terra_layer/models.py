@@ -232,6 +232,7 @@ class Layer(models.Model):
                     print(f"{filter_field.field.name} replaced by {new_field.name}.")
                 else:
                     filter_field.field = new_field
+                    filter_field.save()
             else:
                 if dry_run:
                     print(f"Old field {field_name} deleted.")
