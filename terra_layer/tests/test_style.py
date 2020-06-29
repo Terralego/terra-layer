@@ -483,14 +483,6 @@ class StyleTestCase(TestCase):
                         {
                             "color": "#000000",
                             "boundaries": {
-                                "lower": {"value": None, "included": True},
-                                "upper": {"value": None, "included": True},
-                            },
-                            "shape": "square",
-                        },
-                        {
-                            "color": "#000000",
-                            "boundaries": {
                                 "lower": {"value": 30, "included": True},
                                 "upper": {"value": 40, "included": True},
                             },
@@ -517,6 +509,14 @@ class StyleTestCase(TestCase):
                             "boundaries": {
                                 "lower": {"value": 0, "included": True},
                                 "upper": {"value": 10, "included": False},
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
                             },
                             "shape": "square",
                         },
@@ -1219,14 +1219,6 @@ class StyleTestCase(TestCase):
                         {
                             "color": "#000000",
                             "boundaries": {
-                                "lower": {"value": None, "included": True},
-                                "upper": {"value": None, "included": True},
-                            },
-                            "shape": "square",
-                        },
-                        {
-                            "color": "#000000",
-                            "boundaries": {
                                 "lower": {"value": 3.256429352130346, "included": True},
                                 "upper": {
                                     "value": 15.25702131719717,
@@ -1274,6 +1266,14 @@ class StyleTestCase(TestCase):
                                     "value": -3.307794810850208,
                                     "included": False,
                                 },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
                             },
                             "shape": "square",
                         },
@@ -1508,14 +1508,6 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "color": "#CC0000",
-                            "boundaries": {
-                                "lower": {"value": None, "included": True},
-                                "upper": {"value": None, "included": True},
-                            },
-                            "shape": "square",
-                        },
-                        {
                             "color": "#000000",
                             "boundaries": {
                                 "lower": {"value": 5.727211814984125, "included": True},
@@ -1565,6 +1557,14 @@ class StyleTestCase(TestCase):
                                     "value": -4.292341999003442,
                                     "included": False,
                                 },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#CC0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
                             },
                             "shape": "square",
                         },

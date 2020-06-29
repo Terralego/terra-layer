@@ -308,7 +308,8 @@ def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
     ]
 
     if include_no_value:
-        ret.append(
+        ret.insert(
+            0,
             {
                 "color": no_value_color,
                 "boundaries": {
@@ -316,7 +317,7 @@ def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
                     "upper": {"value": None, "included": True},
                 },
                 "shape": "square",
-            }
+            },
         )
 
     if not ret:
