@@ -41,6 +41,15 @@ DEFAULT_STYLE_GRADUADED = {
     },
 }
 
+DEFAULT_STYLE_GRADUADED_NO_VALUE = {
+    "type": "fill",
+    "paint": {
+        "fill-color": DEFAULT_NO_VALUE_FILL_COLOR,
+        "fill-opacity": DEFAULT_NO_VALUE_FILL_OPACITY,
+        "fill-outline-color": DEFAULT_NO_VALUE_STROKE_COLOR,
+    },
+}
+
 DEFAULT_LEGEND_GRADUADED = {
     "color": DEFAULT_NO_VALUE_FILL_COLOR,
     "boundaries": {
@@ -85,6 +94,7 @@ def get_min_max(geo_layer, field):
         cursor.execute(
             """
             SELECT
+                bool_or((properties->>%(field)s)::numeric IS NULL) AS is_null,
                 min((properties->>%(field)s)::numeric) AS min,
                 max((properties->>%(field)s)::numeric) AS max
             FROM
@@ -95,8 +105,8 @@ def get_min_max(geo_layer, field):
             {"field": field, "layer_id": geo_layer.id},
         )
         row = cursor.fetchone()
-        min, max = row
-        return [min, max]
+        is_null, min, max = row
+        return [is_null == True, min, max]  # noqa
 
 
 def get_positive_min_max(geo_layer, field):
@@ -107,6 +117,7 @@ def get_positive_min_max(geo_layer, field):
         cursor.execute(
             """
             SELECT
+                bool_or((properties->>%(field)s)::numeric IS NULL) AS is_null,
                 min((properties->>%(field)s)::numeric) AS min,
                 max((properties->>%(field)s)::numeric) AS max
             FROM
@@ -118,8 +129,8 @@ def get_positive_min_max(geo_layer, field):
             {"field": field, "layer_id": geo_layer.id},
         )
         row = cursor.fetchone()
-        min, max = row
-        return [min, max]
+        is_null, min, max = row
+        return [is_null == True, min, max]  # noqa
 
 
 def discretize_quantile(geo_layer, field, class_count):
@@ -134,6 +145,14 @@ def discretize_quantile(geo_layer, field, class_count):
                 SELECT
                     (properties->>%(field)s)::numeric AS value,
                     ntile(%(class_count)s) OVER (ORDER BY (properties->>%(field)s)::numeric) AS ntile
+                FROM
+                    geostore_feature
+                WHERE
+                    layer_id = %(layer_id)s
+                UNION ALL
+                SELECT
+                    NULL AS value,
+                    NULL AS ntile
                 FROM
                     geostore_feature
                 WHERE
@@ -153,11 +172,13 @@ def discretize_quantile(geo_layer, field, class_count):
             {"field": field, "class_count": class_count, "layer_id": geo_layer.id},
         )
         rows = cursor.fetchall()
-        if rows and rows[0] and rows[0][0] is not None and rows[0][1] is not None:
-            # Each class start + last class end
-            return [r[0] for r in rows] + [rows[-1][1]]
-        else:
-            return []
+        if rows and len(rows) > 0:
+            rows = [row for row in rows if row[0] is not None]
+            if len(rows) == 0:
+                return []
+            else:
+                # Each class start + last class end
+                return [r[0] for r in rows] + [rows[-1][1]]
 
 
 def discretize_jenks(geo_layer, field, class_count):
@@ -179,8 +200,7 @@ def discretize_jenks(geo_layer, field, class_count):
                 FROM
                     geostore_feature
                 WHERE
-                    layer_id = %(layer_id)s AND
-                    (properties->>%(field)s)::numeric IS NOT NULL
+                    layer_id = %(layer_id)s
             )
             SELECT
                 min(field) AS min,
@@ -196,18 +216,20 @@ def discretize_jenks(geo_layer, field, class_count):
             {"field": field, "class_count": class_count, "layer_id": geo_layer.id},
         )
         rows = cursor.fetchall()
-        if rows and rows[0] and rows[0][0] is not None and rows[0][1] is not None:
-            # # Each class start + last class end
-            return [r[0] for r in rows] + [rows[-1][1]]
-        else:
-            return []
+        if rows and len(rows) > 0:
+            rows = [row for row in rows if row[0] is not None]
+            if len(rows) == 0:
+                return []
+            else:
+                # Each class start + last class end
+                return [r[0] for r in rows] + [rows[-1][1]]
 
 
 def discretize_equal_interval(geo_layer, field, class_count):
     """
     Compute QuantiEqual Interval class boundaries from a layer property.
     """
-    min, max = get_min_max(geo_layer, field)
+    is_null, min, max = get_min_max(geo_layer, field)
     if min is not None and max is not None and isinstance(min, numbers.Number):
         delta = (max - min) / class_count
         return [min + delta * i for i in range(0, class_count + 1)]
@@ -235,18 +257,34 @@ def get_field_style(field):
     return ["get", field]
 
 
-def get_style_no_value_condition(include_no_value, key, with_value, with_no_value):
+def get_style_no_value_condition(
+    include_no_value, key, with_value, with_no_value, default_value
+):
     if include_no_value:
-        return ["case", ["==", ["typeof", key], "number"], with_value, with_no_value]
+        if with_value:
+            return [
+                "case",
+                ["==", ["typeof", key], "number"],
+                with_value,
+                with_no_value,
+            ]
+        else:
+            return with_no_value
     else:
-        return with_value
+        if with_value:
+            return with_value
+        else:
+            return default_value
 
 
 def gen_style_steps(expression, boundaries, colors):
     """
     Assume len(boundaries) <= len(colors) - 1
     """
-    return ["step", expression, colors[0]] + _flatten(zip(boundaries[1:], colors[1:]))
+    if len(boundaries) > 0:
+        return ["step", expression, colors[0]] + _flatten(
+            zip(boundaries[1:], colors[1:])
+        )
 
 
 def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
@@ -280,6 +318,9 @@ def gen_legend_steps(boundaries, colors, include_no_value, no_value_color):
                 "shape": "square",
             }
         )
+
+    if not ret:
+        ret = [DEFAULT_LEGEND_GRADUADED]
 
     return ret
 
@@ -469,19 +510,25 @@ def gen_layer_fill(
         "type": "fill",
         "paint": {
             "fill-color": get_style_no_value_condition(
-                include_no_value, key, fill_color, style_no_value["fill_color"]
+                include_no_value,
+                key,
+                fill_color,
+                style_no_value["fill_color"],
+                DEFAULT_FILL_COLOR,
             ),
             "fill-opacity": get_style_no_value_condition(
                 include_no_value,
                 key,
-                style["fill_opacity"],
+                fill_color and style["fill_opacity"],
                 style_no_value["fill_opacity"],
+                DEFAULT_FILL_OPACITY,
             ),
             "fill-outline-color": get_style_no_value_condition(
                 include_no_value,
                 key,
-                style["stroke_color"],
+                fill_color and style["stroke_color"],
                 style_no_value["stroke_color"],
+                DEFAULT_STROKE_COLOR,
             ),
         },
     }
@@ -498,31 +545,39 @@ def gen_layer_circle(
         "layout": {"circle-sort-key": ["-", sort_key]},
         "paint": {
             "circle-radius": get_style_no_value_condition(
-                include_no_value, radius, radius, style_no_value["circle_radius"]
+                include_no_value,
+                radius,
+                radius,
+                style_no_value["circle_radius"],
+                DEFAULT_CIRCLE_RADIUS,
             ),
             "circle-color": get_style_no_value_condition(
                 include_no_value,
                 radius,
                 style["fill_color"],
                 style_no_value["fill_color"],
+                DEFAULT_FILL_COLOR,
             ),
             "circle-opacity": get_style_no_value_condition(
                 include_no_value,
                 radius,
                 style["fill_opacity"],
                 style_no_value["fill_opacity"],
+                DEFAULT_FILL_OPACITY,
             ),
             "circle-stroke-color": get_style_no_value_condition(
                 include_no_value,
                 radius,
                 style["stroke_color"],
                 style_no_value["stroke_color"],
+                DEFAULT_STROKE_COLOR,
             ),
             "circle-stroke-width": get_style_no_value_condition(
                 include_no_value,
                 radius,
                 style["stroke_width"],
                 style_no_value["stroke_width"],
+                DEFAULT_STROKE_WIDTH,
             ),
         },
     }
@@ -569,7 +624,7 @@ def generate_style_from_wizard(layer, config):
 
         include_no_value = config.get("include_no_value", False)
 
-        if boundaries:
+        if boundaries is not None:
             if "style" in config:
                 config_style = {
                     k: config["style"].get(k, DEFAULT_STYLE[k])
@@ -607,7 +662,7 @@ def generate_style_from_wizard(layer, config):
         else:
             return (
                 DEFAULT_STYLE_GRADUADED,
-                {"items": [DEFAULT_LEGEND_GRADUADED]} if include_no_value else {},
+                {"items": [DEFAULT_LEGEND_GRADUADED]},
             )
 
     elif symbology == "circle":
@@ -633,8 +688,8 @@ def generate_style_from_wizard(layer, config):
         include_no_value = config.get("include_no_value", False)
 
         mm = get_positive_min_max(geo_layer, field)
-        if mm[0] is not None and mm[1] is not None:
-            mm = boundaries_round(mm)
+        if mm[1] is not None and mm[2] is not None:
+            mm = boundaries_round(mm[1:])
             boundaries = [0, math.sqrt(mm[1] / math.pi)]
             sizes = [0, config["max_diameter"] / 2]
 
