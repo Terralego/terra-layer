@@ -37,22 +37,22 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [1.0, 2.0])
+        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, 1.0, 2.0])
 
     def test_get_positive_min_max(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [1.0, 2.0])
+        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, 1.0, 2.0])
 
     def test_get_no_positive_min_max(self):
         geo_layer = self.source.get_layer()
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [None, None])
+        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, None, None])
 
     def test_get_no_min_max(self):
         geo_layer = self.source.get_layer()
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [None, None])
+        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, None, None])
 
     def test_circle_boundaries_0(self):
         min = 0
@@ -202,7 +202,10 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
-        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+        self.assertEqual(
+            self.layer.legends,
+            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+        )
 
     def test_0graduated_quantile(self):
         self.layer.layer_style_wizard = {
@@ -218,7 +221,10 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
-        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+        self.assertEqual(
+            self.layer.legends,
+            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+        )
 
     def test_0graduated_jenks(self):
         self.layer.layer_style_wizard = {
@@ -234,7 +240,10 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
-        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+        self.assertEqual(
+            self.layer.legends,
+            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+        )
 
     def test_update_wizard(self):
         self.layer.layer_style_wizard = {
@@ -250,7 +259,10 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
-        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+        self.assertEqual(
+            self.layer.legends,
+            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+        )
 
         self.layer.layer_style_wizard = {
             "field": "b",
@@ -265,7 +277,10 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
-        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+        self.assertEqual(
+            self.layer.legends,
+            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+        )
 
     def test_boundaries_less(self):
         geo_layer = self.source.get_layer()
@@ -319,7 +334,7 @@ class StyleTestCase(TestCase):
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED_NO_VALUE)
         self.assertEqual(
             self.layer.legends,
             [{"title": "my_layer_name", "items": [style.DEFAULT_LEGEND_GRADUADED]}],
@@ -1138,6 +1153,136 @@ class StyleTestCase(TestCase):
             ],
         )
 
+    def test_gauss_graduated_quantile_white_none(self):
+        geo_layer = self.source.get_layer()
+
+        random.seed(33)
+        for index in range(0, 1000):
+            self._feature_factory(geo_layer, a=random.gauss(0, 5)),
+        for index in range(0, 10):
+            self._feature_factory(geo_layer, a=None),
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "method": "quantile",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
+            "include_no_value": True,
+        }
+        self.layer.save()
+        self.maxDiff = None
+
+        self.assertEqual(
+            self.layer.layer_style,
+            {
+                "type": "fill",
+                "paint": {
+                    "fill-color": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        [
+                            "step",
+                            ["get", "a"],
+                            "#aa0000",
+                            -3.307794810850208,
+                            "#770000",
+                            0.020384992547665716,
+                            "#330000",
+                            3.256429352130346,
+                            "#000000",
+                        ],
+                        "#000000",
+                    ],
+                    "fill-opacity": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        0.4,
+                        0,
+                    ],
+                    "fill-outline-color": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        "#ffffff",
+                        "#ffffff",
+                    ],
+                },
+            },
+        )
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#000000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#000000",
+                            "boundaries": {
+                                "lower": {"value": 3.256429352130346, "included": True},
+                                "upper": {
+                                    "value": 15.25702131719717,
+                                    "included": True,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#330000",
+                            "boundaries": {
+                                "lower": {
+                                    "value": 0.020384992547665716,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": 3.256429352130346,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#770000",
+                            "boundaries": {
+                                "lower": {
+                                    "value": -3.307794810850208,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": 0.020384992547665716,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {
+                                    "value": -15.554792351427212,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": -3.307794810850208,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
     def test_gauss_graduated_jenks(self):
         geo_layer = self.source.get_layer()
 
@@ -1242,6 +1387,59 @@ class StyleTestCase(TestCase):
             ],
         )
 
+    def test_graduated_jenks_only_none(self):
+        geo_layer = self.source.get_layer()
+
+        self._feature_factory(geo_layer, a=None),
+
+        self.layer.layer_style_wizard = {
+            "field": "a",
+            "symbology": "graduated",
+            "method": "jenks",
+            "style": {
+                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "stroke_color": "#ffffff",
+            },
+            "include_no_value": True,
+            "no_value_style": {
+                "fill_color": "#CC0000",
+                "fill_opacity": 0.5,
+                "stroke_color": "#00ffff",
+            },
+        }
+        self.layer.save()
+        self.maxDiff = None
+
+        self.assertEqual(
+            self.layer.layer_style,
+            {
+                "type": "fill",
+                "paint": {
+                    "fill-color": "#CC0000",
+                    "fill-opacity": 0.5,
+                    "fill-outline-color": "#00ffff",
+                },
+            },
+        )
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#CC0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
     def test_gauss_graduated_jenks_with_none(self):
         geo_layer = self.source.get_layer()
 
@@ -1259,7 +1457,12 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "stroke_color": "#ffffff",
             },
-            "include_no_value": False,
+            "include_no_value": True,
+            "no_value_style": {
+                "fill_color": "#CC0000",
+                "fill_opacity": 0.5,
+                "stroke_color": "#00ffff",
+            },
         }
         self.layer.save()
 
@@ -1269,18 +1472,33 @@ class StyleTestCase(TestCase):
                 "type": "fill",
                 "paint": {
                     "fill-color": [
-                        "step",
-                        ["get", "a"],
-                        "#aa0000",
-                        -4.292341999003442,
-                        "#770000",
-                        0.5740581144424383,
-                        "#330000",
-                        5.727211814984125,
-                        "#000000",
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        [
+                            "step",
+                            ["get", "a"],
+                            "#aa0000",
+                            -4.292341999003442,
+                            "#770000",
+                            0.5740581144424383,
+                            "#330000",
+                            5.727211814984125,
+                            "#000000",
+                        ],
+                        "#CC0000",
                     ],
-                    "fill-opacity": 0.4,
-                    "fill-outline-color": "#ffffff",
+                    "fill-opacity": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        0.4,
+                        0.5,
+                    ],
+                    "fill-outline-color": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        "#ffffff",
+                        "#00ffff",
+                    ],
                 },
             },
         )
@@ -1289,6 +1507,14 @@ class StyleTestCase(TestCase):
             [
                 {
                     "items": [
+                        {
+                            "color": "#CC0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        },
                         {
                             "color": "#000000",
                             "boundaries": {
