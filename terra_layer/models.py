@@ -77,14 +77,13 @@ class Scene(models.Model):
             layer = Layer.objects.get(pk=current_node["geolayer"])
             layer.group = parent
             layer.order = order
-            layer.save()
+            layer.save(wizard_update=False)
 
     def insert_in_tree(self, layer, parts, group_config=None):
         """ Add the layer in tree. Each parts are a group name to find inside the tree.
             Here we assume that missing groups are added at first position of current node
             We create missing group with default exclusive group configuration (should be corrected later if necessary)
         """
-
         group_config = group_config or {}
 
         current_node = self.tree
@@ -111,7 +110,6 @@ class Scene(models.Model):
         if group_config and last_group:
             # And update tho config
             last_group.update(group_config)
-
         self.save()
 
     def save(self, *args, **kwargs):
@@ -195,8 +193,8 @@ class Layer(models.Model):
     class Meta:
         ordering = ("order", "name")
 
-    def save(self, **kwargs):
-        if self.layer_style_wizard:
+    def save(self, wizard_update=True, **kwargs):
+        if self.layer_style_wizard and wizard_update:
             style, legend_addition = generate_style_from_wizard(
                 self, self.layer_style_wizard
             )
