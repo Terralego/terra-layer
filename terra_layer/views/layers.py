@@ -8,7 +8,7 @@ from django.http import Http404, QueryDict
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.http import urlunquote
-from django_geosource.models import WMTSSource
+from django_geosource.models import WMTSSource, FieldTypes
 
 from geostore.tokens import tiles_token_generator
 
@@ -28,6 +28,9 @@ from ..serializers import (
 )
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
+
+# Map source field data_type to format_type
+TYPE_MAP = {a: b.name.lower() for a, b in dict(FieldTypes.choices()).items()}
 
 
 class SceneViewset(ModelViewSet):
@@ -425,13 +428,15 @@ class LayerView(APIView):
     def get_filter_fields_for_layer(self, layer):
         """ Return the filter fields of the layer if table is enabled
         """
+
         if layer.table_enable:
             return [
                 {
                     "value": field_filter.field.name,
                     "label": field_filter.label or field_filter.field.label,
                     "exportable": field_filter.exportable,
-                    "format_type": field_filter.format_type,
+                    "format_type": field_filter.format_type
+                    or TYPE_MAP[field_filter.field.data_type],
                     "display": field_filter.display,
                     "settings": field_filter.settings,
                 }
