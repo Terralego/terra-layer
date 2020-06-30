@@ -1,4 +1,18 @@
 
+0.5.0 / 2020-06-30
+==================
+
+  * Fix bad format type sent to server
+  * Add an option to not generate wizard
+  * Fix circle legend generator using decimal value
+  * Style generator: graduated, no data close to small value in legend
+  * Style generator: deal with null value vs empty table
+  * Gen style, fix color usage
+  * Fix & remove default params to gen_legend_circle()
+  * Add a dict level style in wizard config
+  * Style generator, support of null value on layer style and legend
+  * Updating a layer's source do not delete field settings anymore
+
 0.4.13 / 2020-06-25
 ==================
 
