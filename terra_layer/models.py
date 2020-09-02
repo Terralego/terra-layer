@@ -215,7 +215,14 @@ class Layer(models.Model):
             # deleting cache for Groups
             groups = self.source.settings.get("groups", [])
             for group in Group.objects.filter(id__in=groups):
-                cache.delete(get_layer_group_cache_key(self.group.view, [group.name,]))
+                cache.delete(
+                    get_layer_group_cache_key(
+                        self.group.view,
+                        [
+                            group.name,
+                        ],
+                    )
+                )
 
     def __str__(self):
         return f"Layer({self.id}) - {self.name}"
