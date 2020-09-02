@@ -1,6 +1,7 @@
 from hashlib import md5
 import uuid
 
+from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.db import models, transaction
 from django.contrib.postgres.fields import JSONField
@@ -210,6 +211,11 @@ class Layer(models.Model):
         # Invalidate cache for layer group
         if self.group:
             cache.delete(get_layer_group_cache_key(self.group.view))
+
+            # deleting cache for Groups
+            groups = self.source.settings.get("groups", [])
+            for group in Group.objects.filter(id__in=groups):
+                cache.delete(get_layer_group_cache_key(self.group.view, [group.name,]))
 
     def __str__(self):
         return f"Layer({self.id}) - {self.name}"
