@@ -29,7 +29,9 @@ class StyleTestCase(TestCase):
 
     def _feature_factory(self, geo_layer, **properties):
         return Feature.objects.create(
-            layer=geo_layer, geom=Point(-1.560408, 47.218658), properties=properties,
+            layer=geo_layer,
+            geom=Point(-1.560408, 47.218658),
+            properties=properties,
         )
 
     def test_get_min_max(self):

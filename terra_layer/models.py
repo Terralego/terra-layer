@@ -15,7 +15,7 @@ from .style import generate_style_from_wizard
 
 
 class Scene(models.Model):
-    """ A scene is a group of data visualisation in terra-visu.
+    """A scene is a group of data visualisation in terra-visu.
     It's also a main menu entry.
     """
 
@@ -80,9 +80,9 @@ class Scene(models.Model):
             layer.save(wizard_update=False)
 
     def insert_in_tree(self, layer, parts, group_config=None):
-        """ Add the layer in tree. Each parts are a group name to find inside the tree.
-            Here we assume that missing groups are added at first position of current node
-            We create missing group with default exclusive group configuration (should be corrected later if necessary)
+        """Add the layer in tree. Each parts are a group name to find inside the tree.
+        Here we assume that missing groups are added at first position of current node
+        We create missing group with default exclusive group configuration (should be corrected later if necessary)
         """
         group_config = group_config or {}
 

@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="layer", options={"ordering": ("order", "name")},
+            name="layer",
+            options={"ordering": ("order", "name")},
         ),
         migrations.AddField(
             model_name="scene",
@@ -83,5 +84,8 @@ class Migration(migrations.Migration):
                 to="terra_layer.LayerGroup",
             ),
         ),
-        migrations.AlterUniqueTogether(name="layergroup", unique_together=set(),),
+        migrations.AlterUniqueTogether(
+            name="layergroup",
+            unique_together=set(),
+        ),
     ]
