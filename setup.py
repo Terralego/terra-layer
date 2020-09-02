@@ -9,7 +9,7 @@ README = open(os.path.join(HERE, "README.md")).read()
 CHANGES = open(os.path.join(HERE, "CHANGES.md")).read()
 
 tests_require = [
-    "factory-boy<3.0.0",
+    "factory-boy",
     "flake8",
     "coverage",
 ]
