@@ -468,7 +468,13 @@ def boundaries_round(boundaries, scale=2):
 
 
 def gen_legend_circle(
-    min, max, size, color, include_no_value, no_value_circle_radius, no_value_color,
+    min,
+    max,
+    size,
+    color,
+    include_no_value,
+    no_value_circle_radius,
+    no_value_color,
 ):
     """
     Generate a circle legend.
@@ -504,7 +510,11 @@ def gen_legend_circle(
 
 
 def gen_layer_fill(
-    key, fill_color, style, include_no_value, style_no_value,
+    key,
+    fill_color,
+    style,
+    include_no_value,
+    style_no_value,
 ):
     """
     Build a Mapbox GL Style layer for pylygon fill.
@@ -538,7 +548,11 @@ def gen_layer_fill(
 
 
 def gen_layer_circle(
-    radius, sort_key, style, include_no_value, style_no_value,
+    radius,
+    sort_key,
+    style,
+    include_no_value,
+    style_no_value,
 ):
     """
     Build a Mapbox GL Style layer for circle.
@@ -595,7 +609,7 @@ def generate_style_from_wizard(layer, config):
     field = config["field"]
 
     if symbology == "graduated":
-        """ config = {
+        """config = {
             "field": "my_field",
             "symbology": "graduated",
             "boundaries": [1, 2, 3, 5],
@@ -669,7 +683,7 @@ def generate_style_from_wizard(layer, config):
             )
 
     elif symbology == "circle":
-        """ config = {
+        """config = {
             "field": "my_field",
             "symbology": "circle",
             "include_no_value": False,  # Show no value features on map and legend

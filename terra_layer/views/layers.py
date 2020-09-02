@@ -38,7 +38,9 @@ class SceneViewset(ModelViewSet):
     queryset = Scene.objects.all()
     permission_classes = (ScenePermission,)
 
-    def get_serializer_class(self,):
+    def get_serializer_class(
+        self,
+    ):
         if self.action in ["retrieve", "update", "create", "partial_update"]:
             return SceneDetailSerializer
         return SceneListSerializer
@@ -124,7 +126,9 @@ class LayerViewset(ModelViewSet):
     def get_queryset(self):
         return self.model.objects.all()
 
-    def get_serializer_class(self,):
+    def get_serializer_class(
+        self,
+    ):
         if self.action in ["retrieve", "update", "create", "partial_update"]:
             return LayerDetailSerializer
         return LayerListSerializer
@@ -136,8 +140,7 @@ class LayerViewset(ModelViewSet):
 
 
 class LayerView(APIView):
-    """ This view generates the LayersTree used to construct the frontend
-    """
+    """This view generates the LayersTree used to construct the frontend"""
 
     permission_classes = ()
     model = Layer
@@ -185,7 +188,7 @@ class LayerView(APIView):
         return Response(response)
 
     def get_response_with_sources(self):
-        """ Return a response object containing the full layersTree with updated
+        """Return a response object containing the full layersTree with updated
         user authentication.
         """
 
@@ -218,8 +221,7 @@ class LayerView(APIView):
         return layer_structure
 
     def get_layer_structure(self):
-        """ Return the structured layerTree
-        """
+        """Return the structured layerTree"""
         return {
             "title": self.scene.name,
             "type": self.scene.category,
@@ -232,8 +234,7 @@ class LayerView(APIView):
         }
 
     def get_map_layers(self):
-        """ Return sources informations using serializer from sources_serializers module
-        """
+        """Return sources informations using serializer from sources_serializers module"""
         map_layers = []
         for layer in self.layers.filter(source__slug__in=self.authorized_sources):
             map_layers += [
@@ -248,15 +249,14 @@ class LayerView(APIView):
         return map_layers
 
     def get_interactions(self, layers):
-        """ Return interactions for all layers in the scene
-        """
+        """Return interactions for all layers in the scene"""
         interactions = []
         for layer in layers:
             interactions += self.get_interactions_for_layer(layer)
         return interactions
 
     def get_formatted_interactions(self, layer):
-        """ Return all interactions of a layer after beeing formatted correctly
+        """Return all interactions of a layer after beeing formatted correctly
         for the frontend
         """
         return [
@@ -277,7 +277,7 @@ class LayerView(APIView):
         ]
 
     def get_interactions_for_layer(self, layer):
-        """ Return formatted interaction of a layer
+        """Return formatted interaction of a layer
 
         It contains, popup, minisheet and custom styles
         """
@@ -327,16 +327,14 @@ class LayerView(APIView):
         return interactions
 
     def get_layers_list_for_layer(self, layer):
-        """ Return list of sublayers of a layer
-        """
+        """Return list of sublayers of a layer"""
         return [
             layer.layer_identifier,
             *[s.layer_identifier for s in layer.custom_styles.all()],
         ]
 
     def get_layers_tree(self, scene):
-        """ Return the full layer tree of a scene object
-        """
+        """Return the full layer tree of a scene object"""
         root_group = LayerGroup.objects.prefetch_related(self.prefetch_layers).get(
             view=scene, parent=None
         )
@@ -345,7 +343,7 @@ class LayerView(APIView):
         return self.get_group_dict(root_group)["layers"]
 
     def get_group_dict(self, group):
-        """ Recursive method that return the tree from a LayerGroup element.
+        """Recursive method that return the tree from a LayerGroup element.
 
         `group.settings` is injected in the group dictionnary, so any setting can be overridden.
 
@@ -426,8 +424,7 @@ class LayerView(APIView):
         return layer_object
 
     def get_filter_fields_for_layer(self, layer):
-        """ Return the filter fields of the layer if table is enabled
-        """
+        """Return the filter fields of the layer if table is enabled"""
 
         if layer.table_enable:
             return [
@@ -444,8 +441,7 @@ class LayerView(APIView):
             ]
 
     def get_filter_forms_for_layer(self, layer):
-        """ Return forms of a layer if filters are enabled
-        """
+        """Return forms of a layer if filters are enabled"""
         if layer.filters_enabled:
             return [
                 {
@@ -458,8 +454,7 @@ class LayerView(APIView):
 
     @cached_property
     def authorized_sources(self):
-        """ Cached property of authorized sources from the authenticated user's groups
-        """
+        """Cached property of authorized sources from the authenticated user's groups"""
         groups = self.user_groups
         sources_slug = list(
             self.layergroup.layers.filter(
@@ -471,8 +466,7 @@ class LayerView(APIView):
 
     @cached_property
     def layers(self):
-        """ List of layers of the selected scene
-        """
+        """List of layers of the selected scene"""
         layers = (
             self.model.objects.filter(group__view=self.scene.pk)
             .order_by("order")
