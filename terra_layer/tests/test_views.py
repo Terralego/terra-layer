@@ -3,6 +3,8 @@ import json
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
 from django_geosource.models import PostGISSource, Source, FieldTypes, WMTSSource
@@ -14,9 +16,10 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
     HTTP_403_FORBIDDEN,
 )
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from terra_layer.models import Layer, LayerGroup, FilterField, CustomStyle
+from terra_layer.utils import get_layer_group_cache_key
 
 from .factories import SceneFactory
 
@@ -701,3 +704,66 @@ class ModelSourceViewsetAnonymousTestCase(TestCase):
             data={"geom": "POINT(0 0)", "properties": {"toto": "ok"}},
         )
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
+
+
+class LayerViewTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserModel.objects.create(
+            **{UserModel.USERNAME_FIELD: "private_user"}
+        )
+        cls.source_params = {
+            "name": "test_view",
+            "db_name": "test",
+            "db_password": "test",
+            "db_host": "localhost",
+            "geom_type": 1,
+            "refresh": -1,
+        }
+        cls.scene = SceneFactory(name="test_scene")
+        cls.layer_group = LayerGroup.objects.get(view=cls.scene)
+
+    def test_cache_is_cleared_after_private_layer_update(self):
+        group = Group.objects.create(name="private")
+        group.user_set.add(self.user)
+        source = PostGISSource.objects.create(
+            **self.source_params, settings={"groups": [group.pk]}
+        )
+        layer = Layer.objects.create(
+            name="private_layer", source=source, group=self.layer_group
+        )
+        # relationship is between geolayer and group, not "terralayer"
+        geo_layer = source.get_layer()
+        group.authorized_layers.add(geo_layer)
+
+        self.client.force_authenticate(self.user)
+        self.client.get(reverse("layerview", args=[self.scene.slug]))
+
+        cache_key = get_layer_group_cache_key(
+            self.scene,
+            [
+                group.name,
+            ],
+        )
+        self.assertIsNotNone(cache.get(cache_key))
+
+        # updating layer to trigger cache reset
+        layer.name = "new_name"
+        layer.save()
+        self.assertIsNone(cache.get(cache_key))
+
+    def test_cache_cleared_after_public_layer_update(self):
+        source = PostGISSource.objects.create(**self.source_params)
+        layer = Layer.objects.create(
+            name="public_layer", source=source, group=self.layer_group
+        )
+
+        self.client.get(reverse("layerview", args=[self.scene.slug]))
+
+        cache_key = get_layer_group_cache_key(self.scene)
+        self.assertIsNotNone(cache.get(cache_key))
+
+        # updating layer to trigger cache reset
+        layer.name = "new_name"
+        layer.save()
+        self.assertIsNone(cache.get(cache_key))
