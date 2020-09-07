@@ -18,6 +18,8 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.serializers import ValidationError
 
+from mapbox_baselayer.models import MapBaseLayer
+
 from ..models import Layer, LayerGroup, FilterField, Scene
 from ..permissions import LayerPermission, ScenePermission
 from ..serializers import (
@@ -477,3 +479,15 @@ class LayerView(APIView):
         if layers:
             return layers
         raise Http404
+
+
+class BaseLayersView(APIView):
+    def get(self, request):
+        baselayers = {
+            base_layer.name: {
+                "id": base_layer.pk,
+                "url": base_layer.url,
+            }
+            for base_layer in MapBaseLayer.objects.all()
+        }
+        return Response(baselayers)

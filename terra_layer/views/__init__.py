@@ -1,4 +1,4 @@
-from .layers import SceneViewset, LayerViewset, LayerView  # NOQA
+from .layers import BaseLayersView, SceneViewset, LayerViewset, LayerView  # NOQA
 from .extras import (  # NOQA
     GeoSourceModelViewset,
     GeostoreLayerViewSet,

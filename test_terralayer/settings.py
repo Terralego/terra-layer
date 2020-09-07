@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "geostore",
     "django_geosource",
     "terra_layer",
+    "mapbox_baselayer",
 ]
 
 AUTH_USER_MODEL = "terra_accounts.TerraUser"

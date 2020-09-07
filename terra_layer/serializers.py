@@ -3,8 +3,15 @@ from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from mapbox_baselayer.models import MapBaseLayer
 
 from .models import CustomStyle, FilterField, Layer, Scene
+
+
+class BaseLayerSerializer(ModelSerializer):
+    class Meta:
+        model = MapBaseLayer
+        fields = "__all__"
 
 
 class SceneListSerializer(ModelSerializer):
@@ -31,6 +38,7 @@ class SceneListSerializer(ModelSerializer):
 class SceneDetailSerializer(ModelSerializer):
     slug = serializers.SlugField(required=False)
     icon = serializers.SerializerMethodField()
+    base_layer = BaseLayerSerializer(required=False)
 
     def get_icon(self, obj):
         if obj.custom_icon:

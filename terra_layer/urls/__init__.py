@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .geostore import urlpatterns as geostore_patterns
 from .geosource import router as geosource_router
-from ..views import LayerViewset, LayerView, SceneViewset
+from ..views import BaseLayersView, LayerViewset, LayerView, SceneViewset
 
 router = routers.SimpleRouter()
 
@@ -13,6 +13,7 @@ router.register(r"geolayer", LayerViewset, basename="layer")
 # Extras viewsets
 
 urlpatterns = [
+    path(r"geolayer/baselayers/", BaseLayersView.as_view(), name="baselayers"),
     path(r"geolayer/view/<str:slug>/", LayerView.as_view(), name="layerview"),
     # Extra urls from third part modules
     path("", include("terra_accounts.urls")),
