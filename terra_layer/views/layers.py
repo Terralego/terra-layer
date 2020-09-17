@@ -245,9 +245,7 @@ class LayerView(APIView):
         ]
 
         # avoid futur reference modifications
-        map_structure = deepcopy(
-            layer_structure["map"]
-        )
+        map_structure = deepcopy(layer_structure["map"])
         background_styles = map_structure.get("backgroundStyle", [])
 
         if type(background_styles) is list:
@@ -509,4 +507,3 @@ class BaseLayerViewSet(ModelViewSet):
     serializer_class = BaseLayerSerializer
     queryset = MapBaseLayer.objects.all()
     ordering_field = ("name", "id")
-
