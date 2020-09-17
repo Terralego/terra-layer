@@ -32,9 +32,7 @@ class Scene(models.Model):
         default=list, validators=[JSONSchemaValidator(limit_value=SCENE_LAYERTREE)]
     )
     config = JSONField(default=dict)
-    baselayer = models.ForeignKey(
-        MapBaseLayer, on_delete=models.CASCADE, null=True, blank=True
-    )
+    baselayer = models.ManyToManyField(MapBaseLayer)
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])

@@ -1,4 +1,5 @@
 import tempfile
+from copy import deepcopy
 
 from django.core.management import call_command, get_commands
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.utils.http import urlunquote
 from django_geosource.models import WMTSSource, FieldTypes
 
 from geostore.tokens import tiles_token_generator
+from mapbox_baselayer.models import MapBaseLayer
 
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -18,7 +20,6 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.serializers import ValidationError
 
-from mapbox_baselayer.models import MapBaseLayer
 
 from ..models import Layer, LayerGroup, FilterField, Scene
 from ..permissions import LayerPermission, ScenePermission
@@ -27,6 +28,7 @@ from ..serializers import (
     LayerDetailSerializer,
     SceneListSerializer,
     SceneDetailSerializer,
+    BaseLayerSerializer,
 )
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
@@ -86,13 +88,11 @@ class SceneViewset(ModelViewSet):
                 call_command("load_xls", scene_name=scene_name, file=xls_file.name)
 
     def perform_update(self, serializer):
-
         if serializer.is_valid():
             self.check_layer_status(
                 serializer.instance.id, serializer.validated_data.get("tree", [])
             )
             serializer.save()
-
         self.handle_import_file(serializer.instance.name)
 
     def perform_create(self, serializer):
@@ -224,7 +224,7 @@ class LayerView(APIView):
 
     def get_layer_structure(self):
         """Return the structured layerTree"""
-        return {
+        layer_structure = {
             "title": self.scene.name,
             "type": self.scene.category,
             "layersTree": self.get_layers_tree(self.scene),
@@ -234,6 +234,30 @@ class LayerView(APIView):
                 "customStyle": {"sources": [], "layers": self.get_map_layers()},
             },
         }
+
+        # settings are merged for now
+        baselayers = [
+            {
+                "label": baselayer.name,
+                "url": baselayer.url,
+            }
+            for baselayer in self.scene.baselayer.all()
+        ]
+
+        # avoid futur reference modifications
+        map_structure = deepcopy(
+            layer_structure["map"]
+        )
+        background_styles = map_structure.get("backgroundStyle", [])
+
+        if type(background_styles) is list:
+            background_styles += baselayers
+        else:
+            # backgroundStyles can be just an url
+            baselayers.append({"label": "terra_default", "url": background_styles})
+            background_styles = baselayers
+        layer_structure["map"]["backgroundStyle"] = background_styles
+        return layer_structure
 
     def get_map_layers(self):
         """Return sources informations using serializer from sources_serializers module"""
@@ -481,13 +505,8 @@ class LayerView(APIView):
         raise Http404
 
 
-class BaseLayersView(APIView):
-    def get(self, request):
-        baselayers = {
-            base_layer.name: {
-                "id": base_layer.pk,
-                "url": base_layer.url,
-            }
-            for base_layer in MapBaseLayer.objects.all()
-        }
-        return Response(baselayers)
+class BaseLayerViewSet(ModelViewSet):
+    serializer_class = BaseLayerSerializer
+    queryset = MapBaseLayer.objects.all()
+    ordering_field = ("name", "id")
+

@@ -1,9 +1,11 @@
+import json
+
 from django.db import transaction
+from mapbox_baselayer.models import MapBaseLayer
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
-from mapbox_baselayer.models import MapBaseLayer
 
 from .models import CustomStyle, FilterField, Layer, Scene
 
@@ -38,7 +40,6 @@ class SceneListSerializer(ModelSerializer):
 class SceneDetailSerializer(ModelSerializer):
     slug = serializers.SlugField(required=False)
     icon = serializers.SerializerMethodField()
-    base_layer = BaseLayerSerializer(required=False)
 
     def get_icon(self, obj):
         if obj.custom_icon:
@@ -47,6 +48,14 @@ class SceneDetailSerializer(ModelSerializer):
     class Meta:
         model = Scene
         fields = "__all__"
+        extra_kwargs = {"baselayer": {"allow_empty": True}}
+
+    def to_internal_value(self, data):
+        baselayer = data.get("baselayer")
+        querydict = data.copy()
+        if type(baselayer) is str:
+            querydict.setlist("baselayer", json.loads(baselayer))
+        return super().to_internal_value(querydict)
 
 
 class FilterFieldSerializer(ModelSerializer):
