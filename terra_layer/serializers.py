@@ -52,9 +52,12 @@ class SceneDetailSerializer(ModelSerializer):
 
     def to_internal_value(self, data):
         baselayer = data.get("baselayer")
+
+        if type(baselayer) is not str:
+            return super().to_internal_value(data)
+
         querydict = data.copy()
-        if type(baselayer) is str:
-            querydict.setlist("baselayer", json.loads(baselayer))
+        querydict.setlist("baselayer", json.loads(baselayer))
         return super().to_internal_value(querydict)
 
 
