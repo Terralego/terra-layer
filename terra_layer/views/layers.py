@@ -220,6 +220,15 @@ class LayerView(APIView):
         ]
         return layer_structure
 
+    def get_map_settings(self, scene):
+        """Return the default map settings overridden with map settings from the scene if present"""
+        if "map_settings" in scene.config:
+            return {
+                **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                **scene.config["map_settings"],
+            }
+        return settings.TERRA_DEFAULT_MAP_SETTINGS
+
     def get_layer_structure(self):
         """Return the structured layerTree"""
         return {
@@ -228,7 +237,7 @@ class LayerView(APIView):
             "layersTree": self.get_layers_tree(self.scene),
             "interactions": self.get_interactions(self.layers),
             "map": {
-                **settings.TERRA_DEFAULT_MAP_SETTINGS,
+                **self.get_map_settings(self.scene),
                 "customStyle": {"sources": [], "layers": self.get_map_layers()},
             },
         }
