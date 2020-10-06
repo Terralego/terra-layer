@@ -414,6 +414,7 @@ class LayerView(APIView):
                 "fields": self.get_filter_fields_for_layer(layer),
                 "form": self.get_filter_forms_for_layer(layer),
             },
+            "credit": layer.source.credit,
         }
 
         # Set the exportable status of the layer if any filter fields is exportable
