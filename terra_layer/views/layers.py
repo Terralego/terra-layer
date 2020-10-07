@@ -417,7 +417,7 @@ class LayerView(APIView):
         }
 
         # Set the exportable status of the layer if any filter fields is exportable
-        layer_object["filters"]["exportable"] = any(
+        layer_object["filters"]["exportable"] = layer.table_export_enable and any(
             [f["exportable"] for f in layer_object["filters"]["fields"] or []]
         )
 
