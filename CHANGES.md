@@ -1,4 +1,11 @@
 
+0.5.1 / 2020-10-07
+==================
+
+  * Feature: Show scene with it's map settings from config json field
+  * Feature: Add credit from layer's source
+  * Fix: Tabular view is exportable only if the global export parameter is set to true on the layer
+
 0.5.0 / 2020-06-30
 ==================
 
