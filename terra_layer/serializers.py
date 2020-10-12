@@ -1,19 +1,12 @@
 import json
 
 from django.db import transaction
-from mapbox_baselayer.models import MapBaseLayer
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.reverse import reverse
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
 from .models import CustomStyle, FilterField, Layer, Scene
-
-
-class BaseLayerSerializer(ModelSerializer):
-    class Meta:
-        model = MapBaseLayer
-        fields = "__all__"
 
 
 class SceneListSerializer(ModelSerializer):

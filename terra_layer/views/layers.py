@@ -12,14 +12,12 @@ from django.utils.http import urlunquote
 from django_geosource.models import WMTSSource, FieldTypes
 
 from geostore.tokens import tiles_token_generator
-from mapbox_baselayer.models import MapBaseLayer
 
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.serializers import ValidationError
-
 
 from ..models import Layer, LayerGroup, FilterField, Scene
 from ..permissions import LayerPermission, ScenePermission
@@ -28,7 +26,6 @@ from ..serializers import (
     LayerDetailSerializer,
     SceneListSerializer,
     SceneDetailSerializer,
-    BaseLayerSerializer,
 )
 from ..sources_serializers import SourceSerializer
 from ..utils import dict_merge, get_layer_group_cache_key
@@ -501,9 +498,3 @@ class LayerView(APIView):
         if layers:
             return layers
         raise Http404
-
-
-class BaseLayerViewSet(ModelViewSet):
-    serializer_class = BaseLayerSerializer
-    queryset = MapBaseLayer.objects.all()
-    ordering_field = ("name", "id")
