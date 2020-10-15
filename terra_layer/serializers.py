@@ -1,3 +1,5 @@
+import json
+
 from django.db import transaction
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
@@ -39,6 +41,17 @@ class SceneDetailSerializer(ModelSerializer):
     class Meta:
         model = Scene
         fields = "__all__"
+        extra_kwargs = {"baselayer": {"allow_empty": True}}
+
+    def to_internal_value(self, data):
+        baselayer = data.get("baselayer")
+
+        if type(baselayer) is not str:
+            return super().to_internal_value(data)
+
+        querydict = data.copy()
+        querydict.setlist("baselayer", json.loads(baselayer))
+        return super().to_internal_value(querydict)
 
 
 class FilterFieldSerializer(ModelSerializer):

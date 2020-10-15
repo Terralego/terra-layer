@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django_geosource.models import Source, Field
 from rest_framework.reverse import reverse
+from mapbox_baselayer.models import MapBaseLayer
 
 from .utils import get_layer_group_cache_key
 from .schema import JSONSchemaValidator, SCENE_LAYERTREE
@@ -31,6 +32,7 @@ class Scene(models.Model):
         default=list, validators=[JSONSchemaValidator(limit_value=SCENE_LAYERTREE)]
     )
     config = JSONField(default=dict)
+    baselayer = models.ManyToManyField(MapBaseLayer)
 
     def get_absolute_url(self):
         return reverse("scene-detail", args=[self.pk])

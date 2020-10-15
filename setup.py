@@ -47,6 +47,8 @@ setup(
         "django-geostore>=0.3.11",
         "django-terra-accounts>=0.3.6",
         "jsonschema",
+        "django-mapbox-baselayer>=0.0.3",
+        "django-terra-settings>=0.1.1",
     ],
     extras_require={"dev": tests_require},
 )

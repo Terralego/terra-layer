@@ -1,4 +1,5 @@
 import tempfile
+from copy import deepcopy
 
 from django.core.management import call_command, get_commands
 from django.conf import settings
@@ -84,13 +85,11 @@ class SceneViewset(ModelViewSet):
                 call_command("load_xls", scene_name=scene_name, file=xls_file.name)
 
     def perform_update(self, serializer):
-
         if serializer.is_valid():
             self.check_layer_status(
                 serializer.instance.id, serializer.validated_data.get("tree", [])
             )
             serializer.save()
-
         self.handle_import_file(serializer.instance.name)
 
     def perform_create(self, serializer):
@@ -231,7 +230,7 @@ class LayerView(APIView):
 
     def get_layer_structure(self):
         """Return the structured layerTree"""
-        return {
+        layer_structure = {
             "title": self.scene.name,
             "type": self.scene.category,
             "layersTree": self.get_layers_tree(self.scene),
@@ -241,6 +240,28 @@ class LayerView(APIView):
                 "customStyle": {"sources": [], "layers": self.get_map_layers()},
             },
         }
+
+        # settings are merged for now
+        baselayers = [
+            {
+                "label": baselayer.name,
+                "url": baselayer.url,
+            }
+            for baselayer in self.scene.baselayer.all()
+        ]
+
+        # avoid futur reference modifications
+        map_structure = deepcopy(layer_structure["map"])
+        background_styles = map_structure.get("backgroundStyle", [])
+
+        if type(background_styles) is list:
+            background_styles += baselayers
+        else:
+            # backgroundStyles can be just an url
+            baselayers.append({"label": "terra_default", "url": background_styles})
+            background_styles = baselayers
+        layer_structure["map"]["backgroundStyle"] = background_styles
+        return layer_structure
 
     def get_map_layers(self):
         """Return sources informations using serializer from sources_serializers module"""

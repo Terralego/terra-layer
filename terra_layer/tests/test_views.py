@@ -119,6 +119,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -136,6 +137,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name 2",
             "slug": "myslug",
             "category": "map",
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -183,6 +185,7 @@ class ModelSourceViewsetTestCase(TestCase):
                     "children": [],
                 },
             ],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -204,6 +207,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -232,6 +236,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -271,6 +276,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -324,6 +330,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -359,6 +366,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -394,6 +402,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -446,6 +455,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": COMPLEXE_SCENE_TREE,
+            "baselayer": [],
         }
 
         response = self.client.post(reverse("scene-list"), query)
@@ -592,6 +602,7 @@ class ModelSourceViewsetTestCase(TestCase):
             "name": "Scene Name",
             "category": "map",
             "tree": [{"geolayer": layer.id}],
+            "baselayer": [],
         }
 
         self.client.post(reverse("scene-list"), query)
