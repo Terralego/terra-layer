@@ -52,10 +52,7 @@ class LayerDumpTestCase(TestCase):
                 "legends": [],
                 "table_enable": False,
                 "table_export_enable": False,
-                "popup_enable": False,
-                "popup_template": "",
-                "popup_minzoom": 0.0,
-                "popup_maxzoom": 22.0,
+                "popup_config": {},
                 "minisheet_enable": False,
                 "minisheet_template": "",
                 "highlight_color": "",
@@ -85,7 +82,7 @@ class LayerDumpTestCase(TestCase):
                 },
             ],
             minisheet_enable=True,
-            popup_enable=True,
+            popup_config={"enable": True},
             highlight_color=True,
         )
         CustomStyle.objects.create(
@@ -129,7 +126,7 @@ class LayerDumpTestCase(TestCase):
                 },
             ],
             minisheet_enable=True,
-            popup_enable=True,
+            popup_config={"enable": True},
             highlight_color=True,
         )
         FilterField.objects.create(label="Test", field=field, layer=layer)

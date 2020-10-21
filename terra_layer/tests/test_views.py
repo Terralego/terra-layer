@@ -315,7 +315,7 @@ class ModelSourceViewsetTestCase(TestCase):
                 },
             ],
             minisheet_enable=True,
-            popup_enable=True,
+            popup_config={"enable": True},
             highlight_color=True,
         )
         CustomStyle.objects.create(

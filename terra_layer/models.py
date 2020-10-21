@@ -168,10 +168,7 @@ class Layer(models.Model):
     table_enable = models.BooleanField(default=False)
     table_export_enable = models.BooleanField(default=False)
 
-    popup_enable = models.BooleanField(default=False)
-    popup_template = models.TextField(blank=True)
-    popup_minzoom = models.FloatField(default=0)
-    popup_maxzoom = models.FloatField(default=22)
+    popup_config = JSONField(default=dict)
 
     minisheet_enable = models.BooleanField(default=False)
     minisheet_template = models.TextField(blank=True)

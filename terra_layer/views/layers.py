@@ -317,7 +317,7 @@ class LayerView(APIView):
 
         main_field = getattr(layer.main_field, "name", None)
 
-        if layer.popup_enable:
+        if layer.popup_config.get("enable"):
             interactions.append(
                 {
                     "id": layer.layer_identifier,
@@ -325,9 +325,12 @@ class LayerView(APIView):
                     "clusterLabel": main_field,  # Kept for compatibility purpose
                     "interaction": "displayTooltip",
                     "trigger": "mouseover",
-                    "template": layer.popup_template,
+                    "template": layer.popup_config.get("template"),
                     "constraints": [
-                        {"minZoom": layer.popup_minzoom, "maxZoom": layer.popup_maxzoom}
+                        {
+                            "minZoom": layer.popup_config.get("minzoom"),
+                            "maxZoom": layer.popup_config.get("maxzoom"),
+                        },
                     ],
                 }
             )
