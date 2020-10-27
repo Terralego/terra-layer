@@ -1,8 +1,8 @@
 
-0.5.2 / XXXX-XX-XX
+0.5.2 / 2020-10-27
 ==================
 
-  * 
+  * Move popup data into a config json field for deeper customization/configuration
 
 0.5.1 / 2020-10-07
 ==================
@@ -75,7 +75,7 @@
 ### Fixes
 
  * Field order was not saved
- * Don't save layer group on write 
+ * Don't save layer group on write
 
 0.4.5      (2019-02-04)
 =======================
