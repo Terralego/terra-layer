@@ -1,4 +1,9 @@
 
+0.5.3 / 2020-11-02
+==================
+
+  * Remove popup_enable & minisheet_enable filter fields
+
 0.5.2 / 2020-10-27
 ==================
 
