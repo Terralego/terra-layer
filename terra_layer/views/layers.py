@@ -116,8 +116,6 @@ class LayerViewset(ModelViewSet):
         "active_by_default",
         "in_tree",
         "table_enable",
-        "popup_enable",
-        "minisheet_enable",
     )
     permission_classes = (LayerPermission,)
     search_fields = ["name", "settings"]
