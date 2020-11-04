@@ -39,24 +39,6 @@ DEFAULT_STYLE_NO_VALUE = {
     "circle_stroke_width": DEFAULT_NO_VALUE_STROKE_WIDTH,
 }
 
-DEFAULT_STYLE_GRADUADED = {
-    "type": "fill",
-    "paint": {
-        "fill-color": DEFAULT_FILL_COLOR,
-        "fill-opacity": DEFAULT_FILL_OPACITY,
-        "fill-outline-color": DEFAULT_STROKE_COLOR,
-    },
-}
-
-DEFAULT_STYLE_GRADUADED_NO_VALUE = {
-    "type": "fill",
-    "paint": {
-        "fill-color": DEFAULT_NO_VALUE_FILL_COLOR,
-        "fill-opacity": DEFAULT_NO_VALUE_FILL_OPACITY,
-        "fill-outline-color": DEFAULT_NO_VALUE_STROKE_COLOR,
-    },
-}
-
 DEFAULT_LEGEND_GRADUADED = {
     "color": DEFAULT_NO_VALUE_FILL_COLOR,
     "boundaries": {
@@ -241,7 +223,8 @@ def discretize_equal_interval(geo_layer, field, class_count):
         delta = (max - min) / class_count
         return [min + delta * i for i in range(0, class_count + 1)]
     else:
-        return []
+        # TODO was return []
+        return None
 
 
 def discretize(geo_layer, field, method, class_count):
@@ -264,11 +247,9 @@ def get_field_style(field):
     return ["get", field]
 
 
-def get_style_no_value_condition(
-    include_no_value, key, with_value, with_no_value, default_value
-):
-    if include_no_value:
-        if with_value:
+def get_style_no_value_condition(key, with_value, with_no_value):
+    if with_no_value is not None:
+        if with_value is not None:
             return [
                 "case",
                 ["==", ["typeof", key], "number"],
@@ -278,10 +259,7 @@ def get_style_no_value_condition(
         else:
             return with_no_value
     else:
-        if with_value:
-            return with_value
-        else:
-            return default_value
+        return with_value
 
 
 def gen_style_steps(expression, boundaries, colors):
@@ -529,7 +507,8 @@ def gen_layer_color_graduation_style(
     mapbox_type = variable_field.split("_")[0]
 
     # TODO remove default style ?
-    mapbox_style = {**DEFAULT_STYLE_GRADUADED["paint"]}
+    # mapbox_style = {**DEFAULT_STYLE_GRADUADED["paint"]}
+    mapbox_style = {}
 
     for style_field, value in style.items():
         mapbox_style_field = style_field.replace("_", "-")
@@ -539,13 +518,13 @@ def gen_layer_color_graduation_style(
         else:
             style_value = value if color_graduation else None
 
-        mapbox_style[mapbox_style_field] = get_style_no_value_condition(
-            style_field in style_no_value,
+        val = get_style_no_value_condition(
             field_getter,
             style_value,
-            style_no_value.get(style_field, DEFAULT_STYLE_NO_VALUE[style_field]),
-            DEFAULT_STYLE[style_field],
+            style_no_value.get(style_field),
         )
+        if val is not None:
+            mapbox_style[mapbox_style_field] = val
 
     return {"type": mapbox_type, "paint": mapbox_style}
 
@@ -563,7 +542,7 @@ def gen_layer_proportionnal_value_style(
     mapbox_type = variable_field.split("_")[0]
 
     # TODO remove default style ?
-    mapbox_style = {**DEFAULT_STYLE_CIRCLE["paint"]}
+    mapbox_style = {}
 
     for style_field, value in style.items():
         mapbox_style_field = style_field.replace("_", "-")
@@ -574,11 +553,9 @@ def gen_layer_proportionnal_value_style(
             style_value = value
 
         mapbox_style[mapbox_style_field] = get_style_no_value_condition(
-            style_field in style_no_value,
             proportionnal_value,
             style_value,
-            style_no_value.get(style_field, DEFAULT_STYLE_NO_VALUE[style_field]),
-            DEFAULT_STYLE[style_field],
+            style_no_value.get(style_field),
         )
 
     return {
@@ -640,6 +617,7 @@ def gen_graduated_color_style(geo_layer, config):
             raise ValueError('"boundaries" must be at least a list of two values')
     elif "method" in config:
         boundaries = discretize(geo_layer, data_field, config["method"], len(colors))
+        print(config["method"], boundaries)
     else:
         raise ValueError(
             'With "graduated" symbology, "boundaries" or "method" should be provided'
@@ -647,12 +625,14 @@ def gen_graduated_color_style(geo_layer, config):
 
     # Use boundaries to make style and legend
     if boundaries is not None:
+        print("value", boundaries)
         config_style = config.get("style", {})
         config_style_no_value = config.get("no_value_style", {})
 
         field_getter = ["get", data_field]
 
         style_steps = gen_style_steps(field_getter, boundaries, colors)
+        print(style_steps)
 
         style = gen_layer_color_graduation_style(
             field_getter,
@@ -672,8 +652,19 @@ def gen_graduated_color_style(geo_layer, config):
         }
         return (style, legend_addition)
     else:
+        print("no value")
+        # Generate default style if no value
+        default_style = {"type": config["variable_field"].split("_")[0]}
+        default_style["paint"] = config["style"]
+        default_style["paint"][config["variable_field"]] = config["style"][
+            config["variable_field"]
+        ][0]
+        default_style["paint"].update(config.get("no_value_style", {}))
+        default_style["paint"] = {
+            k.replace("_", "-"): v for (k, v) in default_style["paint"].items()
+        }
         return (
-            DEFAULT_STYLE_GRADUADED,  # TODO Not generic
+            default_style,
             {"items": [DEFAULT_LEGEND_GRADUADED]},
         )
 
