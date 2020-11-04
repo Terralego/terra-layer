@@ -32,7 +32,7 @@ class Command(BaseCommand):
             if data.get(field):
                 data[field] = klass.objects.get(**{sfield: data[field]}).pk
 
-        for cs in data["custom_styles"]:
+        for cs in data["extra_styles"]:
             cs["source"] = Source.objects.get(slug=cs["source"]).pk
 
         if data.get("main_field"):

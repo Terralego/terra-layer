@@ -30,7 +30,7 @@ class Command(BaseCommand):
             serialized.pop(field)
 
         # Clean custom_style id
-        for cs in serialized.get("custom_styles", []):
+        for cs in serialized.get("extra_styles", []):
             cs.pop("id")
             cs["source"] = Source.objects.get(pk=cs["source"]).slug
 

@@ -82,7 +82,7 @@ class LayerListSerializer(ModelSerializer):
 
 class LayerDetailSerializer(ModelSerializer):
     fields = FilterFieldSerializer(many=True, read_only=True, source="fields_filters")
-    custom_styles = CustomStyleSerializer(many=True, read_only=True)
+    extra_styles = CustomStyleSerializer(many=True, read_only=True)
     group = PrimaryKeyRelatedField(read_only=True)
 
     @transaction.atomic
@@ -90,8 +90,8 @@ class LayerDetailSerializer(ModelSerializer):
         instance = super().create(validated_data)
 
         # Update m2m through field
-        self._update_nested(instance, "custom_styles", CustomStyleSerializer)
         self._update_m2m_through(instance, "fields", FilterFieldSerializer)
+        self._update_nested(instance, "extra_styles", CustomStyleSerializer)
 
         return instance
 
@@ -108,7 +108,7 @@ class LayerDetailSerializer(ModelSerializer):
 
         # Update m2m through field
         self._update_m2m_through(instance, "fields", FilterFieldSerializer)
-        self._update_nested(instance, "custom_styles", CustomStyleSerializer)
+        self._update_nested(instance, "extra_styles", CustomStyleSerializer)
 
         return instance
 

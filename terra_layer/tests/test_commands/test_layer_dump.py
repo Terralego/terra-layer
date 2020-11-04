@@ -39,12 +39,13 @@ class LayerDumpTestCase(TestCase):
             json.loads(mock_sdout.getvalue()),
             {
                 "fields": [],
-                "custom_styles": [],
+                "extra_styles": [],
                 "uuid": "91c60192-9060-4bf6-b0de-818c5a362d89",
                 "name": "Layer_without_custom_style",
                 "in_tree": True,
                 "order": 0,
                 "description": "",
+                "main_style": {},
                 "layer_style": {},
                 "layer_style_wizard": {},
                 "settings": {},
@@ -71,7 +72,7 @@ class LayerDumpTestCase(TestCase):
         self.maxDiff = None
         layer = Layer.objects.create(
             source=self.source,
-            name="Layer_with_custom_style",
+            name="Layer_with_extra_style",
             interactions=[
                 {
                     "id": "terralego-eae-sync",
@@ -89,18 +90,19 @@ class LayerDumpTestCase(TestCase):
             layer=layer,
             source=self.source,
             interactions=[
-                {"id": "custom_style", "interaction": "highlight", "trigger": "click"},
+                {"id": "extra_style", "interaction": "highlight", "trigger": "click"},
             ],
         )
         call_command("layer_dump", pk=layer.pk)
         self.assertEqual(
-            json.loads(mock_stdout.getvalue())["custom_styles"],
+            json.loads(mock_stdout.getvalue())["extra_styles"],
             [
                 {
-                    "style": {},
+                    "style_config": {},
+                    "style": {}, # TODO remove me
                     "interactions": [
                         {
-                            "id": "custom_style",
+                            "id": "extra_style",
                             "trigger": "click",
                             "interaction": "highlight",
                         }
@@ -117,7 +119,7 @@ class LayerDumpTestCase(TestCase):
 
         layer = Layer.objects.create(
             source=self.source,
-            name="Layer_with_custom_style",
+            name="Layer_with_extra_style",
             interactions=[
                 {
                     "id": "terralego-eae-sync",
