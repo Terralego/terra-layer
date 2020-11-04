@@ -17,7 +17,6 @@ urlpatterns = [
     # Extra urls from third part modules
     path("", include("terra_accounts.urls")),
     path("", include("terra_settings.urls")),
-    path("", include("mapbox_baselayer.urls")),
     path("geostore/", include(geostore_patterns)),
     path(
         "geosource/",
