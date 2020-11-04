@@ -147,7 +147,8 @@ class StyleTestCase(TestCase):
         self.assertEqual(style.ceil_scale(0.58, 1), 1)
 
     def test_symbology_fail(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "__666__",
         }
@@ -156,13 +157,14 @@ class StyleTestCase(TestCase):
             self.layer.save()
 
     def test_method_fail(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "__666__",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
         }
 
@@ -171,114 +173,130 @@ class StyleTestCase(TestCase):
 
     def test_empty(self):
         geo_layer = self.source.get_layer()
-        geo_layer.layer_style_wizard = {}
+        geo_layer.main_style = {}
         geo_layer.save()
 
         # Make a random change on the layer before save
         self.layer.name = "foobar"
         self.layer.save()
-        self.assertEqual(self.layer.layer_style, {})
+        self.assertEqual(self.layer.main_style, {})
         self.assertEqual(self.layer.legends, [])
 
     def test_no_wizard(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
 
-        self.layer.layer_style_wizard = {}
+        self.layer.main_style = {}
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, {})
+        self.assertEqual(self.layer.main_style, {})
         self.assertEqual(self.layer.legends, [])
 
     def test_0graduated_equal_interval(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(
+            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+        )
         self.assertEqual(
             self.layer.legends,
             [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
         )
 
     def test_0graduated_quantile(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(
+            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+        )
         self.assertEqual(
             self.layer.legends,
             [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
         )
 
     def test_0graduated_jenks(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(
+            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+        )
         self.assertEqual(
             self.layer.legends,
             [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
         )
 
     def test_update_wizard(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
+
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(
+            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+        )
         self.assertEqual(
             self.layer.legends,
             [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
         )
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "b",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED)
+        self.assertEqual(
+            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+        )
         self.assertEqual(
             self.layer.legends,
             [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
@@ -289,12 +307,13 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
@@ -306,13 +325,14 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0],
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
@@ -324,19 +344,27 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "b",
             "symbology": "graduated",
             "method": "quantile",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_opacity": 0.4,
+                "fill_outline_color": "#ffffff",
+            },
+            "no_value_style": {
+                "fill_color": "#000000",
+                "fill_opacity": 0,
             },
             "include_no_value": True,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_GRADUADED_NO_VALUE)
+        self.assertEqual(
+            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED_NO_VALUE
+        )
         self.assertEqual(
             self.layer.legends,
             [{"title": "my_layer_name", "items": [style.DEFAULT_LEGEND_GRADUADED]}],
@@ -347,20 +375,21 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0, 10, 20, 30, 40],
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -429,20 +458,26 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
         self._feature_factory(geo_layer, a=None),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0, 10, 20, 30, 40],
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#fffffa",
+                "fill_opacity": 0.4,
+                "fill_outline_color": "#fffffa",
+            },
+            "no_value_style": {
+                "fill_color": "#000000",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": True,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -462,12 +497,7 @@ class StyleTestCase(TestCase):
                         ],
                         "#000000",
                     ],
-                    "fill-opacity": [
-                        "case",
-                        ["==", ["typeof", ["get", "a"]], "number"],
-                        0.4,
-                        0,
-                    ],
+                    "fill-opacity": 0.4,
                     "fill-outline-color": [
                         "case",
                         ["==", ["typeof", ["get", "a"]], "number"],
@@ -533,20 +563,21 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -614,20 +645,21 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -677,20 +709,21 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -736,35 +769,44 @@ class StyleTestCase(TestCase):
         )
 
     def test_0circle(self):
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "style": {"fill_color": "#0000cc", "stroke_color": "#ffffff"},
+            "style": {"circle_color": "#0000cc", "circle_stroke_color": "#ffffff"},
             "include_no_value": False,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.layer_style, style.DEFAULT_STYLE_CIRCLE)
+        self.assertEqual(self.layer.main_style["map_style"], style.DEFAULT_STYLE_CIRCLE)
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_2circle(self):
         geo_layer = self.source.get_layer()
-        self._feature_factory(geo_layer, a=0),
-        self._feature_factory(geo_layer, a=1),
-        self._feature_factory(geo_layer, a=129),
+        self._feature_factory(geo_layer, a=0)
+        self._feature_factory(geo_layer, a=1)
+        self._feature_factory(geo_layer, a=129)
 
-        self.layer.layer_style_wizard = {
+        self.maxDiff = None
+
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "style": {"fill_color": "#0000cc", "stroke_color": "#ffffff"},
+            "style": {
+                "circle_color": "#0000cc",
+                "circle_opacity": 0.4,
+                "circle_stroke_color": "#ffffff",
+                "circle_stroke_width": 0.3,
+            },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "circle",
                 "layout": {"circle-sort-key": ["-", ["get", "a"]]},
@@ -835,15 +877,28 @@ class StyleTestCase(TestCase):
 
     def test_2circle_no_value(self):
         geo_layer = self.source.get_layer()
-        self._feature_factory(geo_layer, a=0),
-        self._feature_factory(geo_layer, a=1),
-        self._feature_factory(geo_layer, a=129),
+        self._feature_factory(geo_layer, a=0)
+        self._feature_factory(geo_layer, a=1)
+        self._feature_factory(geo_layer, a=129)
+        self.maxDiff = None
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "style": {"fill_color": "#0000ca", "stroke_color": "#fffffa"},
+            "style": {
+                "circle_color": "#0000ca",
+                "circle_stroke_color": "#fffffa",
+                "circle_stroke_width": 0.3,
+                # "circle_opacity": 0.4,
+            },
+            "no_value_style": {
+                "circle_radius": 30,
+                "circle_color": "#000000",
+                "circle_stroke_color": "#ffffff",
+                "circle_stroke_width": 0.2,
+            },
             "include_no_value": True,
         }
         self.layer.save()
@@ -858,7 +913,7 @@ class StyleTestCase(TestCase):
             100.0,
         ]
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "circle",
                 "layout": {"circle-sort-key": ["-", ["get", "a"]]},
@@ -875,12 +930,6 @@ class StyleTestCase(TestCase):
                         "#0000ca",
                         "#000000",
                     ],
-                    "circle-opacity": [
-                        "case",
-                        ["==", ["typeof", interpolate], "number"],
-                        0.4,
-                        0,
-                    ],
                     "circle-stroke-color": [
                         "case",
                         ["==", ["typeof", interpolate], "number"],
@@ -891,8 +940,10 @@ class StyleTestCase(TestCase):
                         "case",
                         ["==", ["typeof", interpolate], "number"],
                         0.3,
-                        0.3,
+                        0.2,
                     ],
+                    # TODO Why ??
+                    "circle-opacity": 0.4,
                 },
             },
         )
@@ -955,12 +1006,15 @@ class StyleTestCase(TestCase):
         for a in [106.8, 59.2, 49.4, 0.1, 0]:
             self._feature_factory(geo_layer, a=a)
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "circle",
             "max_diameter": 200,
-            "fill_color": "#0000cc",
-            "stroke_color": "#ffffff",
+            "style": {
+                "circle_color": "#0000cc",
+                "circle_stroke_color": "#ffffff",
+            },
         }
         self.layer.save()
 
@@ -1010,23 +1064,24 @@ class StyleTestCase(TestCase):
         geo_layer = self.source.get_layer()
 
         random.seed(33)
-        for index in range(0, 1000):
+        for _ in range(0, 1000):
             self._feature_factory(geo_layer, a=random.gauss(0, 5)),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -1114,20 +1169,22 @@ class StyleTestCase(TestCase):
         for index in range(0, 1000):
             self._feature_factory(geo_layer, a=random.gauss(0, 5)),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
+        self.maxDiff = None
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -1220,13 +1277,21 @@ class StyleTestCase(TestCase):
         for index in range(0, 10):
             self._feature_factory(geo_layer, a=None),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_opacity": 0.4,
+                "fill_outline_color": "#ffffff",
+            },
+            "no_value_style": {
+                "fill_color": "#000000",
+                "fill_opacity": 0,
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": True,
         }
@@ -1234,7 +1299,7 @@ class StyleTestCase(TestCase):
         self.maxDiff = None
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -1348,20 +1413,21 @@ class StyleTestCase(TestCase):
         for index in range(0, 1000):
             self._feature_factory(geo_layer, a=random.gauss(0, 5)),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": False,
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -1450,26 +1516,28 @@ class StyleTestCase(TestCase):
 
         self._feature_factory(geo_layer, a=None),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_opacity": 0.4,
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": True,
             "no_value_style": {
                 "fill_color": "#CC0000",
                 "fill_opacity": 0.5,
-                "stroke_color": "#00ffff",
+                "fill_outline_color": "#00ffff",
             },
         }
         self.layer.save()
         self.maxDiff = None
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {
@@ -1507,25 +1575,27 @@ class StyleTestCase(TestCase):
         for index in range(0, 10):
             self._feature_factory(geo_layer, a=None),
 
-        self.layer.layer_style_wizard = {
+        self.layer.main_style = {
+            "type": "variable",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "stroke_color": "#ffffff",
+                "fill_opacity": 0.4,
+                "fill_outline_color": "#ffffff",
             },
             "include_no_value": True,
             "no_value_style": {
                 "fill_color": "#CC0000",
                 "fill_opacity": 0.5,
-                "stroke_color": "#00ffff",
+                "fill_outline_color": "#00ffff",
             },
         }
         self.layer.save()
 
         self.assertEqual(
-            self.layer.layer_style,
+            self.layer.main_style["map_style"],
             {
                 "type": "fill",
                 "paint": {

@@ -161,7 +161,7 @@ class LayerView(APIView):
                     ),
                     to_attr="filters_enabled",
                 ),
-                "custom_styles__source",
+                "extra_styles__source",
             )
         ),
     )
@@ -269,7 +269,7 @@ class LayerView(APIView):
                 SourceSerializer.get_object_serializer(layer).data,
                 *[
                     SourceSerializer.get_object_serializer(cs).data
-                    for cs in layer.custom_styles.filter(
+                    for cs in layer.extra_styles.filter(
                         source__slug__in=self.authorized_sources
                     )
                 ],
@@ -310,7 +310,7 @@ class LayerView(APIView):
         It contains, popup, minisheet and custom styles
         """
         interactions = self.get_formatted_interactions(layer)
-        for cs in layer.custom_styles.all():
+        for cs in layer.extra_styles.all():
             interactions += self.get_formatted_interactions(cs)
 
         main_field = getattr(layer.main_field, "name", None)
@@ -363,7 +363,7 @@ class LayerView(APIView):
         """Return list of sublayers of a layer"""
         return [
             layer.layer_identifier,
-            *[s.layer_identifier for s in layer.custom_styles.all()],
+            *[s.layer_identifier for s in layer.extra_styles.all()],
         ]
 
     def get_layers_tree(self, scene):
@@ -416,7 +416,7 @@ class LayerView(APIView):
     def get_layer_dict(self, layer):
         if (
             layer.source.slug not in self.authorized_sources
-            or layer.custom_styles.exclude(
+            or layer.extra_styles.exclude(
                 source__slug__in=self.authorized_sources
             ).exists()
         ):
@@ -505,7 +505,7 @@ class LayerView(APIView):
             self.model.objects.filter(group__view=self.scene.pk)
             .order_by("order")
             .select_related("source")
-            .prefetch_related("custom_styles__source")
+            .prefetch_related("extra_styles__source")
         )
 
         if layers:

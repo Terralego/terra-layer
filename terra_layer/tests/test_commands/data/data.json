@@ -8,8 +8,8 @@
   "order": 0,
   "shown": false
 }],
-  "custom_styles": [{
-    "style": {},
+  "extra_styles": [{
+    "style_config": {},
     "interactions":
     [{
       "id": "custom_style",

@@ -160,6 +160,9 @@ class Layer(models.Model):
 
     layer_style = JSONField(default=dict)
     layer_style_wizard = JSONField(default=dict)
+
+    main_style = JSONField(default=dict)
+
     settings = JSONField(default=dict)
     active_by_default = models.BooleanField(default=False)
 
@@ -191,11 +194,11 @@ class Layer(models.Model):
         ordering = ("order", "name")
 
     def save(self, wizard_update=True, **kwargs):
-        if self.layer_style_wizard and wizard_update:
-            style, legend_addition = generate_style_from_wizard(
-                self, self.layer_style_wizard
+        if 'type' in self.main_style and self.main_style['type'] != 'advanced' and wizard_update:
+            generated_map_style, legend_addition = generate_style_from_wizard(
+                self, self.main_style
             )
-            self.layer_style = style
+            self.main_style['map_style'] = generated_map_style
             if not self.legends:
                 legend_addition["title"] = self.name
                 self.legends = [legend_addition]
@@ -265,12 +268,14 @@ class Layer(models.Model):
 
 class CustomStyle(models.Model):
     layer = models.ForeignKey(
-        Layer, on_delete=models.CASCADE, related_name="custom_styles"
+        Layer, on_delete=models.CASCADE, related_name="extra_styles"
     )
     source = models.ForeignKey(
         Source, on_delete=models.CASCADE, related_name="sublayers"
     )
     style = JSONField(default=dict)
+    style_config = JSONField(default=dict)
+
     interactions = JSONField(default=list)
 
     @property
