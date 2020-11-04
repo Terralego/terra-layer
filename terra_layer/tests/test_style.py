@@ -195,6 +195,7 @@ class StyleTestCase(TestCase):
     def test_0graduated_equal_interval(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
@@ -207,7 +208,11 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(
-            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+            self.layer.main_style["map_style"],
+            {
+                "paint": {"fill-color": "#aa0000", "fill-outline-color": "#ffffff"},
+                "type": "fill",
+            },
         )
         self.assertEqual(
             self.layer.legends,
@@ -229,7 +234,11 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(
-            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+            self.layer.main_style["map_style"],
+            {
+                "paint": {"fill-color": "#aa0000", "fill-outline-color": "#ffffff"},
+                "type": "fill",
+            },
         )
         self.assertEqual(
             self.layer.legends,
@@ -251,7 +260,11 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(
-            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+            self.layer.main_style["map_style"],
+            {
+                "paint": {"fill-color": "#aa0000", "fill-outline-color": "#ffffff"},
+                "type": "fill",
+            },
         )
         self.assertEqual(
             self.layer.legends,
@@ -261,6 +274,7 @@ class StyleTestCase(TestCase):
     def test_update_wizard(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
@@ -274,7 +288,11 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(
-            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+            self.layer.main_style["map_style"],
+            {
+                "paint": {"fill-color": "#aa0000", "fill-outline-color": "#ffffff"},
+                "type": "fill",
+            },
         )
         self.assertEqual(
             self.layer.legends,
@@ -295,7 +313,11 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(
-            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED
+            self.layer.main_style["map_style"],
+            {
+                "paint": {"fill-color": "#aa0000", "fill-outline-color": "#ffffff"},
+                "type": "fill",
+            },
         )
         self.assertEqual(
             self.layer.legends,
@@ -363,7 +385,14 @@ class StyleTestCase(TestCase):
         self.layer.save()
 
         self.assertEqual(
-            self.layer.main_style["map_style"], style.DEFAULT_STYLE_GRADUADED_NO_VALUE
+            self.layer.main_style["map_style"],
+            {
+                "paint": {
+                    "fill-color": "#000000",
+                    "fill-opacity": 0,
+                },
+                "type": "fill",
+            },
         )
         self.assertEqual(
             self.layer.legends,
@@ -404,7 +433,6 @@ class StyleTestCase(TestCase):
                         30,
                         "#000000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -592,7 +620,6 @@ class StyleTestCase(TestCase):
                         1.75,
                         "#000000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -672,7 +699,6 @@ class StyleTestCase(TestCase):
                         2.0,
                         "#330000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -736,7 +762,6 @@ class StyleTestCase(TestCase):
                         2,
                         "#330000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -942,8 +967,6 @@ class StyleTestCase(TestCase):
                         0.3,
                         0.2,
                     ],
-                    # TODO Why ??
-                    "circle-opacity": 0.4,
                 },
             },
         )
@@ -1096,7 +1119,6 @@ class StyleTestCase(TestCase):
                         7.554067900041074,
                         "#000000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -1199,7 +1221,6 @@ class StyleTestCase(TestCase):
                         3.186540376312785,
                         "#000000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
@@ -1297,6 +1318,7 @@ class StyleTestCase(TestCase):
         }
         self.layer.save()
         self.maxDiff = None
+        print(self.layer.main_style["map_style"])
 
         self.assertEqual(
             self.layer.main_style["map_style"],
@@ -1442,7 +1464,6 @@ class StyleTestCase(TestCase):
                         5.727211814984125,
                         "#000000",
                     ],
-                    "fill-opacity": 0.4,
                     "fill-outline-color": "#ffffff",
                 },
             },
