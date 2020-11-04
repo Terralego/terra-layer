@@ -149,6 +149,7 @@ class StyleTestCase(TestCase):
     def test_symbology_fail(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "__666__",
         }
@@ -159,6 +160,7 @@ class StyleTestCase(TestCase):
     def test_method_fail(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "__666__",
@@ -221,6 +223,7 @@ class StyleTestCase(TestCase):
     def test_0graduated_quantile(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
@@ -246,6 +249,7 @@ class StyleTestCase(TestCase):
     def test_0graduated_jenks(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
@@ -297,6 +301,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "b",
             "symbology": "graduated",
             "method": "jenks",
@@ -326,6 +331,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "style": {
@@ -343,6 +349,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0],
@@ -361,6 +368,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "b",
             "symbology": "graduated",
             "method": "quantile",
@@ -398,6 +406,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0, 10, 20, 30, 40],
@@ -479,6 +488,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "boundaries": [0, 10, 20, 30, 40],
@@ -583,6 +593,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
@@ -663,6 +674,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
@@ -725,6 +737,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
@@ -783,6 +796,7 @@ class StyleTestCase(TestCase):
     def test_0circle(self):
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "circle_radius",
             "field": "a",
             "symbology": "circle",
             "max_value": 200,
@@ -813,6 +827,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "circle_radius",
             "field": "a",
             "symbology": "circle",
             "max_value": 200,
@@ -904,6 +919,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "circle_radius",
             "field": "a",
             "symbology": "circle",
             "max_value": 200,
@@ -1024,6 +1040,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "circle_radius",
             "field": "a",
             "symbology": "circle",
             "max_value": 200,
@@ -1085,6 +1102,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "equal_interval",
@@ -1185,6 +1203,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "quantile",
@@ -1426,6 +1445,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
@@ -1527,6 +1547,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
@@ -1585,6 +1606,7 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
+            "variable_field": "fill_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",

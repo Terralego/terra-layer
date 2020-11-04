@@ -527,10 +527,8 @@ def generate_style_from_wizard(layer, config):
     symbology = config["symbology"]
 
     if symbology == "graduated":
-        # config["variable_field"] = "fill_color"
         return gen_graduated_color_style(geo_layer, config)
     elif symbology == "circle":
-        # config["variable_field"] = "circle_radius"
         return gen_proportional_value_style(geo_layer, config)
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
