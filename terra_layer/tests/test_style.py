@@ -203,7 +203,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -229,7 +228,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -255,7 +253,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -282,7 +279,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
 
         self.layer.save()
@@ -308,7 +304,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -337,7 +332,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         with self.assertRaises(ValueError):
             self.layer.save()
@@ -356,7 +350,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         with self.assertRaises(ValueError):
             self.layer.save()
@@ -380,7 +373,6 @@ class StyleTestCase(TestCase):
                 "fill_color": "#000000",
                 "fill_opacity": 0,
             },
-            "include_no_value": True,
         }
         self.layer.save()
 
@@ -413,7 +405,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -500,7 +491,6 @@ class StyleTestCase(TestCase):
                 "fill_color": "#000000",
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": True,
         }
         self.layer.save()
 
@@ -600,7 +590,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -681,7 +670,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -744,7 +732,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -798,13 +785,22 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "field": "a",
             "symbology": "circle",
-            "max_diameter": 200,
+            "max_value": 200,
             "style": {"circle_color": "#0000cc", "circle_stroke_color": "#ffffff"},
-            "include_no_value": False,
         }
         self.layer.save()
 
-        self.assertEqual(self.layer.main_style["map_style"], style.DEFAULT_STYLE_CIRCLE)
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "paint": {
+                    "circle-color": "#0000cc",
+                    "circle-radius": 200,
+                    "circle-stroke-color": "#ffffff",
+                },
+                "type": "circle",
+            },
+        )
         self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
 
     def test_2circle(self):
@@ -819,14 +815,13 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "field": "a",
             "symbology": "circle",
-            "max_diameter": 200,
+            "max_value": 200,
             "style": {
                 "circle_color": "#0000cc",
                 "circle_opacity": 0.4,
                 "circle_stroke_color": "#ffffff",
                 "circle_stroke_width": 0.3,
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -911,12 +906,11 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "field": "a",
             "symbology": "circle",
-            "max_diameter": 200,
+            "max_value": 200,
             "style": {
                 "circle_color": "#0000ca",
                 "circle_stroke_color": "#fffffa",
                 "circle_stroke_width": 0.3,
-                # "circle_opacity": 0.4,
             },
             "no_value_style": {
                 "circle_radius": 30,
@@ -924,7 +918,6 @@ class StyleTestCase(TestCase):
                 "circle_stroke_color": "#ffffff",
                 "circle_stroke_width": 0.2,
             },
-            "include_no_value": True,
         }
         self.layer.save()
 
@@ -1033,7 +1026,7 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "field": "a",
             "symbology": "circle",
-            "max_diameter": 200,
+            "max_value": 200,
             "style": {
                 "circle_color": "#0000cc",
                 "circle_stroke_color": "#ffffff",
@@ -1099,7 +1092,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -1200,7 +1192,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
         self.maxDiff = None
@@ -1314,11 +1305,9 @@ class StyleTestCase(TestCase):
                 "fill_opacity": 0,
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": True,
         }
         self.layer.save()
         self.maxDiff = None
-        print(self.layer.main_style["map_style"])
 
         self.assertEqual(
             self.layer.main_style["map_style"],
@@ -1444,7 +1433,6 @@ class StyleTestCase(TestCase):
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": False,
         }
         self.layer.save()
 
@@ -1547,7 +1535,6 @@ class StyleTestCase(TestCase):
                 "fill_opacity": 0.4,
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": True,
             "no_value_style": {
                 "fill_color": "#CC0000",
                 "fill_opacity": 0.5,
@@ -1606,7 +1593,6 @@ class StyleTestCase(TestCase):
                 "fill_opacity": 0.4,
                 "fill_outline_color": "#ffffff",
             },
-            "include_no_value": True,
             "no_value_style": {
                 "fill_color": "#CC0000",
                 "fill_opacity": 0.5,
