@@ -798,7 +798,7 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "variable_field": "circle_radius",
             "field": "a",
-            "symbology": "circle",
+            "symbology": "proportionnal",
             "max_value": 200,
             "style": {"circle_color": "#0000cc", "circle_stroke_color": "#ffffff"},
         }
@@ -829,7 +829,7 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "variable_field": "circle_radius",
             "field": "a",
-            "symbology": "circle",
+            "symbology": "proportionnal",
             "max_value": 200,
             "style": {
                 "circle_color": "#0000cc",
@@ -921,7 +921,7 @@ class StyleTestCase(TestCase):
             "type": "variable",
             "variable_field": "circle_radius",
             "field": "a",
-            "symbology": "circle",
+            "symbology": "proportionnal",
             "max_value": 200,
             "style": {
                 "circle_color": "#0000ca",
@@ -979,6 +979,7 @@ class StyleTestCase(TestCase):
                 },
             },
         )
+
         self.assertEqual(
             self.layer.legends,
             [
@@ -1033,20 +1034,19 @@ class StyleTestCase(TestCase):
             ],
         )
 
-    def test_ncircle(self):
+    def test_nlines(self):
         geo_layer = self.source.get_layer()
         for a in [106.8, 59.2, 49.4, 0.1, 0]:
             self._feature_factory(geo_layer, a=a)
 
         self.layer.main_style = {
             "type": "variable",
-            "variable_field": "circle_radius",
+            "variable_field": "line_width",
             "field": "a",
-            "symbology": "circle",
+            "symbology": "proportionnal",
             "max_value": 200,
             "style": {
-                "circle_color": "#0000cc",
-                "circle_stroke_color": "#ffffff",
+                "line_color": "#0000cc",
             },
         }
         self.layer.save()
@@ -1057,37 +1057,18 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "diameter": 200.0,
+                            "size": 110,
                             "boundaries": {"lower": {"value": 110}},
-                            "shape": "circle",
+                            "shape": "line",
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 134.83997249264843,
-                            "boundaries": {"lower": {"value": 50.0}},
-                            "shape": "circle",
-                            "color": "#0000cc",
-                        },
-                        {
-                            "diameter": 95.34625892455922,
-                            "boundaries": {"lower": {"value": 25.0}},
-                            "shape": "circle",
-                            "color": "#0000cc",
-                        },
-                        {
-                            "diameter": 60.30226891555273,
-                            "boundaries": {"lower": {"value": 10.0}},
-                            "shape": "circle",
-                            "color": "#0000cc",
-                        },
-                        {
-                            "diameter": 42.64014327112209,
-                            "boundaries": {"lower": {"value": 5.0}},
-                            "shape": "circle",
+                            "size": 0.1,
+                            "boundaries": {"lower": {"value": 0.1}},
+                            "shape": "line",
                             "color": "#0000cc",
                         },
                     ],
-                    "stackedCircles": True,
                     "title": "my_layer_name",
                 }
             ],
@@ -1445,13 +1426,13 @@ class StyleTestCase(TestCase):
 
         self.layer.main_style = {
             "type": "variable",
-            "variable_field": "fill_color",
+            "variable_field": "fill_outline_color",
             "field": "a",
             "symbology": "graduated",
             "method": "jenks",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_outline_color": ["#aa0000", "#770000", "#330000", "#000000"],
+                "fill_color": "#ffffff",
             },
         }
         self.layer.save()
@@ -1461,7 +1442,7 @@ class StyleTestCase(TestCase):
             {
                 "type": "fill",
                 "paint": {
-                    "fill-color": [
+                    "fill-outline-color": [
                         "step",
                         ["get", "a"],
                         "#aa0000",
@@ -1472,7 +1453,7 @@ class StyleTestCase(TestCase):
                         5.727211814984125,
                         "#000000",
                     ],
-                    "fill-outline-color": "#ffffff",
+                    "fill-color": "#ffffff",
                 },
             },
         )
