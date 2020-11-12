@@ -276,6 +276,10 @@ def gen_style_interpolate(expression, boundaries, values):
     return ["interpolate", ["linear"], expression] + _flatten(zip(boundaries, values))
 
 
+def size_boundaries_candidate(min, max):
+    return []
+
+
 def circle_boundaries_candidate(min, max):
     """
     Implementation of Self-Adjusting Legends for Proportional Symbol Maps
@@ -410,7 +414,45 @@ def boundaries_round(boundaries, scale=2):
     )
 
 
-def gen_legend_circle(
+def gen_proportionnal_size_legend(
+    shape,  # line, square, circle
+    min,
+    max,
+    size,
+    color,
+    no_value_size,
+    no_value_color,
+):
+    """
+    Generate a proportionnal size legend
+    """
+    candidates = size_boundaries_candidate(min, max)
+    boundaries = [max] + candidates + [min]
+
+    ret = [
+        {
+            "size": b,
+            "boundaries": {"lower": {"value": b}},
+            "shape": shape,
+            "color": color,
+        }
+        for b in boundaries
+    ]
+
+    if no_value_size:
+        ret.append(
+            {
+                "size": no_value_size,
+                "boundaries": {"lower": {"value": None}},
+                "shape": shape,
+                "color": no_value_color,
+            }
+        )
+
+    return ret
+
+
+def gen_proportionnal_circle_legend(
     min,
     max,
     size,
@@ -524,11 +566,13 @@ def generate_style_from_wizard(layer, config):
     Return a Mapbox GL Style and a Legend from a wizard setting.
     """
     geo_layer = layer.source.get_layer()
-    symbology = config["symbology"]
+    symbology = config["analysis_type"]
 
-    if symbology == "graduated":
+    if symbology == "graduate":
         return gen_graduated_color_style(geo_layer, config)
-    elif symbology == "circle":
+    if symbology == "categorize":
+        return []
+    elif symbology == "proportionnal":
         return gen_proportional_value_style(geo_layer, config)
     else:
         raise ValueError(f'Unknow symbology "{symbology}"')
@@ -537,7 +581,7 @@ def generate_style_from_wizard(layer, config):
 def gen_graduated_color_style(geo_layer, config):
     """config = {
         "field": "my_field",
-        "symbology": "graduated",
+        "analysis_type": "graduate",
         "boundaries": [1, 2, 3, 5],
         "method": "equal_interval",  # How to compute boundaries if not provided
         "variable_field": "fill_color", # Style field to variate
@@ -567,7 +611,7 @@ def gen_graduated_color_style(geo_layer, config):
         boundaries = discretize(geo_layer, data_field, config["method"], len(colors))
     else:
         raise ValueError(
-            'With "graduated" symbology, "boundaries" or "method" should be provided'
+            'With "graduate" analysis_type, "boundaries" or "method" should be provided'
         )
 
     # Use boundaries to make style and legend
@@ -615,7 +659,8 @@ def gen_graduated_color_style(geo_layer, config):
 def gen_proportional_value_style(geo_layer, config):
     """config = {
         "field": "my_field",
-        "symbology": "circle",
+        "symbology": "proportionnal",
+        "variable_field": "circle_radius", # Style field to variate
         "max_diameter": 200,
         "style": {
             "circle_color": "#0000cc",
@@ -657,17 +702,40 @@ def gen_proportional_value_style(geo_layer, config):
             style_no_value=config_style_no_value,
         )
 
-        legend_addition = {
-            "items": gen_legend_circle(
-                mm[0],
-                mm[1],
-                config["max_value"],
-                config_style["circle_color"],
-                config_style_no_value.get(proportional_field),
-                config_style_no_value.get("circle_color"),
-            ),
-            "stackedCircles": True,
-        }
+        legend_addition = []
+        if proportional_field in ["circle_radius"]:
+            legend_addition = {
+                "items": gen_proportionnal_circle_legend(
+                    mm[0],
+                    mm[1],
+                    config["max_value"],
+                    config_style["circle_color"],
+                    config_style_no_value.get("circle_radius"),
+                    config_style_no_value.get("circle_color"),
+                ),
+                "stackedCircles": True,
+            }
+        elif proportional_field in [
+            "line_width",
+            "circle_stroke_width",
+        ]:
+            mapbox_type_2_shape = {
+                "line": "line",
+                "circle": "circle",
+            }
+            mapbox_type = proportional_field.split("_")[0]
+            legend_addition = {
+                "items": gen_proportionnal_size_legend(
+                    mapbox_type_2_shape[mapbox_type],
+                    mm[0],
+                    mm[1],
+                    config["max_value"],
+                    config_style[f"{mapbox_type}_color"],
+                    config_style_no_value.get(proportional_field),
+                    config_style_no_value.get(f"{mapbox_type}_color"),
+                ),
+            }
+
         return (style, legend_addition)
     else:
         # Generate default style if no value
