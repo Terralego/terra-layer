@@ -4,25 +4,30 @@ import math
 from functools import reduce
 from terra_layer.settings import (
     DEFAULT_CIRCLE_MIN_LEGEND_HEIGHT,
+    DEFAULT_SIZE_MIN_LEGEND_HEIGHT,
     DEFAULT_NO_VALUE_FILL_COLOR,
-    DEFAULT_NO_VALUE_CIRCLE_RADIUS,
 )
 
-DEFAULT_LEGEND_GRADUADED = {
-    "color": DEFAULT_NO_VALUE_FILL_COLOR,
-    "boundaries": {
-        "lower": {"value": None, "included": True},
-        "upper": {"value": None, "included": True},
-    },
-    "shape": "square",
+
+def to_map_style(prop):
+    return prop.replace("_", "-")
+
+
+style_type_2_color_legend_shape = {
+    "fill": "square",
+    "circle": "circle",
+    "symbol": "symbol",
+    "line": "line",
 }
 
-DEFAULT_LEGEND_CIRCLE = {
-    "diameter": DEFAULT_NO_VALUE_CIRCLE_RADIUS * 2,
-    "boundaries": {"lower": {"value": None}},
-    "shape": "circle",
-    "color": DEFAULT_NO_VALUE_FILL_COLOR,
-}
+
+def field_2_variation_type(field):
+    if "color" in field:
+        return "color"
+    if "width" in field or "height" in field:
+        return "value"
+    if "radius" in field or "size" in field:
+        return "radius"
 
 
 def _flatten(levels):
@@ -201,10 +206,6 @@ def discretize(geo_layer, field, method, class_count):
         raise ValueError(f'Unknow discretize method "{method}"')
 
 
-def get_field_style(field):
-    return ["get", field]
-
-
 def get_style_no_value_condition(key, with_value, with_no_value):
     if with_no_value is not None:
         if with_value is not None:
@@ -230,7 +231,7 @@ def gen_style_steps(expression, boundaries, colors):
         )
 
 
-def gen_legend_steps(boundaries, colors, no_value_color):
+def gen_legend_steps(boundaries, colors, no_value_color, shape="square"):
     """
     Generate a discrete legend.
     """
@@ -245,7 +246,7 @@ def gen_legend_steps(boundaries, colors, no_value_color):
                     "included": index + 1 == size,
                 },
             },
-            "shape": "square",
+            "shape": shape,
         }
         for index in range(size)
     ]
@@ -259,12 +260,9 @@ def gen_legend_steps(boundaries, colors, no_value_color):
                     "lower": {"value": None, "included": True},
                     "upper": {"value": None, "included": True},
                 },
-                "shape": "square",
+                "shape": shape,
             },
         )
-
-    if not ret:
-        ret = [DEFAULT_LEGEND_GRADUADED]
 
     return ret
 
@@ -277,7 +275,7 @@ def gen_style_interpolate(expression, boundaries, values):
 
 
 def size_boundaries_candidate(min, max):
-    return []
+    return [(max - min) / 2]
 
 
 def circle_boundaries_candidate(min, max):
@@ -414,11 +412,11 @@ def boundaries_round(boundaries, scale=2):
     )
 
 
-def gen_proportionnal_size_legend(
+def gen_proportionnal_size_legend_items(
     shape,  # line, square, circle
     min,
     max,
-    size,
+    max_value,
     color,
     no_value_size,
     no_value_color,
@@ -426,12 +424,15 @@ def gen_proportionnal_size_legend(
     """
     Generate a proportionnal size legend
     """
+    if min <= DEFAULT_SIZE_MIN_LEGEND_HEIGHT:
+        min = DEFAULT_SIZE_MIN_LEGEND_HEIGHT
+
     candidates = size_boundaries_candidate(min, max)
     boundaries = [max] + candidates + [min]
 
     ret = [
         {
-            "size": b,
+            "size": (b / max) * max_value,
             "boundaries": {"lower": {"value": b}},
             "shape": shape,
             "color": color,
@@ -452,13 +453,8 @@ def gen_proportionnal_size_legend(
     return ret
 
 
-def gen_proportionnal_circle_legend(
-    min,
-    max,
-    size,
-    color,
-    no_value_circle_radius,
-    no_value_color,
+def gen_proportionnal_circle_legend_items(
+    shape, min, max, size, color, no_value_radius, no_value_color
 ):
     """
     Generate a circle legend.
@@ -474,18 +470,18 @@ def gen_proportionnal_circle_legend(
         {
             "diameter": math.sqrt(b / math.pi) * r,
             "boundaries": {"lower": {"value": b}},
-            "shape": "circle",
+            "shape": shape,
             "color": color,
         }
         for b in boundaries
     ]
 
-    if no_value_circle_radius:
+    if no_value_radius:
         ret.append(
             {
-                "diameter": no_value_circle_radius * 2,
+                "diameter": no_value_radius * 2,
                 "boundaries": {"lower": {"value": None}},
-                "shape": "circle",
+                "shape": shape,
                 "color": no_value_color,
             }
         )
@@ -493,72 +489,217 @@ def gen_proportionnal_circle_legend(
     return ret
 
 
-def gen_layer_color_graduation_style(
-    field_getter,
-    variable_field,
-    color_graduation,
-    style,
-    style_no_value,
-):
-    """
-    Build a Mapbox GL Style layer for color graduation.
-    """
-    mapbox_type = variable_field.split("_")[0]
+def gen_graduated_color_style(geo_layer, data_field, map_field, prop_config):
+    colors = prop_config["values"]
+    no_value = prop_config.get("no_value")
 
-    mapbox_style = {}
+    # Step 1 generate boundaries
+    if "boundaries" in prop_config:
+        boundaries = prop_config["boundaries"]
+        if len(boundaries) < 2:
+            raise ValueError('"boundaries" must be at least a list of two values')
+    elif "method" in prop_config:
+        boundaries = discretize(
+            geo_layer, data_field, prop_config["method"], len(colors)
+        )
+    else:
+        raise ValueError(
+            'With "graduated" analysis, "boundaries" or "method" should be provided'
+        )
 
-    for style_field, value in style.items():
-        mapbox_style_field = style_field.replace("_", "-")
+    # Use boundaries to make style
+    if boundaries is not None:
+        field_getter = ["get", data_field]
 
-        if style_field == variable_field:
-            style_value = color_graduation
-        else:
-            style_value = value if color_graduation else None
+        style_steps = gen_style_steps(field_getter, boundaries, colors)
 
-        val = get_style_no_value_condition(
+        return get_style_no_value_condition(
             field_getter,
-            style_value,
-            style_no_value.get(style_field),
+            style_steps,
+            no_value,
         )
-        if val is not None:
-            mapbox_style[mapbox_style_field] = val
-
-    return {"type": mapbox_type, "paint": mapbox_style}
+    else:
+        return no_value or colors[0]
 
 
-def gen_layer_proportionnal_value_style(
-    proportionnal_value,
-    sort_key,
-    variable_field,
-    style,
-    style_no_value,
+def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_config):
+    colors = prop_config["values"]
+    no_value = prop_config.get("no_value")
+
+    # Step 1 generate boundaries
+    if "boundaries" in prop_config:
+        boundaries = prop_config["boundaries"]
+        if len(boundaries) < 2:
+            raise ValueError('"boundaries" must be at least a list of two values')
+    elif "method" in prop_config:
+        boundaries = discretize(
+            geo_layer, data_field, prop_config["method"], len(colors)
+        )
+    else:
+        raise ValueError(
+            'With "graduate" analysis_type, "boundaries" or "method" should be provided'
+        )
+
+    # Use boundaries to make style
+    if boundaries is not None:
+        return {
+            "items": gen_legend_steps(
+                boundaries,
+                colors,
+                no_value,
+            )[::-1],
+        }
+    else:
+        color = colors[0]
+        if no_value:
+            color = no_value
+
+        return {
+            "items": [
+                {
+                    "color": color,
+                    "boundaries": {
+                        "lower": {"value": None, "included": True},
+                        "upper": {"value": None, "included": True},
+                    },
+                    "shape": style_type_2_color_legend_shape.get(
+                        map_style_type, "square"
+                    ),
+                }
+            ]
+        }
+
+
+def gen_proportionnal_radius_style(geo_layer, data_field, map_field, prop_config):
+    field_getter = ["get", data_field]
+    max_value = prop_config["max_radius"]
+    no_value = prop_config.get("no_value")
+
+    # Get min max value
+    mm = get_positive_min_max(geo_layer, data_field)
+
+    if mm[1] is not None and mm[2] is not None:
+        mm = boundaries_round(mm[1:])
+        boundaries = [0, math.sqrt(mm[1] / math.pi)]
+        sizes = [0, max_value / 2]
+
+        radius_base = ["sqrt", ["/", field_getter, ["pi"]]]
+        radius = gen_style_interpolate(radius_base, boundaries, sizes)
+
+        return get_style_no_value_condition(
+            field_getter,
+            radius,
+            no_value,
+        )
+    else:
+        return no_value or 0
+
+
+def gen_proportionnal_radius_legend(
+    geo_layer, data_field, map_style_type, prop_config, color, no_value_color
 ):
-    """
-    Build a Mapbox GL Style layer for color graduation.
-    """
-    mapbox_type = variable_field.split("_")[0]
+    no_value_size = prop_config.get("no_value")
+    max_value = prop_config["max_radius"]
 
-    mapbox_style = {}
+    # Get min max value
+    mm = get_positive_min_max(geo_layer, data_field)
 
-    for style_field, value in style.items():
-        mapbox_style_field = style_field.replace("_", "-")
+    if mm[1] is not None and mm[2] is not None:
+        mm = boundaries_round(mm[1:])
 
-        if style_field == variable_field:
-            style_value = proportionnal_value
-        else:
-            style_value = value
+        return {
+            "items": gen_proportionnal_circle_legend_items(
+                style_type_2_color_legend_shape[map_style_type],
+                mm[0],
+                mm[1],
+                max_value,
+                color,
+                no_value_size,
+                no_value_color,
+            ),
+            "stackedCircles": True,
+        }
+    else:
+        return {
+            "items": [
+                {
+                    "diameter": no_value_size,
+                    "color": no_value_color or color,
+                    "boundaries": {
+                        "lower": {"value": None, "included": True},
+                        "upper": {"value": None, "included": True},
+                    },
+                    "shape": style_type_2_color_legend_shape.get(
+                        map_style_type, "circle"
+                    ),
+                }
+            ]
+        }
 
-        mapbox_style[mapbox_style_field] = get_style_no_value_condition(
-            proportionnal_value,
-            style_value,
-            style_no_value.get(style_field),
+
+def gen_proportionnal_size_style(geo_layer, data_field, map_field, prop_config):
+    field_getter = ["get", data_field]
+    max_value = prop_config["max_value"]
+    no_value = prop_config.get("no_value")
+
+    # Get min max value
+    mm = get_positive_min_max(geo_layer, data_field)
+
+    if mm[1] is not None and mm[2] is not None:
+        mm = boundaries_round(mm[1:])
+        boundaries = [0, mm[1]]
+        sizes = [0, max_value]
+
+        interpolation = gen_style_interpolate(field_getter, boundaries, sizes)
+
+        return get_style_no_value_condition(
+            field_getter,
+            interpolation,
+            no_value,
         )
+    else:
+        return no_value or 0
 
-    return {
-        "type": mapbox_type,
-        "layout": {f"{mapbox_type}-sort-key": ["-", sort_key]},
-        "paint": mapbox_style,
-    }
+
+def gen_proportionnal_size_legend(
+    geo_layer, data_field, map_style_type, prop_config, color, no_value_color
+):
+    no_value_size = prop_config.get("no_value")
+    max_value = prop_config["max_value"]
+
+    # Get min max value
+    mm = get_positive_min_max(geo_layer, data_field)
+
+    if mm[1] is not None and mm[2] is not None:
+        # mm = boundaries_round(mm[1:])
+
+        return {
+            "items": gen_proportionnal_size_legend_items(
+                style_type_2_color_legend_shape[map_style_type],
+                mm[0],
+                mm[1],
+                max_value,
+                color,
+                no_value_size,
+                no_value_color,
+            ),
+        }
+    else:
+        return {
+            "items": [
+                {
+                    "size": no_value_size,
+                    "boundaries": {
+                        "lower": {"value": None, "included": True},
+                        "upper": {"value": None, "included": True},
+                    },
+                    "shape": style_type_2_color_legend_shape.get(
+                        map_style_type, "circle"
+                    ),
+                    "color": no_value_color or color,
+                }
+            ]
+        }
 
 
 def generate_style_from_wizard(layer, config):
@@ -566,189 +707,106 @@ def generate_style_from_wizard(layer, config):
     Return a Mapbox GL Style and a Legend from a wizard setting.
     """
     geo_layer = layer.source.get_layer()
-    symbology = config["analysis_type"]
 
-    if symbology == "graduate":
-        return gen_graduated_color_style(geo_layer, config)
-    if symbology == "categorize":
-        return []
-    elif symbology == "proportionnal":
-        return gen_proportional_value_style(geo_layer, config)
-    else:
-        raise ValueError(f'Unknow symbology "{symbology}"')
+    # fill, fill_extrusion, line, text, symbol, circle
+    map_style_type = config["map_style_type"]
 
+    map_style = {"type": map_style_type, "paint": {}}
 
-def gen_graduated_color_style(geo_layer, config):
-    """config = {
-        "field": "my_field",
-        "analysis_type": "graduate",
-        "boundaries": [1, 2, 3, 5],
-        "method": "equal_interval",  # How to compute boundaries if not provided
-        "variable_field": "fill_color", # Style field to variate
-        "style": {
-            "fill_color": ["#ff0000", "#aa0000", "#770000", "#330000", "#000000"],
-            "fill_opacity": 0.5,
-            "fill_outline_color": "#ffffff",
-        },
-        "no_value_style": {
-            "fill_color": "#000000",
-            "fill_opacity": 0,
-            "fill_outline_color": "#ffffff",
-        },
-    }
-    """
-    data_field = config["field"]
-    variable_field = config["variable_field"]
+    legends = []
 
-    colors = config["style"].get(variable_field) if "style" in config else None
+    for map_field, prop_config in config["style"].items():
+        style_type = prop_config.get("type", "none")
+        map_style_prop = to_map_style(map_field)
+        if style_type == "fixed":
+            # Fixed value
+            value = prop_config["value"]
+            no_value = prop_config.get("no_value")
+            data_field = prop_config.get("field")
+            map_style["paint"][map_style_prop] = get_style_no_value_condition(
+                ["get", data_field], value, no_value
+            )
+        elif style_type == "variable":
+            # Variable style
+            data_field = prop_config["field"]
+            variation_type = field_2_variation_type(map_field)
+            analysis = prop_config["analysis"]
 
-    # Step 1 generate boundaries
-    if "boundaries" in config:
-        boundaries = config["boundaries"]
-        if len(boundaries) < 2:
-            raise ValueError('"boundaries" must be at least a list of two values')
-    elif "method" in config:
-        boundaries = discretize(geo_layer, data_field, config["method"], len(colors))
-    else:
-        raise ValueError(
-            'With "graduate" analysis_type, "boundaries" or "method" should be provided'
-        )
+            if analysis not in ["graduated", "discretized", "proportionnal"]:
+                raise ValueError(f'Unknow analysis type "{analysis}"')
 
-    # Use boundaries to make style and legend
-    if boundaries is not None:
-        config_style = config.get("style", {})
-        config_style_no_value = config.get("no_value_style", {})
+            if variation_type == "color":
+                map_style["paint"][map_style_prop] = gen_graduated_color_style(
+                    geo_layer, data_field, map_field, prop_config
+                )
+                if prop_config.get("generate_legend"):
+                    # TODO reuse previous computations
+                    legends.append(
+                        gen_graduated_color_legend(
+                            geo_layer, data_field, map_style_type, prop_config
+                        )
+                    )
 
-        field_getter = ["get", data_field]
+            if variation_type == "radius":
+                map_style["paint"][map_style_prop] = gen_proportionnal_radius_style(
+                    geo_layer, data_field, map_field, prop_config
+                )
+                # Add sort key
+                # TODO find more intelligent way to do that
+                map_style["layout"] = {
+                    f"{map_style_type}-sort-key": ["-", ["get", data_field]]
+                }
+                if prop_config.get("generate_legend"):
+                    # TODO reuse previous computations
+                    color = (
+                        config["style"]
+                        .get(f"{map_style_type}_color", {})
+                        .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
+                    )
+                    no_value_color = (
+                        config["style"]
+                        .get(f"{map_style_type}_color", {})
+                        .get("no_value")
+                    )
+                    legends.append(
+                        gen_proportionnal_radius_legend(
+                            geo_layer,
+                            data_field,
+                            map_style_type,
+                            prop_config,
+                            color,
+                            no_value_color,
+                        )
+                    )
 
-        style_steps = gen_style_steps(field_getter, boundaries, colors)
+            if variation_type == "value":
+                map_style["layout"] = {
+                    f"{map_style_type}-sort-key": ["-", ["get", data_field]]
+                }
+                map_style["paint"][map_style_prop] = gen_proportionnal_size_style(
+                    geo_layer, data_field, map_field, prop_config
+                )
+                if prop_config.get("generate_legend"):
+                    # TODO reuse previous computations
+                    color = (
+                        config["style"]
+                        .get(f"{map_style_type}_color", {})
+                        .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
+                    )
+                    no_value_color = (
+                        config["style"]
+                        .get(f"{map_style_type}_color", {})
+                        .get("no_value")
+                    )
+                    legends.append(
+                        gen_proportionnal_size_legend(
+                            geo_layer,
+                            data_field,
+                            map_style_type,
+                            prop_config,
+                            color,
+                            no_value_color,
+                        )
+                    )
 
-        style = gen_layer_color_graduation_style(
-            field_getter,
-            variable_field,
-            color_graduation=style_steps,
-            style=config_style,
-            style_no_value=config_style_no_value,
-        )
-
-        legend_addition = {
-            "items": gen_legend_steps(
-                boundaries,
-                colors,
-                config_style_no_value.get(variable_field),
-            )[::-1],
-        }
-        return (style, legend_addition)
-    else:
-        # Generate default style if no value
-        default_style = {"type": variable_field.split("_")[0]}
-        default_style["paint"] = config["style"]
-        default_style["paint"][variable_field] = config["style"][variable_field][0]
-        # Update no_value_style
-        default_style["paint"].update(config.get("no_value_style", {}))
-        # Rename properties for mapbox
-        default_style["paint"] = {
-            k.replace("_", "-"): v for (k, v) in default_style["paint"].items()
-        }
-        return (
-            default_style,
-            {"items": [DEFAULT_LEGEND_GRADUADED]},
-        )
-
-
-def gen_proportional_value_style(geo_layer, config):
-    """config = {
-        "field": "my_field",
-        "symbology": "proportionnal",
-        "variable_field": "circle_radius", # Style field to variate
-        "max_diameter": 200,
-        "style": {
-            "circle_color": "#0000cc",
-            "circle_opacity": 0.5,
-            "circle_stroke_color": "#ffffff",
-            "circle_stroke_width": 1,
-        },
-        "no_value_style": { # Specify no_value style if any
-            "circle_color": "#000000",
-            "circle_opacity": 0,
-            "circle_stroke_color": "#ffffff",
-            "circle_stroke_width": 1,
-        },
-    }
-    """
-    data_field = config["field"]
-    proportional_field = config["variable_field"]
-
-    field_getter = ["get", config["field"]]
-
-    mm = get_positive_min_max(geo_layer, data_field)
-    if mm[1] is not None and mm[2] is not None:
-        mm = boundaries_round(mm[1:])
-        boundaries = [0, math.sqrt(mm[1] / math.pi)]
-        sizes = [0, config["max_value"] / 2]
-
-        radius_base = ["sqrt", ["/", field_getter, ["pi"]]]
-        radius = gen_style_interpolate(radius_base, boundaries, sizes)
-
-        config_style = config["style"]
-        config_style[proportional_field] = radius
-        config_style_no_value = config.get("no_value_style", {})
-
-        style = gen_layer_proportionnal_value_style(
-            proportionnal_value=radius,
-            sort_key=field_getter,
-            variable_field=proportional_field,
-            style=config_style,
-            style_no_value=config_style_no_value,
-        )
-
-        legend_addition = []
-        if proportional_field in ["circle_radius"]:
-            legend_addition = {
-                "items": gen_proportionnal_circle_legend(
-                    mm[0],
-                    mm[1],
-                    config["max_value"],
-                    config_style["circle_color"],
-                    config_style_no_value.get("circle_radius"),
-                    config_style_no_value.get("circle_color"),
-                ),
-                "stackedCircles": True,
-            }
-        elif proportional_field in [
-            "line_width",
-            "circle_stroke_width",
-        ]:
-            mapbox_type_2_shape = {
-                "line": "line",
-                "circle": "circle",
-            }
-            mapbox_type = proportional_field.split("_")[0]
-            legend_addition = {
-                "items": gen_proportionnal_size_legend(
-                    mapbox_type_2_shape[mapbox_type],
-                    mm[0],
-                    mm[1],
-                    config["max_value"],
-                    config_style[f"{mapbox_type}_color"],
-                    config_style_no_value.get(proportional_field),
-                    config_style_no_value.get(f"{mapbox_type}_color"),
-                ),
-            }
-
-        return (style, legend_addition)
-    else:
-        # Generate default style if no value
-        default_style = {"type": proportional_field.split("_")[0]}
-        default_style["paint"] = config["style"]
-        default_style["paint"][proportional_field] = config["max_value"]
-        # Update no_value_style
-        default_style["paint"].update(config.get("no_value_style", {}))
-        # Rename properties for mapbox
-        default_style["paint"] = {
-            k.replace("_", "-"): v for (k, v) in default_style["paint"].items()
-        }
-        return (
-            default_style,
-            {"items": [DEFAULT_LEGEND_CIRCLE]} if config.get("no_value_style") else {},
-        )
+    return (map_style, legends)
