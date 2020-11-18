@@ -146,12 +146,21 @@ class StyleTestCase(TestCase):
         )  # Got it, exactly what I want
         self.assertEqual(style.ceil_scale(0.58, 1), 1)
 
-    def test_symbology_fail(self):
+    def test_analysis_fail(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "__666__",
+            "type": "wizard",
+            "map_style_type": "fill",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "method": "jenks",
+                    "analysis": "__666__",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
+            },
         }
 
         with self.assertRaises(ValueError):
@@ -159,14 +168,18 @@ class StyleTestCase(TestCase):
 
     def test_method_fail(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "__666__",
+            "type": "wizard",
+            "map_style_type": "fill",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "method": "__666__",
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
 
@@ -196,16 +209,21 @@ class StyleTestCase(TestCase):
 
     def test_0graduated_equal_interval(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "equal_interval",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "equal_interval",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
+
         self.layer.save()
 
         self.assertEqual(
@@ -217,21 +235,40 @@ class StyleTestCase(TestCase):
         )
         self.assertEqual(
             self.layer.legends,
-            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
         )
 
     def test_0graduated_quantile(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "quantile",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "quantile",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
+
         self.layer.save()
 
         self.assertEqual(
@@ -243,19 +280,37 @@ class StyleTestCase(TestCase):
         )
         self.assertEqual(
             self.layer.legends,
-            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
         )
 
     def test_0graduated_jenks(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "jenks",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         self.layer.save()
@@ -269,19 +324,37 @@ class StyleTestCase(TestCase):
         )
         self.assertEqual(
             self.layer.legends,
-            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
         )
 
     def test_update_wizard(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "jenks",
+            "type": "wizard",
+            "map_style_type": "fill",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "method": "jenks",
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
 
@@ -294,22 +367,43 @@ class StyleTestCase(TestCase):
                 "type": "fill",
             },
         )
+
         self.assertEqual(
             self.layer.legends,
-            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
         )
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "b",
-            "symbology": "graduated",
-            "method": "jenks",
+            "type": "wizard",
+            "map_style_type": "fill",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "b",
+                    "method": "jenks",
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
+        # TODO Empty legend for now
+        self.layer.legends = []
         self.layer.save()
 
         self.assertEqual(
@@ -319,9 +413,24 @@ class StyleTestCase(TestCase):
                 "type": "fill",
             },
         )
+
         self.assertEqual(
             self.layer.legends,
-            [{"items": [style.DEFAULT_LEGEND_GRADUADED], "title": "my_layer_name"}],
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
         )
 
     def test_boundaries_less(self):
@@ -330,13 +439,17 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         with self.assertRaises(ValueError):
@@ -348,14 +461,18 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "boundaries": [0],
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "boundaries": [0],
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         with self.assertRaises(ValueError):
@@ -367,19 +484,28 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "b",
-            "symbology": "graduated",
-            "method": "quantile",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_opacity": 0.4,
-                "fill_outline_color": "#ffffff",
-            },
-            "no_value_style": {
-                "fill_color": "#000000",
-                "fill_opacity": 0,
+                "fill_color": {
+                    "type": "variable",
+                    "field": "b",
+                    "analysis": "graduated",
+                    "method": "quantile",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "no_value": "#000000",
+                    "generate_legend": True,
+                },
+                "fill_opacity": {
+                    "type": "fixed",
+                    "value": 0.4,
+                    "field": "b",
+                    "no_value": 0,
+                },
+                "fill_outline_color": {
+                    "type": "fixed",
+                    "value": "#ffffff",
+                },
             },
         }
         self.layer.save()
@@ -387,16 +513,36 @@ class StyleTestCase(TestCase):
         self.assertEqual(
             self.layer.main_style["map_style"],
             {
+                "type": "fill",
                 "paint": {
                     "fill-color": "#000000",
-                    "fill-opacity": 0,
+                    "fill-opacity": [
+                        "case",
+                        ["==", ["typeof", ["get", "b"]], "number"],
+                        0.4,
+                        0,
+                    ],
+                    "fill-outline-color": "#ffffff",
                 },
-                "type": "fill",
             },
         )
         self.assertEqual(
             self.layer.legends,
-            [{"title": "my_layer_name", "items": [style.DEFAULT_LEGEND_GRADUADED]}],
+            [
+                {
+                    "title": "my_layer_name",
+                    "items": [
+                        {
+                            "color": "#000000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                }
+            ],
         )
 
     def test_boundaries(self):
@@ -413,6 +559,22 @@ class StyleTestCase(TestCase):
             "style": {
                 "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
                 "fill_outline_color": "#ffffff",
+            },
+        }
+
+        self.layer.main_style = {
+            "map_style_type": "fill",
+            "type": "wizard",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "boundaries": [0, 10, 20, 30, 40],
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         self.layer.save()
@@ -502,6 +664,33 @@ class StyleTestCase(TestCase):
                 "fill_outline_color": "#ffffff",
             },
         }
+
+        self.layer.main_style = {
+            "map_style_type": "fill",
+            "type": "wizard",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "boundaries": [0, 10, 20, 30, 40],
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "no_value": "#000000",
+                    "generate_legend": True,
+                },
+                "fill_opacity": {
+                    "type": "fixed",
+                    "value": 0.4,
+                },
+                "fill_outline_color": {
+                    "type": "fixed",
+                    "value": "#fffffa",
+                    "field": "a",
+                    "no_value": "#ffffff",
+                },
+            },
+        }
+
         self.layer.save()
 
         self.assertEqual(
@@ -592,14 +781,18 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "equal_interval",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "equal_interval",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         self.layer.save()
@@ -673,14 +866,18 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "jenks",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         self.layer.save()
@@ -736,16 +933,21 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=2),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "quantile",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "quantile",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
+
         self.layer.save()
 
         self.assertEqual(
@@ -795,27 +997,54 @@ class StyleTestCase(TestCase):
 
     def test_0circle(self):
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "circle_radius",
-            "field": "a",
-            "symbology": "proportionnal",
-            "max_value": 200,
-            "style": {"circle_color": "#0000cc", "circle_stroke_color": "#ffffff"},
+            "map_style_type": "circle",
+            "type": "wizard",
+            "style": {
+                "circle_radius": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "proportionnal",
+                    "max_radius": 200,
+                    "generate_legend": True,
+                    "no_value": 20,
+                },
+                "circle_color": {"type": "fixed", "value": "#0000cc"},
+                "circle_stroke_color": {"type": "fixed", "value": "#ffffff"},
+            },
         }
         self.layer.save()
 
         self.assertEqual(
             self.layer.main_style["map_style"],
             {
+                "layout": {"circle-sort-key": ["-", ["get", "a"]]},
                 "paint": {
                     "circle-color": "#0000cc",
-                    "circle-radius": 200,
+                    "circle-radius": 20,
                     "circle-stroke-color": "#ffffff",
                 },
                 "type": "circle",
             },
         )
-        self.assertEqual(self.layer.legends, [{"title": "my_layer_name"}])
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "title": "my_layer_name",
+                    "items": [
+                        {
+                            "diameter": 20,
+                            "color": "#0000cc",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "circle",
+                        }
+                    ],
+                }
+            ],
+        )
 
     def test_2circle(self):
         geo_layer = self.source.get_layer()
@@ -826,16 +1055,20 @@ class StyleTestCase(TestCase):
         self.maxDiff = None
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "circle_radius",
-            "field": "a",
-            "symbology": "proportionnal",
-            "max_value": 200,
+            "map_style_type": "circle",
+            "type": "wizard",
             "style": {
-                "circle_color": "#0000cc",
-                "circle_opacity": 0.4,
-                "circle_stroke_color": "#ffffff",
-                "circle_stroke_width": 0.3,
+                "circle_radius": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "proportionnal",
+                    "max_radius": 200,
+                    "generate_legend": True,
+                },
+                "circle_color": {"type": "fixed", "value": "#0000cc"},
+                "circle_opacity": {"type": "fixed", "value": 0.4},
+                "circle_stroke_color": {"type": "fixed", "value": "#ffffff"},
+                "circle_stroke_width": {"type": "fixed", "value": 0.3},
             },
         }
         self.layer.save()
@@ -875,31 +1108,31 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "diameter": 175.41160386140584,
-                            "boundaries": {"lower": {"value": 100.0}},
+                            "boundaries": {"lower": {"value": 100}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 124.03473458920845,
-                            "boundaries": {"lower": {"value": 50.0}},
+                            "boundaries": {"lower": {"value": 50}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 87.70580193070292,
-                            "boundaries": {"lower": {"value": 25.0}},
+                            "boundaries": {"lower": {"value": 25}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 55.47001962252292,
-                            "boundaries": {"lower": {"value": 10.0}},
+                            "boundaries": {"lower": {"value": 10}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 39.22322702763681,
-                            "boundaries": {"lower": {"value": 5.0}},
+                            "boundaries": {"lower": {"value": 5}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
@@ -918,21 +1151,41 @@ class StyleTestCase(TestCase):
         self.maxDiff = None
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "circle_radius",
-            "field": "a",
-            "symbology": "proportionnal",
-            "max_value": 200,
+            "map_style_type": "circle",
+            "type": "wizard",
             "style": {
-                "circle_color": "#0000ca",
-                "circle_stroke_color": "#fffffa",
-                "circle_stroke_width": 0.3,
-            },
-            "no_value_style": {
-                "circle_radius": 30,
-                "circle_color": "#000000",
-                "circle_stroke_color": "#ffffff",
-                "circle_stroke_width": 0.2,
+                "circle_radius": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "proportionnal",
+                    "max_radius": 200,
+                    "generate_legend": True,
+                    "no_value": 30,
+                },
+                "circle_color": {
+                    "type": "fixed",
+                    "value": "#0000ca",
+                    "field": "a",
+                    "no_value": "#000000",
+                },
+                "circle_opacity": {
+                    "type": "fixed",
+                    "value": 0.4,
+                    "field": "a",
+                    "no_value": "#000000",
+                },
+                "circle_stroke_color": {
+                    "type": "fixed",
+                    "value": "#fffffa",
+                    "field": "a",
+                    "no_value": "#ffffff",
+                },
+                "circle_stroke_width": {
+                    "type": "fixed",
+                    "value": 0.3,
+                    "field": "a",
+                    "no_value": 0.2,
+                },
             },
         }
         self.layer.save()
@@ -946,37 +1199,44 @@ class StyleTestCase(TestCase):
             6.432750982580687,
             100.0,
         ]
+
         self.assertEqual(
             self.layer.main_style["map_style"],
             {
                 "type": "circle",
-                "layout": {"circle-sort-key": ["-", ["get", "a"]]},
                 "paint": {
                     "circle-radius": [
                         "case",
-                        ["==", ["typeof", interpolate], "number"],
+                        ["==", ["typeof", ["get", "a"]], "number"],
                         interpolate,
                         30,
                     ],
                     "circle-color": [
                         "case",
-                        ["==", ["typeof", interpolate], "number"],
+                        ["==", ["typeof", ["get", "a"]], "number"],
                         "#0000ca",
+                        "#000000",
+                    ],
+                    "circle-opacity": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        0.4,
                         "#000000",
                     ],
                     "circle-stroke-color": [
                         "case",
-                        ["==", ["typeof", interpolate], "number"],
+                        ["==", ["typeof", ["get", "a"]], "number"],
                         "#fffffa",
                         "#ffffff",
                     ],
                     "circle-stroke-width": [
                         "case",
-                        ["==", ["typeof", interpolate], "number"],
+                        ["==", ["typeof", ["get", "a"]], "number"],
                         0.3,
                         0.2,
                     ],
                 },
+                "layout": {"circle-sort-key": ["-", ["get", "a"]]},
             },
         )
 
@@ -993,31 +1253,31 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "diameter": 175.41160386140584,
-                            "boundaries": {"lower": {"value": 100.0}},
+                            "boundaries": {"lower": {"value": 100}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 124.03473458920845,
-                            "boundaries": {"lower": {"value": 50.0}},
+                            "boundaries": {"lower": {"value": 50}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 87.70580193070292,
-                            "boundaries": {"lower": {"value": 25.0}},
+                            "boundaries": {"lower": {"value": 25}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 55.47001962252292,
-                            "boundaries": {"lower": {"value": 10.0}},
+                            "boundaries": {"lower": {"value": 10}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 39.22322702763681,
-                            "boundaries": {"lower": {"value": 5.0}},
+                            "boundaries": {"lower": {"value": 5}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
@@ -1040,13 +1300,17 @@ class StyleTestCase(TestCase):
             self._feature_factory(geo_layer, a=a)
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "line_width",
-            "field": "a",
-            "symbology": "proportionnal",
-            "max_value": 200,
+            "type": "wizard",
+            "map_style_type": "line",
             "style": {
-                "line_color": "#0000cc",
+                "line_width": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "proportionnal",
+                    "max_value": 200,
+                    "generate_legend": True,
+                },
+                "line_color": {"type": "fixed", "value": "#0000cc"},
             },
         }
         self.layer.save()
@@ -1057,14 +1321,20 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "size": 110,
+                            "size": 200.0,
                             "boundaries": {"lower": {"value": 110}},
                             "shape": "line",
                             "color": "#0000cc",
                         },
                         {
-                            "size": 0.1,
-                            "boundaries": {"lower": {"value": 0.1}},
+                            "size": 99.0909090909091,
+                            "boundaries": {"lower": {"value": 54.5}},
+                            "shape": "line",
+                            "color": "#0000cc",
+                        },
+                        {
+                            "size": 1.8181818181818181,
+                            "boundaries": {"lower": {"value": 1}},
                             "shape": "line",
                             "color": "#0000cc",
                         },
@@ -1082,16 +1352,21 @@ class StyleTestCase(TestCase):
             self._feature_factory(geo_layer, a=random.gauss(0, 5)),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "equal_interval",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "equal_interval",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
+
         self.layer.save()
 
         self.assertEqual(
@@ -1183,16 +1458,21 @@ class StyleTestCase(TestCase):
             self._feature_factory(geo_layer, a=random.gauss(0, 5)),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "quantile",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "quantile",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
+
         self.layer.save()
         self.maxDiff = None
 
@@ -1290,20 +1570,30 @@ class StyleTestCase(TestCase):
             self._feature_factory(geo_layer, a=None),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "quantile",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_opacity": 0.4,
-                "fill_outline_color": "#ffffff",
-            },
-            "no_value_style": {
-                "fill_color": "#000000",
-                "fill_opacity": 0,
-                "fill_outline_color": "#ffffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "quantile",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "no_value": "#000000",
+                    "generate_legend": True,
+                },
+                "fill_opacity": {
+                    "type": "fixed",
+                    "value": 0.4,
+                    "no_value": 0,
+                    "field": "a",
+                },
+                "fill_outline_color": {
+                    "type": "fixed",
+                    "value": "#ffffff",
+                    "no_value": "#ffffff",
+                    "field": "a",
+                },
             },
         }
         self.layer.save()
@@ -1425,14 +1715,18 @@ class StyleTestCase(TestCase):
             self._feature_factory(geo_layer, a=random.gauss(0, 5)),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_outline_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "jenks",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_outline_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_color": "#ffffff",
+                "fill_outline_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
         self.layer.save()
@@ -1527,22 +1821,33 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=None),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "jenks",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_opacity": 0.4,
-                "fill_outline_color": "#ffffff",
-            },
-            "no_value_style": {
-                "fill_color": "#CC0000",
-                "fill_opacity": 0.5,
-                "fill_outline_color": "#00ffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "no_value": "#CC0000",
+                    "generate_legend": True,
+                },
+                "fill_opacity": {
+                    "type": "fixed",
+                    "value": 0.4,
+                    "field": "a",
+                    "no_value": 0.5,
+                },
+                "fill_outline_color": {
+                    "type": "fixed",
+                    "value": "#ffffff",
+                    "field": "a",
+                    "no_value": "#00ffff",
+                },
             },
         }
+
         self.layer.save()
         self.maxDiff = None
 
@@ -1552,8 +1857,18 @@ class StyleTestCase(TestCase):
                 "type": "fill",
                 "paint": {
                     "fill-color": "#CC0000",
-                    "fill-opacity": 0.5,
-                    "fill-outline-color": "#00ffff",
+                    "fill-opacity": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        0.4,
+                        0.5,
+                    ],
+                    "fill-outline-color": [
+                        "case",
+                        ["==", ["typeof", ["get", "a"]], "number"],
+                        "#ffffff",
+                        "#00ffff",
+                    ],
                 },
             },
         )
@@ -1586,22 +1901,33 @@ class StyleTestCase(TestCase):
             self._feature_factory(geo_layer, a=None),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "method": "jenks",
+            "map_style_type": "fill",
+            "type": "wizard",
             "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_opacity": 0.4,
-                "fill_outline_color": "#ffffff",
-            },
-            "no_value_style": {
-                "fill_color": "#CC0000",
-                "fill_opacity": 0.5,
-                "fill_outline_color": "#00ffff",
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "no_value": "#CC0000",
+                    "generate_legend": True,
+                },
+                "fill_opacity": {
+                    "type": "fixed",
+                    "value": 0.4,
+                    "field": "a",
+                    "no_value": 0.5,
+                },
+                "fill_outline_color": {
+                    "type": "fixed",
+                    "value": "#ffffff",
+                    "field": "a",
+                    "no_value": "#00ffff",
+                },
             },
         }
+
         self.layer.save()
 
         self.assertEqual(

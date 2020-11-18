@@ -184,7 +184,7 @@ class Layer(models.Model):
 
     @property
     def style(self):
-        return self.layer_style
+        return self.main_style.get("map_style", self.layer_style)
 
     @cached_property
     def layer_identifier(self):
@@ -194,16 +194,24 @@ class Layer(models.Model):
         ordering = ("order", "name")
 
     def save(self, wizard_update=True, **kwargs):
-        if 'type' in self.main_style and self.main_style['type'] != 'advanced' and wizard_update:
-            generated_map_style, legend_addition = generate_style_from_wizard(
+        if (
+            "type" in self.main_style
+            and self.main_style["type"] != "advanced"
+            and wizard_update
+        ):
+            generated_map_style, legend_additions = generate_style_from_wizard(
                 self, self.main_style
             )
-            self.main_style['map_style'] = generated_map_style
-            if not self.legends:
+            self.main_style["map_style"] = generated_map_style
+
+            # Add legend title
+            for legend_addition in legend_additions:
                 legend_addition["title"] = self.name
-                self.legends = [legend_addition]
+
+            if not self.legends:
+                self.legends = legend_additions
             else:
-                self.legends[0].update(legend_addition)
+                self.legends += legend_additions
 
         super().save(**kwargs)
 
