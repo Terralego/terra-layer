@@ -196,7 +196,7 @@ class Layer(models.Model):
     def save(self, wizard_update=True, **kwargs):
         if (
             "type" in self.main_style
-            and self.main_style["type"] != "advanced"
+            and self.main_style["type"] == "wizard"
             and wizard_update
         ):
             generated_map_style, legend_additions = generate_style_from_wizard(

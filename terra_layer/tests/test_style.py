@@ -1034,6 +1034,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "diameter": 20,
+                            "size": 20,
                             "color": "#0000cc",
                             "boundaries": {
                                 "lower": {"value": None, "included": True},
@@ -1102,36 +1103,42 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "diameter": 200.0,
+                            "size": 200.0,
                             "boundaries": {"lower": {"value": 130}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 175.41160386140584,
+                            "size": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 124.03473458920845,
+                            "size": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 87.70580193070292,
+                            "size": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 55.47001962252292,
+                            "size": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10}},
                             "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 39.22322702763681,
+                            "size": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5}},
                             "shape": "circle",
                             "color": "#0000cc",
@@ -1247,42 +1254,49 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "diameter": 200.0,
+                            "size": 200.0,
                             "boundaries": {"lower": {"value": 130}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 175.41160386140584,
+                            "size": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 124.03473458920845,
+                            "size": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 87.70580193070292,
+                            "size": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 55.47001962252292,
+                            "size": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 39.22322702763681,
+                            "size": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5}},
                             "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 60,
+                            "size": 60,
                             "boundaries": {"lower": {"value": None}},
                             "shape": "circle",
                             "color": "#000000",
@@ -2031,6 +2045,115 @@ class StyleTestCase(TestCase):
                                 "upper": {"value": None, "included": True},
                             },
                             "shape": "square",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
+    def test_gauss_graduated_size_jenks(self):
+        geo_layer = self.source.get_layer()
+
+        random.seed(33)
+        for index in range(0, 1000):
+            self._feature_factory(geo_layer, a=random.gauss(0, 5)),
+
+        self.layer.main_style = {
+            "map_style_type": "line",
+            "type": "wizard",
+            "style": {
+                "line_width": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": [3, 5, 10, 15],
+                    "generate_legend": True,
+                },
+                "line_color": {"type": "fixed", "value": "#ffffff"},
+            },
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "line",
+                "paint": {
+                    "line-width": [
+                        "step",
+                        ["get", "a"],
+                        3,
+                        -4.292341999003442,
+                        5,
+                        0.5740581144424383,
+                        10,
+                        5.727211814984125,
+                        15,
+                    ],
+                    "line-color": "#ffffff",
+                },
+            },
+        )
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#ffffff",
+                            "size": 15,
+                            "boundaries": {
+                                "lower": {"value": 5.727211814984125, "included": True},
+                                "upper": {"value": 15.25702131719717, "included": True},
+                            },
+                            "shape": "line",
+                        },
+                        {
+                            "color": "#ffffff",
+                            "size": 10,
+                            "boundaries": {
+                                "lower": {
+                                    "value": 0.5740581144424383,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": 5.727211814984125,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "line",
+                        },
+                        {
+                            "color": "#ffffff",
+                            "size": 5,
+                            "boundaries": {
+                                "lower": {
+                                    "value": -4.292341999003442,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": 0.5740581144424383,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "line",
+                        },
+                        {
+                            "color": "#ffffff",
+                            "size": 3,
+                            "boundaries": {
+                                "lower": {
+                                    "value": -15.554792351427212,
+                                    "included": True,
+                                },
+                                "upper": {
+                                    "value": -4.292341999003442,
+                                    "included": False,
+                                },
+                            },
+                            "shape": "line",
                         },
                     ],
                     "title": "my_layer_name",
