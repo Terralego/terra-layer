@@ -200,7 +200,7 @@ class Layer(models.Model):
             and wizard_update
         ):
             generated_map_style, legend_additions = generate_style_from_wizard(
-                self, self.main_style
+                self.source.get_layer(), self.main_style
             )
             self.main_style["map_style"] = generated_map_style
 
@@ -212,6 +212,31 @@ class Layer(models.Model):
                 self.legends = legend_additions
             else:
                 self.legends += legend_additions
+
+        for extra_style in self.extra_styles.all():
+            style_config = extra_style.style_config
+            source = extra_style.source
+
+            if (
+                "type" in style_config
+                and style_config["type"] == "wizard"
+                and wizard_update
+            ):
+                generated_map_style, legend_additions = generate_style_from_wizard(
+                    source.get_layer(), style_config
+                )
+                style_config["map_style"] = generated_map_style
+
+                # Add legend title
+                for legend_addition in legend_additions:
+                    legend_addition["title"] = self.name
+
+                if not self.legends:
+                    self.legends = legend_additions
+                else:
+                    self.legends += legend_additions
+
+                extra_style.save()
 
         super().save(**kwargs)
 

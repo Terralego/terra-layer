@@ -2160,3 +2160,381 @@ class StyleTestCase(TestCase):
                 }
             ],
         )
+
+    def test_categorize_colors_0value(self):
+
+        self.layer.main_style = {
+            "map_style_type": "fill",
+            "type": "wizard",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "categorized",
+                    "categories": [],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {"type": "fill", "paint": {"fill-outline-color": "#00ffff"}},
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
+    def test_categorize_colors(self):
+
+        self.layer.main_style = {
+            "map_style_type": "fill",
+            "type": "wizard",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "categorized",
+                    "categories": [
+                        {"name": "Alaska", "value": "#fc34bc"},
+                        {"name": "Cameroun", "value": "#2334bc"},
+                        {"name": "France", "value": "#fc3445"},
+                        {"name": "Canada", "value": "#fc15bc"},
+                        {"name": "Groland", "value": "#1623bc"},
+                    ],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "fill",
+                "paint": {
+                    "fill-color": [
+                        "case",
+                        ["==", ["get", "a"], "Alaska"],
+                        "#fc34bc",
+                        ["==", ["get", "a"], "Cameroun"],
+                        "#2334bc",
+                        ["==", ["get", "a"], "France"],
+                        "#fc3445",
+                        ["==", ["get", "a"], "Canada"],
+                        "#fc15bc",
+                        ["==", ["get", "a"], "Groland"],
+                        "#1623bc",
+                    ],
+                    "fill-outline-color": "#00ffff",
+                },
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {"color": "#fc34bc", "label": "Alaska", "shape": "square"},
+                        {"color": "#2334bc", "label": "Cameroun", "shape": "square"},
+                        {"color": "#fc3445", "label": "France", "shape": "square"},
+                        {"color": "#fc15bc", "label": "Canada", "shape": "square"},
+                        {"color": "#1623bc", "label": "Groland", "shape": "square"},
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
+    def test_categorize_colors_with_no_value(self):
+
+        self.layer.main_style = {
+            "map_style_type": "fill",
+            "type": "wizard",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "categorized",
+                    "categories": [
+                        {"name": "Alaska", "value": "#fc34bc"},
+                        {"name": "Cameroun", "value": "#2334bc"},
+                        {"name": "France", "value": "#fc3445"},
+                        {"name": "Canada", "value": "#fc15bc"},
+                        {"name": "Groland", "value": "#1623bc"},
+                        {"name": "", "value": "#0023bc"},
+                        {"name": None, "value": "#000000"},
+                    ],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "fill",
+                "paint": {
+                    "fill-color": [
+                        "case",
+                        ["has", "a"],
+                        [
+                            "case",
+                            ["==", ["get", "a"], "Alaska"],
+                            "#fc34bc",
+                            ["==", ["get", "a"], "Cameroun"],
+                            "#2334bc",
+                            ["==", ["get", "a"], "France"],
+                            "#fc3445",
+                            ["==", ["get", "a"], "Canada"],
+                            "#fc15bc",
+                            ["==", ["get", "a"], "Groland"],
+                            "#1623bc",
+                            ["==", ["get", "a"], ""],
+                            "#0023bc",
+                            "#000000",
+                        ],
+                        "#000000",
+                    ],
+                    "fill-outline-color": "#00ffff",
+                },
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {"color": "#fc34bc", "label": "Alaska", "shape": "square"},
+                        {"color": "#2334bc", "label": "Cameroun", "shape": "square"},
+                        {"color": "#fc3445", "label": "France", "shape": "square"},
+                        {"color": "#fc15bc", "label": "Canada", "shape": "square"},
+                        {"color": "#1623bc", "label": "Groland", "shape": "square"},
+                        {"color": "#0023bc", "label": "", "shape": "square"},
+                        {"color": "#000000", "label": None, "shape": "square"},
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
+    def test_categorize_radius_with_no_value(self):
+
+        self.layer.main_style = {
+            "map_style_type": "circle",
+            "type": "wizard",
+            "style": {
+                "circle_radius": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "categorized",
+                    "categories": [
+                        {"name": "Alaska", "value": 10},
+                        {"name": "Cameroun", "value": 20},
+                        {"name": "France", "value": 30},
+                        {"name": "Canada", "value": 40},
+                        {"name": "Groland", "value": 50},
+                        {"name": "", "value": 2},
+                        {"name": None, "value": 0},
+                    ],
+                    "generate_legend": True,
+                },
+                "circle_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "circle",
+                "paint": {
+                    "circle-radius": [
+                        "case",
+                        ["has", "a"],
+                        [
+                            "case",
+                            ["==", ["get", "a"], "Alaska"],
+                            10,
+                            ["==", ["get", "a"], "Cameroun"],
+                            20,
+                            ["==", ["get", "a"], "France"],
+                            30,
+                            ["==", ["get", "a"], "Canada"],
+                            40,
+                            ["==", ["get", "a"], "Groland"],
+                            50,
+                            ["==", ["get", "a"], ""],
+                            2,
+                            0,
+                        ],
+                        0,
+                    ],
+                    "circle-color": "#00ffff",
+                },
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "size": 10,
+                            "label": "Alaska",
+                            "shape": "circle",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 20,
+                            "label": "Cameroun",
+                            "shape": "circle",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 30,
+                            "label": "France",
+                            "shape": "circle",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 40,
+                            "label": "Canada",
+                            "shape": "circle",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 50,
+                            "label": "Groland",
+                            "shape": "circle",
+                            "color": "#00ffff",
+                        },
+                        {"size": 2, "label": "", "shape": "circle", "color": "#00ffff"},
+                        {
+                            "size": 0,
+                            "label": None,
+                            "shape": "circle",
+                            "color": "#00ffff",
+                        },
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
+    def test_categorize_values_with_no_value(self):
+
+        self.layer.main_style = {
+            "map_style_type": "line",
+            "type": "wizard",
+            "style": {
+                "line_width": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "categorized",
+                    "categories": [
+                        {"name": "Alaska", "value": 10},
+                        {"name": "Cameroun", "value": 20},
+                        {"name": "France", "value": 30},
+                        {"name": "Canada", "value": 40},
+                        {"name": "Groland", "value": 50},
+                        {"name": "", "value": 2},
+                        {"name": None, "value": 0},
+                    ],
+                    "generate_legend": True,
+                },
+                "line_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "line",
+                "paint": {
+                    "line-width": [
+                        "case",
+                        ["has", "a"],
+                        [
+                            "case",
+                            ["==", ["get", "a"], "Alaska"],
+                            10,
+                            ["==", ["get", "a"], "Cameroun"],
+                            20,
+                            ["==", ["get", "a"], "France"],
+                            30,
+                            ["==", ["get", "a"], "Canada"],
+                            40,
+                            ["==", ["get", "a"], "Groland"],
+                            50,
+                            ["==", ["get", "a"], ""],
+                            2,
+                            0,
+                        ],
+                        0,
+                    ],
+                    "line-color": "#00ffff",
+                },
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "size": 10,
+                            "label": "Alaska",
+                            "shape": "line",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 20,
+                            "label": "Cameroun",
+                            "shape": "line",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 30,
+                            "label": "France",
+                            "shape": "line",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 40,
+                            "label": "Canada",
+                            "shape": "line",
+                            "color": "#00ffff",
+                        },
+                        {
+                            "size": 50,
+                            "label": "Groland",
+                            "shape": "line",
+                            "color": "#00ffff",
+                        },
+                        {"size": 2, "label": "", "shape": "line", "color": "#00ffff"},
+                        {"size": 0, "label": None, "shape": "line", "color": "#00ffff"},
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
