@@ -617,6 +617,62 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
         }
 
 
+def gen_categorized_value_style(geo_layer, data_field, prop_config):
+    default_value = None
+    field_getter = ["get", data_field]
+
+    if not prop_config["categories"]:
+        return None
+
+    steps = ["case"]
+    for category in prop_config["categories"]:
+        name = category["name"]
+        value = category["value"]
+        if name is None:
+            default_value = value
+            continue
+
+        steps.append(["==", field_getter, name])
+        steps.append(value)
+
+    if default_value is not None:
+        steps.append(default_value)
+        return ["case", ["has", data_field], steps, default_value]
+    else:
+        return steps
+
+
+def gen_categorized_value_legend(
+    map_style_type,
+    prop_config,
+    legend_field="size",
+    other_properties=None,
+):
+    other_properties = other_properties or {}
+
+    default_value = None
+    shape = style_type_2_legend_shape.get(map_style_type, "square")
+
+    items = []
+    for category in prop_config["categories"]:
+        name = category["name"]
+        value = category["value"]
+        if name is None:
+            default_value = value
+            continue
+
+        items.append(
+            {legend_field: value, "label": name, "shape": shape, **other_properties}
+        )
+
+    if default_value is not None:
+        items.append(
+            {legend_field: value, "label": None, "shape": shape, **other_properties}
+        )
+
+    return {"items": items}
+
+
 def gen_graduated_size_style(geo_layer, data_field, map_field, prop_config):
     values = prop_config["values"]
     no_value = prop_config.get("no_value")
@@ -827,11 +883,10 @@ def gen_proportionnal_size_legend(
         }
 
 
-def generate_style_from_wizard(layer, config):
+def generate_style_from_wizard(geo_layer, config):
     """
     Return a Mapbox GL Style and a Legend from a wizard setting.
     """
-    geo_layer = layer.source.get_layer()
 
     # fill, fill_extrusion, line, text, symbol, circle
     map_style_type = config["map_style_type"]
@@ -869,8 +924,21 @@ def generate_style_from_wizard(layer, config):
                                 geo_layer, data_field, map_style_type, prop_config
                             )
                         )
-                elif analysis == "discretized":
-                    raise NotImplementedError()
+                elif analysis == "categorized":
+                    map_style["paint"][map_style_prop] = gen_categorized_value_style(
+                        geo_layer, data_field, prop_config
+                    )
+                    if map_style["paint"][map_style_prop] is None:
+                        del map_style["paint"][map_style_prop]
+
+                    if prop_config.get("generate_legend"):
+                        legends.append(
+                            gen_categorized_value_legend(
+                                map_style_type,
+                                prop_config,
+                                "color",
+                            )
+                        )
                 elif analysis == "proportionnal":
                     raise NotImplementedError()
                 else:
@@ -879,8 +947,27 @@ def generate_style_from_wizard(layer, config):
             if variation_type == "radius":
                 if analysis == "graduated":
                     raise NotImplementedError()
-                elif analysis == "categorize":
-                    raise NotImplementedError()
+                elif analysis == "categorized":
+                    map_style["paint"][map_style_prop] = gen_categorized_value_style(
+                        geo_layer, data_field, prop_config
+                    )
+                    if map_style["paint"][map_style_prop] is None:
+                        del map_style["paint"][map_style_prop]
+
+                    if prop_config.get("generate_legend"):
+                        color = (
+                            config["style"]
+                            .get(f"{map_style_type}_color", {})
+                            .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
+                        )
+                        legends.append(
+                            gen_categorized_value_legend(
+                                map_style_type,
+                                prop_config,
+                                "size",
+                                other_properties={"color": color},
+                            )
+                        )
                 elif analysis == "proportionnal":
                     map_style["paint"][map_style_prop] = gen_proportionnal_radius_style(
                         geo_layer, data_field, map_field, prop_config
@@ -942,12 +1029,31 @@ def generate_style_from_wizard(layer, config):
                                 no_value_color,
                             )
                         )
-                elif analysis == "discretized":
-                    raise NotImplementedError()
+                elif analysis == "categorized":
+                    map_style["paint"][map_style_prop] = gen_categorized_value_style(
+                        geo_layer, data_field, prop_config
+                    )
+                    if map_style["paint"][map_style_prop] is None:
+                        del map_style["paint"][map_style_prop]
+                        
+                    if prop_config.get("generate_legend"):
+                        color = (
+                            config["style"]
+                            .get(f"{map_style_type}_color", {})
+                            .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
+                        )
+                        legends.append(
+                            gen_categorized_value_legend(
+                                map_style_type,
+                                prop_config,
+                                "size",
+                                other_properties={"color": color},
+                            )
+                        )
                 elif analysis == "proportionnal":
-                    map_style["layout"] = {
+                    """map_style["layout"] = {
                         f"{map_style_type}-sort-key": ["-", ["get", data_field]]
-                    }
+                    }"""
                     map_style["paint"][map_style_prop] = gen_proportionnal_size_style(
                         geo_layer, data_field, map_field, prop_config
                     )
