@@ -83,7 +83,9 @@ class ModelSourceViewsetTestCase(TestCase):
             name="test_field", label="test_label", data_type=FieldTypes.String.value
         )
         layer = Layer.objects.create(
-            group=group, source=self.source, minisheet_enable=False
+            group=group,
+            source=self.source,
+            minisheet_config={"enable": False},
         )
         FilterField.objects.create(
             label="test layer fields",
@@ -96,7 +98,7 @@ class ModelSourceViewsetTestCase(TestCase):
         query = {
             "source": self.source.pk,
             "name": "test layer",
-            "minisheet_enable": True,
+            "minisheet_config": {"enable": True},
             "filter_enable": True,
         }
 
@@ -105,7 +107,7 @@ class ModelSourceViewsetTestCase(TestCase):
         self.assertEqual(response.status_code, HTTP_200_OK)
 
         response = response.json()
-        self.assertTrue(response.get("minisheet_enable"))
+        self.assertTrue(response.get("minisheet_config", {}).get("enable"))
         self.assertEqual(response["view"], self.scene.id)
 
     def test_get_scene(self):
@@ -201,7 +203,7 @@ class ModelSourceViewsetTestCase(TestCase):
     def test_create_scene_with_layer_in_tree(self):
 
         layer = Layer.objects.create(
-            group=None, source=self.source, minisheet_enable=False
+            group=None, source=self.source, minisheet_config={"enable": False}
         )
         query = {
             "name": "Scene Name",
@@ -314,9 +316,11 @@ class ModelSourceViewsetTestCase(TestCase):
                     "trigger": "mouseover",
                 },
             ],
-            minisheet_enable=True,
+            minisheet_config={
+                "enable": True,
+                "highlight_color": True,
+            },
             popup_config={"enable": True},
-            highlight_color=True,
         )
         CustomStyle.objects.create(
             layer=layer,
@@ -550,9 +554,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
     def test_validation_error_on_scene_create(self):
 
-        layer = Layer.objects.create(
-            group=None, source=self.source, minisheet_enable=False
-        )
+        layer = Layer.objects.create(group=None, source=self.source)
 
         query = {
             "name": "Scene Name",
@@ -594,9 +596,7 @@ class ModelSourceViewsetTestCase(TestCase):
 
     def test_validation_error_on_delete_attached_layer(self):
 
-        layer = Layer.objects.create(
-            group=None, source=self.source, minisheet_enable=False
-        )
+        layer = Layer.objects.create(group=None, source=self.source)
 
         query = {
             "name": "Scene Name",
@@ -612,7 +612,9 @@ class ModelSourceViewsetTestCase(TestCase):
 
     def test_delete_layer(self):
         layer = Layer.objects.create(
-            group=None, source=self.source, minisheet_enable=False
+            group=None,
+            source=self.source,
+            minisheet_config={"enable": False},
         )
 
         response = self.client.delete(reverse("layer-detail", kwargs={"pk": layer.id}))

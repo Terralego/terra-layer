@@ -169,11 +169,8 @@ class Layer(models.Model):
     table_export_enable = models.BooleanField(default=False)
 
     popup_config = JSONField(default=dict)
+    minisheet_config = JSONField(default=dict)
 
-    minisheet_enable = models.BooleanField(default=False)
-    minisheet_template = models.TextField(blank=True)
-
-    highlight_color = models.CharField(max_length=255, blank=True)
     main_field = models.ForeignKey(
         Field, null=True, on_delete=models.CASCADE, related_name="is_main_of"
     )
