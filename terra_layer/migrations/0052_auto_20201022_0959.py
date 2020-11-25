@@ -14,6 +14,17 @@ def populate_popup_config(apps, schema_editor):
             "wizard": {},
             "advanced": True,
         }
+        layer.save()
+
+
+def reverse_popuplate_popup_config(apps, schema_editor):
+    LayerModel = apps.get_model("terra_layer", "Layer")
+    for layer in LayerModel.objects.all():
+        layer.popup_enable = layer.popup_config.get("enable", False)
+        layer.popup_minzoom = layer.popup_config.get("minzoom", 0)
+        layer.popup_maxzoom = layer.popup_config.get("maxzoom", 24)
+        layer.popup_template = layer.popup_config.get("template", "")
+        layer.save()
 
 
 class Migration(migrations.Migration):
@@ -25,6 +36,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(
             populate_popup_config,
-            reverse_code=migrations.RunPython.noop,
+            reverse_code=reverse_popuplate_popup_config,
         )
     ]
