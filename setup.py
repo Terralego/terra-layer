@@ -45,10 +45,10 @@ setup(
         "djangorestframework",
         "django-geosource>=0.3",
         "django-geostore>=0.3.11",
-        "django-terra-accounts>=0.3.6",
+        "django-terra-accounts>=1.0.1",
         "jsonschema",
         "django-mapbox-baselayer>=0.0.3",
-        "django-terra-settings>=0.1.1",
+        "django-terra-settings>=1.0",
     ],
     extras_require={"dev": tests_require},
 )
