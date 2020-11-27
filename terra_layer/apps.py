@@ -6,6 +6,6 @@ class TerraLayerConfig(PermissionRegistrationMixin, AppConfig):
     name = "terra_layer"
 
     permissions = (
-        ("can_manage_layers", "Can manage layers"),
-        ("can_manage_sources", "Can manage sources"),
+        ("DataLayer", "can_manage_layers", "Can manage layers"),
+        ("DataSource", "can_manage_sources", "Can manage sources"),
     )
