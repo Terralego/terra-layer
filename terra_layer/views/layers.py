@@ -333,13 +333,13 @@ class LayerView(APIView):
                 }
             )
 
-        if layer.minisheet_enable:
+        if layer.minisheet_config.get("enable"):
             settings_interactions = {
                 "id": layer.layer_identifier,
                 "mainField": main_field,
                 "clusterLabel": main_field,  # Kept for compatibility purpose
                 "interaction": "displayDetails",
-                "template": layer.minisheet_template,
+                "template": layer.minisheet_config.get("template", ""),
                 "fetchProperties": {
                     "url": urlunquote(
                         reverse(
@@ -350,8 +350,10 @@ class LayerView(APIView):
                     "id": "_id",
                 },
             }
-            if layer.highlight_color:
-                settings_interactions["highlight_color"] = layer.highlight_color
+            if layer.minisheet_config.get("highlight_color"):
+                settings_interactions["highlight_color"] = layer.minisheet_config[
+                    "highlight_color"
+                ]
 
             interactions.append(settings_interactions)
 

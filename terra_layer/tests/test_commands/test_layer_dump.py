@@ -53,9 +53,7 @@ class LayerDumpTestCase(TestCase):
                 "table_enable": False,
                 "table_export_enable": False,
                 "popup_config": {},
-                "minisheet_enable": False,
-                "minisheet_template": "",
-                "highlight_color": "",
+                "minisheet_config": {},
                 "interactions": [],
                 "source": "test_view",
                 "group": None,
@@ -81,9 +79,11 @@ class LayerDumpTestCase(TestCase):
                     "trigger": "mouseover",
                 },
             ],
-            minisheet_enable=True,
+            minisheet_config={
+                "enable": True,
+                "highlight_color": True,
+            },
             popup_config={"enable": True},
-            highlight_color=True,
         )
         CustomStyle.objects.create(
             layer=layer,
@@ -125,9 +125,11 @@ class LayerDumpTestCase(TestCase):
                     "trigger": "mouseover",
                 },
             ],
-            minisheet_enable=True,
+            minisheet_config={
+                "enable": True,
+                "highlight_color": True,
+            },
             popup_config={"enable": True},
-            highlight_color=True,
         )
         FilterField.objects.create(label="Test", field=field, layer=layer)
         call_command("layer_dump", pk=layer.pk)
