@@ -99,7 +99,7 @@ class LayerDumpTestCase(TestCase):
             [
                 {
                     "style_config": {},
-                    "style": {}, # TODO remove me
+                    "style": {},  # TODO remove me
                     "interactions": [
                         {
                             "id": "extra_style",

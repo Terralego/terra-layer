@@ -169,6 +169,8 @@ class LayerView(APIView):
     scene = None
 
     def get(self, request, slug=None, format=None):
+        update_cache = request.query_params.get("cache") == "false"
+
         self.scene = get_object_or_404(Scene, slug=slug)
         self.layergroup = self.layers.first().source.get_layer().layer_groups.first()
 
@@ -180,7 +182,11 @@ class LayerView(APIView):
             self.scene, self.user_groups.values_list("name", flat=True)
         )
 
-        response = cache.get_or_set(cache_key, self.get_response_with_sources)
+        if update_cache:
+            response = self.get_response_with_sources()
+            cache.set(cache_key, response)
+        else:
+            response = cache.get_or_set(cache_key, self.get_response_with_sources)
 
         return Response(response)
 
