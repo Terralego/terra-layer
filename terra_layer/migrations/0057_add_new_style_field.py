@@ -8,23 +8,27 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('terra_layer', '0053_auto_20201022_1000'),
+        ("terra_layer", "0056_auto_20201124_1037"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='customstyle',
-            name='style_config',
+            model_name="customstyle",
+            name="style_config",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
         ),
         migrations.AddField(
-            model_name='layer',
-            name='main_style',
+            model_name="layer",
+            name="main_style",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=dict),
         ),
         migrations.AlterField(
-            model_name='customstyle',
-            name='layer',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='extra_styles', to='terra_layer.layer'),
+            model_name="customstyle",
+            name="layer",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="extra_styles",
+                to="terra_layer.layer",
+            ),
         ),
     ]
