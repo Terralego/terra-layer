@@ -183,8 +183,8 @@ class Layer(models.Model):
     fields = models.ManyToManyField(Field, through="FilterField")
 
     @property
-    def style(self):
-        return self.main_style.get("map_style", self.layer_style)
+    def map_style(self):
+        return self.main_style.get("map_style", self.main_style)
 
     @cached_property
     def layer_identifier(self):
@@ -206,37 +206,12 @@ class Layer(models.Model):
 
             # Add legend title
             for legend_addition in legend_additions:
-                legend_addition["title"] = self.name
+                legend_addition["title"] = f"{self.name}"
 
             if not self.legends:
                 self.legends = legend_additions
             else:
                 self.legends += legend_additions
-
-        for extra_style in self.extra_styles.all():
-            style_config = extra_style.style_config
-            source = extra_style.source
-
-            if (
-                "type" in style_config
-                and style_config["type"] == "wizard"
-                and wizard_update
-            ):
-                generated_map_style, legend_additions = generate_style_from_wizard(
-                    source.get_layer(), style_config
-                )
-                style_config["map_style"] = generated_map_style
-
-                # Add legend title
-                for legend_addition in legend_additions:
-                    legend_addition["title"] = self.name
-
-                if not self.legends:
-                    self.legends = legend_additions
-                else:
-                    self.legends += legend_additions
-
-                extra_style.save()
 
         super().save(**kwargs)
 
@@ -312,10 +287,38 @@ class CustomStyle(models.Model):
     interactions = JSONField(default=list)
 
     @property
+    def map_style(self):
+        return self.style_config.get("map_style", self.style)
+
+    @property
     def layer_identifier(self):
         return md5(
             f"{self.source.slug}-{self.source.pk}-{self.pk}".encode("utf-8")
         ).hexdigest()
+
+    def save(self, wizard_update=True, **kwargs):
+        if (
+            "type" in self.style_config
+            and self.style_config["type"] == "wizard"
+            and wizard_update
+        ):
+            generated_map_style, legend_additions = generate_style_from_wizard(
+                self.source.get_layer(), self.style_config
+            )
+            self.style_config["map_style"] = generated_map_style
+
+            # Add legend title
+            for legend_addition in legend_additions:
+                legend_addition["title"] = f"{self.layer.name}"
+
+            if not self.layer.legends:
+                self.layer.legends = legend_additions
+            else:
+                self.layer.legends += legend_additions
+
+            self.layer.save(wizard_update=False)
+
+        super().save(**kwargs)
 
 
 class FilterField(models.Model):

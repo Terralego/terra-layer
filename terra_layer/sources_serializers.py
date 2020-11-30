@@ -30,7 +30,7 @@ class SourceSerializer(serializers.BaseSerializer):
 
     def to_representation(self, obj):
         return {
-            **obj.style,
+            **obj.map_style,
             "id": obj.layer_identifier,
             "source": DEFAULT_SOURCE_NAME,
             "source-layer": self.source_object.slug,

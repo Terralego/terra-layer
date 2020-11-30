@@ -14,6 +14,7 @@ def to_map_style(prop):
 
 
 style_type_2_legend_shape = {
+    "fill-extrusion": "square",
     "fill": "square",
     "circle": "circle",
     "symbol": "symbol",
@@ -617,7 +618,7 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
         }
 
 
-def gen_categorized_value_style(geo_layer, data_field, prop_config):
+def gen_categorized_value_style(geo_layer, data_field, prop_config, default_no_value):
     default_value = None
     field_getter = ["get", data_field]
 
@@ -635,8 +636,9 @@ def gen_categorized_value_style(geo_layer, data_field, prop_config):
         steps.append(["==", field_getter, name])
         steps.append(value)
 
+    steps.append(default_value or default_no_value)
+
     if default_value is not None:
-        steps.append(default_value)
         return ["case", ["has", data_field], steps, default_value]
     else:
         return steps
@@ -926,7 +928,7 @@ def generate_style_from_wizard(geo_layer, config):
                         )
                 elif analysis == "categorized":
                     map_style["paint"][map_style_prop] = gen_categorized_value_style(
-                        geo_layer, data_field, prop_config
+                        geo_layer, data_field, prop_config, DEFAULT_NO_VALUE_FILL_COLOR
                     )
                     if map_style["paint"][map_style_prop] is None:
                         del map_style["paint"][map_style_prop]
@@ -949,7 +951,7 @@ def generate_style_from_wizard(geo_layer, config):
                     raise NotImplementedError()
                 elif analysis == "categorized":
                     map_style["paint"][map_style_prop] = gen_categorized_value_style(
-                        geo_layer, data_field, prop_config
+                        geo_layer, data_field, prop_config, 0
                     )
                     if map_style["paint"][map_style_prop] is None:
                         del map_style["paint"][map_style_prop]
@@ -1031,11 +1033,11 @@ def generate_style_from_wizard(geo_layer, config):
                         )
                 elif analysis == "categorized":
                     map_style["paint"][map_style_prop] = gen_categorized_value_style(
-                        geo_layer, data_field, prop_config
+                        geo_layer, data_field, prop_config, 0
                     )
                     if map_style["paint"][map_style_prop] is None:
                         del map_style["paint"][map_style_prop]
-                        
+
                     if prop_config.get("generate_legend"):
                         color = (
                             config["style"]
