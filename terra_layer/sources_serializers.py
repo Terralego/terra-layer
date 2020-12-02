@@ -43,7 +43,7 @@ class SourceSerializer(serializers.BaseSerializer):
 class WMTSSourceSerializer(SourceSerializer):
     def to_representation(self, obj):
         return {
-            **obj.style,
+            **obj.map_style,
             "id": obj.layer_identifier,
             "type": "raster",
             "minzoom": self.source_object.minzoom or 0,
