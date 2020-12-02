@@ -1,4 +1,20 @@
 
+0.6.0 / 2020-12-02
+==================
+
+Breaking changes
+----------------
+
+  * Minisheet api as evolved.
+  * Permissions are now implemented
+
+Changes
+-------
+
+  * Add github actions
+  * [Breaking change] Move minisheet info into a config field
+  * [Breaking change] Upgrade terra-settings & terra-accounts
+
 0.5.3 / 2020-11-02
 ==================
 
