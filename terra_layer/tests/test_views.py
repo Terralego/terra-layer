@@ -780,3 +780,18 @@ class LayerViewTestCase(APITestCase):
         layer.name = "new_name"
         layer.save()
         self.assertIsNone(cache.get(cache_key))
+
+    def test_cache_updated_with_query_parameter(self):
+        source = PostGISSource.objects.create(**self.source_params)
+        Layer.objects.create(name="public_layer", source=source, group=self.layer_group)
+
+        self.client.get(reverse("layerview", args=[self.scene.slug]))
+
+        cache_key = get_layer_group_cache_key(self.scene)
+        self.assertIsNotNone(cache.get(cache_key))
+
+        response = self.client.get(
+            reverse("layerview", args=[self.scene.slug]), {"cache": "false"}
+        )
+
+        self.assertEqual(response.status_code, HTTP_200_OK)

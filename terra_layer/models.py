@@ -4,7 +4,11 @@ import uuid
 from django.contrib.auth.models import Group
 from django.core.cache import cache
 from django.db import models, transaction
-from django.contrib.postgres.fields import JSONField
+
+try:
+    from django.db.models import JSONField
+except ImportError:  # TODO Remove when dropping Django releases < 3.1
+    from django.contrib.postgres.fields import JSONField
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django_geosource.models import Source, Field
@@ -194,11 +198,7 @@ class Layer(models.Model):
         ordering = ("order", "name")
 
     def save(self, wizard_update=True, **kwargs):
-        if (
-            "type" in self.main_style
-            and self.main_style["type"] == "wizard"
-            and wizard_update
-        ):
+        if self.main_style.get("type") == "wizard" and wizard_update:
             generated_map_style, legend_additions = generate_style_from_wizard(
                 self.source.get_layer(), self.main_style
             )
@@ -297,11 +297,7 @@ class CustomStyle(models.Model):
         ).hexdigest()
 
     def save(self, wizard_update=True, **kwargs):
-        if (
-            "type" in self.style_config
-            and self.style_config["type"] == "wizard"
-            and wizard_update
-        ):
+        if self.style_config.get("type") == "wizard" and wizard_update:
             generated_map_style, legend_additions = generate_style_from_wizard(
                 self.source.get_layer(), self.style_config
             )
