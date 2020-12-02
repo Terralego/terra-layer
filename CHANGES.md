@@ -1,4 +1,11 @@
 
+0.7.0 / 2020-12-02
+==================
+
+/!\ Major breaking change for style génération
+
+  * Improve style generation, API updated
+
 0.6.0 / 2020-12-02
 ==================
 
