@@ -138,7 +138,7 @@ def forward(apps, schema_editor):
         if layer.main_style:
             print(f"Nothing to do for {layer}. Already migrated ?")
             continue
-        # print(layer.layer_style)
+
         if layer.layer_style_wizard:
             print(f"Wizard style for {layer}")
             if layer.layer_style_wizard["symbology"] == "graduated":

@@ -187,7 +187,6 @@ def discretize_equal_interval(geo_layer, field, class_count):
         delta = (max - min) / class_count
         return [min + delta * i for i in range(0, class_count + 1)]
     else:
-        # TODO was return []
         return None
 
 
@@ -579,15 +578,9 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
     # Step 1 generate boundaries
     if "boundaries" in prop_config:
         boundaries = prop_config["boundaries"]
-        if len(boundaries) < 2:
-            raise ValueError('"boundaries" must be at least a list of two values')
     elif "method" in prop_config:
         boundaries = discretize(
             geo_layer, data_field, prop_config["method"], len(colors)
-        )
-    else:
-        raise ValueError(
-            'With "graduate" analysis_type, "boundaries" or "method" should be provided'
         )
 
     # Use boundaries to make style
@@ -625,7 +618,7 @@ def gen_categorized_value_style(geo_layer, data_field, prop_config, default_no_v
     if not prop_config["categories"]:
         return None
 
-    steps = ["case"]
+    steps = ["match", field_getter]
     for category in prop_config["categories"]:
         name = category["name"]
         value = category["value"]
@@ -633,7 +626,7 @@ def gen_categorized_value_style(geo_layer, data_field, prop_config, default_no_v
             default_value = value
             continue
 
-        steps.append(["==", field_getter, name])
+        steps.append(name)
         steps.append(value)
 
     steps.append(default_value or default_no_value)
@@ -717,15 +710,9 @@ def gen_graduated_size_legend(
     # Step 1 generate boundaries
     if "boundaries" in prop_config:
         boundaries = prop_config["boundaries"]
-        if len(boundaries) < 2:
-            raise ValueError('"boundaries" must be at least a list of two values')
     elif "method" in prop_config:
         boundaries = discretize(
             geo_layer, data_field, prop_config["method"], len(values)
-        )
-    else:
-        raise ValueError(
-            'With "graduate" analysis_type, "boundaries" or "method" should be provided'
         )
 
     # Use boundaries to make style
@@ -941,15 +928,11 @@ def generate_style_from_wizard(geo_layer, config):
                                 "color",
                             )
                         )
-                elif analysis == "proportionnal":
-                    raise NotImplementedError()
                 else:
-                    raise ValueError(f'Unknow analysis type "{analysis}"')
+                    raise ValueError(f'Unhandled analysis type "{analysis}"')
 
             if variation_type == "radius":
-                if analysis == "graduated":
-                    raise NotImplementedError()
-                elif analysis == "categorized":
+                if analysis == "categorized":
                     map_style["paint"][map_style_prop] = gen_categorized_value_style(
                         geo_layer, data_field, prop_config, 0
                     )
@@ -1002,7 +985,7 @@ def generate_style_from_wizard(geo_layer, config):
                             )
                         )
                 else:
-                    raise ValueError(f'Unknow analysis type "{analysis}"')
+                    raise ValueError(f'Unhandled analysis type "{analysis}"')
 
             if variation_type == "value":
                 if analysis == "graduated":
