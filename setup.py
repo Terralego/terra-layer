@@ -43,8 +43,8 @@ setup(
     install_requires=[
         "Django>=2.2",
         "djangorestframework",
-        "django-geosource>=0.3",
-        "django-geostore>=0.3.11",
+        "django-geosource>=0.4.10",
+        "django-geostore>=0.5.4",
         "django-terra-accounts>=1.0.1",
         "jsonschema",
         "django-mapbox-baselayer>=0.0.3",
