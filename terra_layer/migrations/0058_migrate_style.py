@@ -116,20 +116,6 @@ def migrate_circle_wizard(layer):
                 ] = fields[field]
 
 
-test = {
-    "type": "wizard",
-    "map_style_type": "fill",
-    "style": {
-        "fill_color": {"type": "variable", "field": "ID_TRONCON", "values": "#769198"},
-        "fill_outline_color": {
-            "type": "fixed",
-            "value": "#d1d1d1",
-            "no_value": "#d1d1d1",
-        },
-    },
-}
-
-
 @transaction.atomic
 def forward(apps, schema_editor):
     Layer = apps.get_model("terra_layer", "Layer")
@@ -163,7 +149,12 @@ def forward(apps, schema_editor):
             if extra.style:
                 extra.style_config = {
                     "type": "advanced",
-                    "map_style_type": extra.style["type"],
+                    "map_style_type": extra.style.get(
+                        "type",
+                        list(extra.style.get("paint", {"fill-color": ""}).keys())[
+                            0
+                        ].split("-")[0],
+                    ),
                     "map_style": extra.style,
                 }
                 extra.save()
