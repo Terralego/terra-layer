@@ -1,4 +1,10 @@
 
+0.7.1 / 2020-12-09
+==================
+
+  * Make migration more robust
+  * Add command to populate baselayer from settings
+
 0.7.0 / 2020-12-02
 ==================
 
