@@ -490,6 +490,53 @@ class StyleTestCase(TestCase):
             ],
         )
 
+    def test_update_wizard_only_for_good_style(self):
+        self.layer.main_style = {
+            "type": "wizard",
+            "map_style_type": "fill",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "method": "jenks",
+                    "analysis": "graduated",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
+                "line_color": {"type": "fixed", "value": "#ffffff"},
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "paint": {"fill-color": "#aa0000", "fill-outline-color": "#ffffff"},
+                "type": "fill",
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                            "shape": "square",
+                        }
+                    ],
+                    "title": "my_layer_name",
+                }
+            ],
+        )
+
     def test_bad_analysis(self):
         self.source.get_layer()
 
