@@ -14,21 +14,27 @@ class Command(BaseCommand):
         max_zoom = default_map_settings.get("maxZoom", 24)
 
         if type(background_styles) is str:
-            baselayer, created = MapBaseLayer.objects.update_or_create(
+            baselayer, _ = MapBaseLayer.objects.update_or_create(
                 name="Default",
-                map_box_url=background_styles,
-                base_layer_type="mapbox",
-                tile_size=512,
-                min_zoom=min_zoom,
-                max_zoom=max_zoom,
-            )
-        else:
-            for i, bg_style in enumerate(background_styles):
-                baselayer, created = MapBaseLayer.objects.update_or_create(
-                    name=bg_style.get("label", f"Default_{i+1}"),
-                    map_box_url=bg_style["url"],
+                defaults=dict(
+                    map_box_url=background_styles,
                     base_layer_type="mapbox",
                     tile_size=512,
                     min_zoom=min_zoom,
                     max_zoom=max_zoom,
+                ),
+            )
+            print(f"Baselayer created/updated '{baselayer.name}'")
+        else:
+            for i, bg_style in enumerate(background_styles):
+                baselayer, _ = MapBaseLayer.objects.update_or_create(
+                    name=bg_style.get("label", f"Default_{i+1}"),
+                    defaults=dict(
+                        map_box_url=bg_style["url"],
+                        base_layer_type="mapbox",
+                        tile_size=512,
+                        min_zoom=min_zoom,
+                        max_zoom=max_zoom,
+                    ),
                 )
+                print(f"Baselayer created/update '{baselayer.name}'")
