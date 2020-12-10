@@ -258,13 +258,17 @@ class LayerView(APIView):
         map_structure = deepcopy(layer_structure["map"])
         background_styles = map_structure.get("backgroundStyle", [])
 
-        if type(background_styles) is list:
-            background_styles += baselayers
-        else:
-            # backgroundStyles can be just an url
-            baselayers.append({"label": "terra_default", "url": background_styles})
-            background_styles = baselayers
-        layer_structure["map"]["backgroundStyle"] = background_styles
+        # If no base layer, we use default one
+        if not baselayers:
+            if type(background_styles) is list:
+                # background_styles += baselayers
+                baselayers = background_styles
+            else:
+                # backgroundStyles can be just an url
+                baselayers = [{"label": "", "url": background_styles}]
+
+        layer_structure["map"]["backgroundStyle"] = baselayers
+
         return layer_structure
 
     def get_map_layers(self):
