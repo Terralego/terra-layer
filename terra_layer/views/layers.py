@@ -483,7 +483,7 @@ class LayerView(APIView):
     def get_filter_forms_for_layer(self, layer):
         """Return forms of a layer if filters are enabled"""
         if layer.filters_enabled:
-            return [
+            filter_list = [
                 {
                     "property": field_filter.field.name,
                     "label": field_filter.label or field_filter.field.label,
@@ -491,6 +491,9 @@ class LayerView(APIView):
                 }
                 for field_filter in layer.filters_enabled
             ]
+            # Respect filter defined order
+            filter_list.sort(key=lambda f: f.get("order", 0))
+            return filter_list
 
     @cached_property
     def authorized_sources(self):
