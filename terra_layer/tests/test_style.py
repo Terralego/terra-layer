@@ -238,6 +238,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -283,6 +284,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -327,6 +329,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -373,6 +376,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -403,8 +407,6 @@ class StyleTestCase(TestCase):
                 "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
         }
-        # Emptied legend for now as previous one is kept on generation
-        self.layer.legends = []
         self.layer.save()
 
         self.assertEqual(
@@ -419,6 +421,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -475,6 +478,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -522,6 +526,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#aa0000",
@@ -731,6 +736,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "title": "my_layer_name",
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -791,6 +797,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -870,6 +877,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -1008,6 +1016,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -1101,6 +1110,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -1184,6 +1194,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#770000",
@@ -1252,6 +1263,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#770000",
@@ -1311,6 +1323,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "title": "my_layer_name",
+                    "auto": True,
                     "items": [
                         {
                             "diameter": 20,
@@ -1380,6 +1393,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "diameter": 200.0,
@@ -1531,6 +1545,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "diameter": 200.0,
@@ -1613,6 +1628,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "size": 200.0,
@@ -1668,6 +1684,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "size": 200.0,
@@ -1723,6 +1740,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "diameter": None,
@@ -1789,6 +1807,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -1896,6 +1915,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -2035,6 +2055,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -2151,6 +2172,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -2272,6 +2294,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#CC0000",
@@ -2366,6 +2389,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#000000",
@@ -2488,6 +2512,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "color": "#ffffff",
@@ -2586,6 +2611,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [],
                     "title": "my_layer_name",
                 }
@@ -2645,6 +2671,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {"color": "#fc34bc", "label": "Alaska", "shape": "square"},
                         {"color": "#2334bc", "label": "Cameroun", "shape": "square"},
@@ -2719,6 +2746,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {"color": "#fc34bc", "label": "Alaska", "shape": "square"},
                         {"color": "#2334bc", "label": "Cameroun", "shape": "square"},
@@ -2797,6 +2825,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "size": 10,
@@ -2904,6 +2933,7 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "auto": True,
                     "items": [
                         {
                             "size": 10,
