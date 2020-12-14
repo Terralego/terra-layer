@@ -162,8 +162,8 @@ class Layer(models.Model):
 
     description = models.TextField(blank=True)
 
-    layer_style = JSONField(default=dict)
-    layer_style_wizard = JSONField(default=dict)
+    layer_style = JSONField(default=dict)  # To be removed
+    layer_style_wizard = JSONField(default=dict)  # To be removed
 
     main_style = JSONField(default=dict)
 
@@ -198,6 +198,10 @@ class Layer(models.Model):
         ordering = ("order", "name")
 
     def save(self, wizard_update=True, **kwargs):
+        if wizard_update:
+            # Clean automatic legends
+            self.legends = [legend for legend in self.legends if not legend.get("auto")]
+
         if self.main_style.get("type") == "wizard" and wizard_update:
             generated_map_style, legend_additions = generate_style_from_wizard(
                 self.source.get_layer(), self.main_style
@@ -207,6 +211,7 @@ class Layer(models.Model):
             # Add legend title
             for legend_addition in legend_additions:
                 legend_addition["title"] = f"{self.name}"
+                legend_addition["auto"] = True
 
             if not self.legends:
                 self.legends = legend_additions
@@ -214,6 +219,10 @@ class Layer(models.Model):
                 self.legends += legend_additions
 
         super().save(**kwargs)
+
+        if wizard_update:
+            for extra_style in self.extra_styles.all():
+                extra_style.update_wizard()
 
         # Invalidate cache for layer group
         if self.group:
@@ -281,7 +290,7 @@ class CustomStyle(models.Model):
     source = models.ForeignKey(
         Source, on_delete=models.CASCADE, related_name="sublayers"
     )
-    style = JSONField(default=dict)
+    style = JSONField(default=dict)  # To be removed
     style_config = JSONField(default=dict)
 
     interactions = JSONField(default=list)
@@ -296,8 +305,8 @@ class CustomStyle(models.Model):
             f"{self.source.slug}-{self.source.pk}-{self.pk}".encode("utf-8")
         ).hexdigest()
 
-    def save(self, wizard_update=True, **kwargs):
-        if self.style_config.get("type") == "wizard" and wizard_update:
+    def update_wizard(self):
+        if self.style_config.get("type") == "wizard":
             generated_map_style, legend_additions = generate_style_from_wizard(
                 self.source.get_layer(), self.style_config
             )
@@ -306,6 +315,7 @@ class CustomStyle(models.Model):
             # Add legend title
             for legend_addition in legend_additions:
                 legend_addition["title"] = f"{self.layer.name}"
+                legend_addition["auto"] = True
 
             if not self.layer.legends:
                 self.layer.legends = legend_additions
@@ -313,6 +323,11 @@ class CustomStyle(models.Model):
                 self.layer.legends += legend_additions
 
             self.layer.save(wizard_update=False)
+            self.save()
+
+    def save(self, wizard_update=False, **kwargs):
+        if wizard_update:
+            self.update_wizard()
 
         super().save(**kwargs)
 
