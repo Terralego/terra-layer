@@ -1,4 +1,13 @@
 
+0.7.2 / 2020-12-14
+==================
+
+  * Try to fix automatic legend duplication
+  * Dont generate style for another map_style
+  * Fix base layer addition when baselayer already defined
+  * Respect filter field order
+  * Enhance populate baselayer command
+
 0.7.1 / 2020-12-09
 ==================
 
