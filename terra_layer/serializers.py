@@ -110,6 +110,8 @@ class LayerDetailSerializer(ModelSerializer):
         self._update_m2m_through(instance, "fields", FilterFieldSerializer)
         self._update_nested(instance, "extra_styles", CustomStyleSerializer)
 
+        instance.save()
+
         return instance
 
     def _update_nested(self, instance, field, serializer):
