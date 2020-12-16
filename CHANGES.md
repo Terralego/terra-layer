@@ -1,4 +1,10 @@
 
+0.7.4 / 2020-12-16
+==================
+
+  * Fix extrusion style generation
+  * More robust migration
+
 0.7.3 / 2020-12-14
 ==================
 
