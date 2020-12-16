@@ -888,7 +888,7 @@ def generate_style_from_wizard(geo_layer, config):
         style_type = prop_config.get("type", "none")
 
         # Ignore style from other representation
-        if not map_field.startswith(map_style_type):
+        if not map_style_type.replace('-', '_') in map_field:
             continue
 
         map_style_prop = to_map_style(map_field)

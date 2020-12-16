@@ -25,14 +25,18 @@ def migrate_graduated_wizard(layer):
     field = layer.layer_style_wizard["field"]
     method = layer.layer_style_wizard.get("method")
     boundaries = layer.layer_style_wizard.get("boundaries")
-    fill_colors = layer.layer_style_wizard["style"]["fill_color"]
+    fill_colors = layer.layer_style_wizard.get("style", layer.layer_style_wizard)[
+        "fill_color"
+    ]
 
     # Other fields
     fields = {}
     no_value_fields = {}
 
     for f in ["fill_color", "fill_opacity", "stroke_color"]:
-        fields[f] = layer.layer_style_wizard["style"].get(f)
+        fields[f] = layer.layer_style_wizard.get("style", layer.layer_style_wizard).get(
+            f
+        )
         no_value_fields[f] = layer.layer_style_wizard.get("no_value_style", {}).get(f)
 
     layer.main_style = {
