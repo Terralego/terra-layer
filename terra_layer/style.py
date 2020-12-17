@@ -888,7 +888,9 @@ def generate_style_from_wizard(geo_layer, config):
         style_type = prop_config.get("type", "none")
 
         # Ignore style from other representation
-        if not map_field.replace('fill_extrusion', 'extrusion').startswith(map_style_type.replace("fill-extrusion", "extrusion")):
+        if not map_field.replace("fill_extrusion", "extrusion").startswith(
+            map_style_type.replace("fill-extrusion", "extrusion")
+        ):
             continue
 
         map_style_prop = to_map_style(map_field)
