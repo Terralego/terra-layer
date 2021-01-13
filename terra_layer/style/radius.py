@@ -15,7 +15,7 @@ from .utils import (
 )
 
 
-def gen_proportionnal_circle_legend_items(
+def gen_proportionnal_radius_legend_items(
     shape,
     min,
     max,
@@ -98,7 +98,7 @@ def gen_proportionnal_radius_legend(
         mm = boundaries_round(mm[1:])
 
         return {
-            "items": gen_proportionnal_circle_legend_items(
+            "items": gen_proportionnal_radius_legend_items(
                 style_type_2_legend_shape[map_style_type],
                 mm[0],
                 mm[1],
