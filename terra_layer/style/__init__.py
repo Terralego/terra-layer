@@ -1,26 +1,18 @@
-from terra_layer.style.utils import (
-    trunc_scale,
-    get_min_max,
-    circle_boundaries_candidate,
-    round_scale,
-    ceil_scale,
-    circle_boundaries_filter_values,
-)
-
 from terra_layer.settings import (
     DEFAULT_NO_VALUE_FILL_COLOR,
 )
 
 from .utils import (
-    discretize,
-    gen_style_steps,
     get_style_no_value_condition,
-    get_positive_min_max,
-    gen_style_interpolate,
-    boundaries_round,
-    size_boundaries_candidate,
-    circle_boundaries_candidate,
-    circle_boundaries_filter_values,
+    trunc_scale,
+    get_min_max,
+    round_scale,
+    ceil_scale,
+)
+
+from .all import (
+    gen_categorized_any_legend,
+    gen_categorized_any_style,
 )
 
 from .color import (
@@ -29,8 +21,6 @@ from .color import (
 )
 
 from .size import (
-    gen_categorized_size_legend,
-    gen_categorized_size_style,
     gen_graduated_size_legend,
     gen_graduated_size_style,
     gen_proportionnal_size_legend,
@@ -105,7 +95,7 @@ def generate_style_from_wizard(geo_layer, config):
                             )
                         )
                 elif analysis == "categorized":
-                    map_style["paint"][map_style_prop] = gen_categorized_size_style(
+                    map_style["paint"][map_style_prop] = gen_categorized_any_style(
                         geo_layer, data_field, prop_config, DEFAULT_NO_VALUE_FILL_COLOR
                     )
                     if map_style["paint"][map_style_prop] is None:
@@ -113,7 +103,7 @@ def generate_style_from_wizard(geo_layer, config):
 
                     if prop_config.get("generate_legend"):
                         legends.append(
-                            gen_categorized_size_legend(
+                            gen_categorized_any_legend(
                                 map_style_type,
                                 prop_config,
                                 "color",
@@ -124,7 +114,7 @@ def generate_style_from_wizard(geo_layer, config):
 
             if variation_type == "radius":
                 if analysis == "categorized":
-                    map_style["paint"][map_style_prop] = gen_categorized_size_style(
+                    map_style["paint"][map_style_prop] = gen_categorized_any_style(
                         geo_layer, data_field, prop_config, 0
                     )
                     if map_style["paint"][map_style_prop] is None:
@@ -137,7 +127,7 @@ def generate_style_from_wizard(geo_layer, config):
                             .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
                         )
                         legends.append(
-                            gen_categorized_size_legend(
+                            gen_categorized_any_legend(
                                 map_style_type,
                                 prop_config,
                                 "size",
@@ -206,7 +196,7 @@ def generate_style_from_wizard(geo_layer, config):
                             )
                         )
                 elif analysis == "categorized":
-                    map_style["paint"][map_style_prop] = gen_categorized_size_style(
+                    map_style["paint"][map_style_prop] = gen_categorized_any_style(
                         geo_layer, data_field, prop_config, 0
                     )
                     if map_style["paint"][map_style_prop] is None:
@@ -219,7 +209,7 @@ def generate_style_from_wizard(geo_layer, config):
                             .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
                         )
                         legends.append(
-                            gen_categorized_size_legend(
+                            gen_categorized_any_legend(
                                 map_style_type,
                                 prop_config,
                                 "size",
