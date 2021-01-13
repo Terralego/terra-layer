@@ -8,6 +8,14 @@ from terra_layer.settings import (
     DEFAULT_NO_VALUE_FILL_COLOR,
 )
 
+style_type_2_legend_shape = {
+    "fill-extrusion": "square",
+    "fill": "square",
+    "circle": "circle",
+    "symbol": "symbol",
+    "line": "line",
+}
+
 
 def _flatten(levels):
     """
