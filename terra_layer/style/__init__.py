@@ -4,10 +4,6 @@ from terra_layer.settings import (
 
 from .utils import (
     get_style_no_value_condition,
-    trunc_scale,
-    get_min_max,
-    round_scale,
-    ceil_scale,
 )
 
 from .all import (

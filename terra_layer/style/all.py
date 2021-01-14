@@ -1,7 +1,3 @@
-from terra_layer.settings import (
-    DEFAULT_SIZE_MIN_LEGEND_HEIGHT,
-)
-
 from .utils import (
     style_type_2_legend_shape,
 )

@@ -2,11 +2,6 @@ from django.db import connection
 import numbers
 import math
 from functools import reduce
-from terra_layer.settings import (
-    DEFAULT_CIRCLE_MIN_LEGEND_HEIGHT,
-    DEFAULT_SIZE_MIN_LEGEND_HEIGHT,
-    DEFAULT_NO_VALUE_FILL_COLOR,
-)
 
 style_type_2_legend_shape = {
     "fill-extrusion": "square",

@@ -4,7 +4,6 @@ from terra_layer.settings import (
 )
 
 from .utils import (
-    discretize,
     get_style_no_value_condition,
     get_positive_min_max,
     gen_style_interpolate,

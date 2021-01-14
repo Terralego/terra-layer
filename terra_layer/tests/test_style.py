@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.gis.geos import Point
 from django.test import TestCase
 
@@ -6,9 +8,14 @@ from terra_layer.models import Layer, CustomStyle
 from django_geosource.models import PostGISSource
 from geostore.models import Feature
 
-from terra_layer import style
-
-import random
+from terra_layer.style.utils import (
+    trunc_scale,
+    get_min_max,
+    round_scale,
+    ceil_scale,
+    circle_boundaries_candidate,
+    circle_boundaries_filter_values,
+)
 
 
 class StyleTestCase(TestCase):
@@ -40,60 +47,54 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, 1.0, 2.0])
+        self.assertEqual(get_min_max(geo_layer, "a"), [False, 1.0, 2.0])
 
     def test_get_positive_min_max(self):
         geo_layer = self.source.get_layer()
         self._feature_factory(geo_layer, a=1),
         self._feature_factory(geo_layer, a=2),
 
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, 1.0, 2.0])
+        self.assertEqual(get_min_max(geo_layer, "a"), [False, 1.0, 2.0])
 
     def test_get_no_positive_min_max(self):
         geo_layer = self.source.get_layer()
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, None, None])
+        self.assertEqual(get_min_max(geo_layer, "a"), [False, None, None])
 
     def test_get_no_min_max(self):
         geo_layer = self.source.get_layer()
-        self.assertEqual(style.get_min_max(geo_layer, "a"), [False, None, None])
+        self.assertEqual(get_min_max(geo_layer, "a"), [False, None, None])
 
     def test_circle_boundaries_0(self):
         min = 0
         max = 1
         with self.assertRaises(ValueError):
-            style.circle_boundaries_candidate(min, max)
+            circle_boundaries_candidate(min, max)
 
     def test_circle_boundaries_1(self):
         min = 1
         max = 1
         size = 100
-        candidates = style.circle_boundaries_candidate(min, max)
+        candidates = circle_boundaries_candidate(min, max)
         candidates = [max] + candidates + [min]
-        boundaries = style.circle_boundaries_filter_values(
-            candidates, min, max, size / 20
-        )
+        boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
         self.assertEqual(boundaries, [1])
 
     def test_circle_boundaries_100(self):
         min = 1
         max = 100
         size = 100
-        candidates = style.circle_boundaries_candidate(min, max)
+        candidates = circle_boundaries_candidate(min, max)
         candidates = [max] + candidates + [min]
-        boundaries = style.circle_boundaries_filter_values(
-            candidates, min, max, size / 20
-        )
+        boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
         self.assertEqual(boundaries, [100, 50, 25, 10, 5, 2.5])
 
     def test_circle_boundaries_001(self):
         min = 0.001
         max = 0.1
         size = 100
-        candidates = style.circle_boundaries_candidate(min, max)
+        candidates = circle_boundaries_candidate(min, max)
         candidates = [max] + candidates + [min]
-        boundaries = style.circle_boundaries_filter_values(
-            candidates, min, max, size / 20
-        )
+        boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
         # Stange
         self.assertEqual(boundaries, [0.1])
         # Should be
@@ -103,49 +104,47 @@ class StyleTestCase(TestCase):
         min = None
         max = None
         size = 100
-        candidates = style.circle_boundaries_candidate(min, max)
+        candidates = circle_boundaries_candidate(min, max)
         candidates = [max] + candidates + [min]
-        boundaries = style.circle_boundaries_filter_values(
-            candidates, min, max, size / 20
-        )
+        boundaries = circle_boundaries_filter_values(candidates, min, max, size / 20)
         self.assertEqual(boundaries, [])
 
     def test_round_scale(self):
-        self.assertEqual(style.trunc_scale(0, 3), 0)
+        self.assertEqual(trunc_scale(0, 3), 0)
 
-        self.assertEqual(style.trunc_scale(111, 3), 111)
-        self.assertEqual(style.trunc_scale(111, 2), 110)
-        self.assertEqual(style.trunc_scale(111, 1), 100)
+        self.assertEqual(trunc_scale(111, 3), 111)
+        self.assertEqual(trunc_scale(111, 2), 110)
+        self.assertEqual(trunc_scale(111, 1), 100)
 
-        self.assertEqual(style.round_scale(111, 3), 111)
-        self.assertEqual(style.round_scale(111, 2), 110)
-        self.assertEqual(style.round_scale(111, 1), 100)
+        self.assertEqual(round_scale(111, 3), 111)
+        self.assertEqual(round_scale(111, 2), 110)
+        self.assertEqual(round_scale(111, 1), 100)
 
-        self.assertEqual(style.round_scale(117, 3), 117)
-        self.assertEqual(style.round_scale(117, 2), 120)
-        self.assertEqual(style.round_scale(117, 1), 100)
+        self.assertEqual(round_scale(117, 3), 117)
+        self.assertEqual(round_scale(117, 2), 120)
+        self.assertEqual(round_scale(117, 1), 100)
 
-        self.assertEqual(style.ceil_scale(117, 3), 117)
-        self.assertEqual(style.ceil_scale(117, 2), 120)
-        self.assertEqual(style.ceil_scale(117, 1), 200)
+        self.assertEqual(ceil_scale(117, 3), 117)
+        self.assertEqual(ceil_scale(117, 2), 120)
+        self.assertEqual(ceil_scale(117, 1), 200)
 
-        self.assertEqual(style.trunc_scale(0.51, 3), 0.51)
-        self.assertEqual(style.trunc_scale(0.51, 2), 0.5)
-        self.assertEqual(style.trunc_scale(0.51, 1), 0)
+        self.assertEqual(trunc_scale(0.51, 3), 0.51)
+        self.assertEqual(trunc_scale(0.51, 2), 0.5)
+        self.assertEqual(trunc_scale(0.51, 1), 0)
 
-        self.assertEqual(style.round_scale(0.51, 3), 0.51)
-        self.assertEqual(style.round_scale(0.51, 2), 0.5)
-        self.assertEqual(style.round_scale(0.51, 1), 1)
+        self.assertEqual(round_scale(0.51, 3), 0.51)
+        self.assertEqual(round_scale(0.51, 2), 0.5)
+        self.assertEqual(round_scale(0.51, 1), 1)
 
-        self.assertEqual(style.round_scale(0.49, 3), 0.49)
-        self.assertEqual(style.round_scale(0.49, 2), 0.5)
-        self.assertEqual(style.round_scale(0.49, 1), 0)
+        self.assertEqual(round_scale(0.49, 3), 0.49)
+        self.assertEqual(round_scale(0.49, 2), 0.5)
+        self.assertEqual(round_scale(0.49, 1), 0)
 
-        self.assertEqual(style.ceil_scale(0.58, 3), 0.58)
+        self.assertEqual(ceil_scale(0.58, 3), 0.58)
         self.assertEqual(
-            style.ceil_scale(0.58, 2), 0.6000000000000001
+            ceil_scale(0.58, 2), 0.6000000000000001
         )  # Got it, exactly what I want
-        self.assertEqual(style.ceil_scale(0.58, 1), 1)
+        self.assertEqual(ceil_scale(0.58, 1), 1)
 
     def test_analysis_fail(self):
         self.layer.main_style = {
