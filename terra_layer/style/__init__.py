@@ -36,10 +36,14 @@ def to_map_style(prop):
 def field_2_variation_type(field):
     if "color" in field:
         return "color"
-    if "width" in field or "height" in field:
+    if "width" in field or "height" in field or "opacity" in field:
         return "value"
     if "radius" in field or "size" in field:
         return "radius"
+    if "image" in field:
+        return "image"
+    if "image" in field:
+        return "image"
 
 
 def generate_style_from_wizard(geo_layer, config):
@@ -50,7 +54,7 @@ def generate_style_from_wizard(geo_layer, config):
     # fill, fill_extrusion, line, text, symbol, circle
     map_style_type = config["map_style_type"]
 
-    map_style = {"type": map_style_type, "paint": {}}
+    map_style = {"type": map_style_type}
 
     legends = []
 
@@ -69,9 +73,9 @@ def generate_style_from_wizard(geo_layer, config):
             value = prop_config["value"]
             no_value = prop_config.get("no_value")
             data_field = prop_config.get("field")
-            map_style["paint"][map_style_prop] = get_style_no_value_condition(
-                ["get", data_field], value, no_value
-            )
+            map_style.setdefault("paint", {})[
+                map_style_prop
+            ] = get_style_no_value_condition(["get", data_field], value, no_value)
         elif style_type == "variable":
             # Variable style
             data_field = prop_config["field"]
@@ -80,7 +84,9 @@ def generate_style_from_wizard(geo_layer, config):
 
             if variation_type == "color":
                 if analysis == "graduated":
-                    map_style["paint"][map_style_prop] = gen_graduated_color_style(
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_graduated_color_style(
                         geo_layer, data_field, map_field, prop_config
                     )
                     if prop_config.get("generate_legend"):
@@ -91,11 +97,13 @@ def generate_style_from_wizard(geo_layer, config):
                             )
                         )
                 elif analysis == "categorized":
-                    map_style["paint"][map_style_prop] = gen_categorized_any_style(
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_categorized_any_style(
                         geo_layer, data_field, prop_config, DEFAULT_NO_VALUE_FILL_COLOR
                     )
-                    if map_style["paint"][map_style_prop] is None:
-                        del map_style["paint"][map_style_prop]
+                    if map_style.setdefault("paint", {})[map_style_prop] is None:
+                        del map_style.setdefault("paint", {})[map_style_prop]
 
                     if prop_config.get("generate_legend"):
                         legends.append(
@@ -110,11 +118,11 @@ def generate_style_from_wizard(geo_layer, config):
 
             if variation_type == "radius":
                 if analysis == "categorized":
-                    map_style["paint"][map_style_prop] = gen_categorized_any_style(
-                        geo_layer, data_field, prop_config, 0
-                    )
-                    if map_style["paint"][map_style_prop] is None:
-                        del map_style["paint"][map_style_prop]
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_categorized_any_style(geo_layer, data_field, prop_config, 0)
+                    if map_style.setdefault("paint", {})[map_style_prop] is None:
+                        del map_style.setdefault("paint", {})[map_style_prop]
 
                     if prop_config.get("generate_legend"):
                         color = (
@@ -131,7 +139,9 @@ def generate_style_from_wizard(geo_layer, config):
                             )
                         )
                 elif analysis == "proportionnal":
-                    map_style["paint"][map_style_prop] = gen_proportionnal_radius_style(
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_proportionnal_radius_style(
                         geo_layer, data_field, map_field, prop_config
                     )
                     # Add sort key
@@ -166,7 +176,9 @@ def generate_style_from_wizard(geo_layer, config):
 
             if variation_type == "value":
                 if analysis == "graduated":
-                    map_style["paint"][map_style_prop] = gen_graduated_size_style(
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_graduated_size_style(
                         geo_layer, data_field, map_field, prop_config
                     )
                     if prop_config.get("generate_legend"):
@@ -192,11 +204,11 @@ def generate_style_from_wizard(geo_layer, config):
                             )
                         )
                 elif analysis == "categorized":
-                    map_style["paint"][map_style_prop] = gen_categorized_any_style(
-                        geo_layer, data_field, prop_config, 0
-                    )
-                    if map_style["paint"][map_style_prop] is None:
-                        del map_style["paint"][map_style_prop]
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_categorized_any_style(geo_layer, data_field, prop_config, 0)
+                    if map_style.setdefault("paint", {})[map_style_prop] is None:
+                        del map_style.setdefault("paint", {})[map_style_prop]
 
                     if prop_config.get("generate_legend"):
                         color = (
@@ -216,7 +228,9 @@ def generate_style_from_wizard(geo_layer, config):
                     """map_style["layout"] = {
                         f"{map_style_type}-sort-key": ["-", ["get", data_field]]
                     }"""
-                    map_style["paint"][map_style_prop] = gen_proportionnal_size_style(
+                    map_style.setdefault("paint", {})[
+                        map_style_prop
+                    ] = gen_proportionnal_size_style(
                         geo_layer, data_field, map_field, prop_config
                     )
                     if prop_config.get("generate_legend"):
