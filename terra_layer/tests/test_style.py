@@ -2971,3 +2971,156 @@ class StyleTestCase(TestCase):
                 }
             ],
         )
+
+    def test_zoom_weight_style(self):
+
+        self.layer.main_style = {
+            "map_style_type": "icon",
+            "type": "wizard",
+            "min_zoom": 4,
+            "max_zoom": 24,
+            "weight": 50,
+            "style": {
+                "icon-image": {
+                    "type": "fixed",
+                    "value": "testicon",
+                    "generate_legend": True,
+                },
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "symbol",
+                "minzoom": 4,
+                "maxzoom": 24,
+                "weight": 50,
+                "layout": {"icon-image": "testicon"},
+            },
+        )
+
+    def test_icon_style(self):
+
+        self.layer.main_style = {
+            "map_style_type": "icon",
+            "type": "wizard",
+            "style": {
+                "icon_image": {
+                    "type": "fixed",
+                    "value": "testicon",
+                    "generate_legend": False,
+                },
+                "icon_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "symbol",
+                "layout": {"icon-image": "testicon"},
+                "paint": {"icon-color": "#00ffff"},
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [],
+        )
+
+    def test_text_style(self):
+
+        self.layer.main_style = {
+            "map_style_type": "text",
+            "type": "wizard",
+            "style": {
+                "text-size": {
+                    "type": "fixed",
+                    "value": 12,
+                },
+                "text-field": {
+                    "type": "fixed",
+                    "value": "{myfield}",
+                },
+                "text-allow-overlap": {
+                    "type": "fixed",
+                    "value": False,
+                },
+                "text_font": {"type": "fixed", "value": ["fontA", "fontB"]},
+                "text_color": {"type": "fixed", "value": "#00ffbb"},
+                "text_halo_color": {
+                    "type": "fixed",
+                    "value": "rgba(255, 255, 255, 0.8)",
+                },
+                "text_halo_width": {"type": "fixed", "value": 2},
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "symbol",
+                "paint": {
+                    "text-color": "#00ffbb",
+                    "text-halo-color": "rgba(255, 255, 255, 0.8)",
+                    "text-halo-width": 2,
+                },
+                "layout": {
+                    "text-field": "{myfield}",
+                    "text-allow-overlap": False,
+                    "text-size": 12,
+                    "text-font": ["fontA", "fontB"],
+                },
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [],
+        )
+
+    def test_remove_unused_style(self):
+
+        self.layer.main_style = {
+            "map_style_type": "icon",
+            "type": "wizard",
+            "style": {
+                "icon_image": {
+                    "type": "fixed",
+                    "value": "testicon",
+                    "generate_legend": False,
+                },
+                "icon_color": {"type": "fixed", "value": "#00ffff"},
+                "text-size": {
+                    "type": "fixed",
+                    "value": 12,
+                },
+                "text-field": {
+                    "type": "fixed",
+                    "value": "{myfield}",
+                },
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.main_style["map_style"],
+            {
+                "type": "symbol",
+                "layout": {"icon-image": "testicon"},
+                "paint": {"icon-color": "#00ffff"},
+            },
+        )
+
+        self.assertEqual(
+            self.layer.legends,
+            [],
+        )
