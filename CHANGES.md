@@ -1,4 +1,11 @@
 
+0.7.6 / 2021-01-26
+==================
+
+  * Add icon/text/zoom style generation
+  * Paint is now optionnal
+  * Split style in multiple files to ease maintenance
+
 0.7.5 / 2020-12-17
 ==================
 
