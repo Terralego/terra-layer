@@ -245,9 +245,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -291,9 +291,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -336,9 +336,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -383,9 +383,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -428,9 +428,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -485,9 +485,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -533,9 +533,9 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
+                    "shape": "square",
                     "title": "my_layer_name",
                 }
             ],
@@ -736,6 +736,7 @@ class StyleTestCase(TestCase):
                 {
                     "title": "my_layer_name",
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -743,7 +744,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         }
                     ],
                 }
@@ -797,6 +797,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -804,7 +805,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 30, "included": True},
                                 "upper": {"value": 40, "included": True},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -812,7 +812,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 20, "included": True},
                                 "upper": {"value": 30, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -820,7 +819,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 10, "included": True},
                                 "upper": {"value": 20, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -828,7 +826,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 0, "included": True},
                                 "upper": {"value": 10, "included": False},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -877,6 +874,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "line",
                     "items": [
                         {
                             "color": "#000000",
@@ -885,7 +883,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 30, "included": True},
                                 "upper": {"value": 40, "included": True},
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#000000",
@@ -894,7 +891,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 20, "included": True},
                                 "upper": {"value": 30, "included": False},
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#000000",
@@ -903,7 +899,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 10, "included": True},
                                 "upper": {"value": 20, "included": False},
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#000000",
@@ -912,7 +907,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 0, "included": True},
                                 "upper": {"value": 10, "included": False},
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#000000",
@@ -921,7 +915,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "line",
                         },
                     ],
                     "title": "my_layer_name",
@@ -1016,6 +1009,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -1023,7 +1017,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 30, "included": True},
                                 "upper": {"value": 40, "included": True},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -1031,7 +1024,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 20, "included": True},
                                 "upper": {"value": 30, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -1039,7 +1031,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 10, "included": True},
                                 "upper": {"value": 20, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -1047,7 +1038,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 0, "included": True},
                                 "upper": {"value": 10, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#000000",
@@ -1055,7 +1045,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -1110,6 +1099,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -1117,7 +1107,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 1.75, "included": True},
                                 "upper": {"value": 2.0, "included": True},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -1125,7 +1114,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 1.5, "included": True},
                                 "upper": {"value": 1.75, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -1133,7 +1121,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 1.25, "included": True},
                                 "upper": {"value": 1.5, "included": False},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -1141,7 +1128,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 1.0, "included": True},
                                 "upper": {"value": 1.25, "included": False},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -1194,6 +1180,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#770000",
@@ -1201,7 +1188,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 2.0, "included": True},
                                 "upper": {"value": 2.0, "included": True},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -1209,7 +1195,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 1.0, "included": True},
                                 "upper": {"value": 2.0, "included": False},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -1263,6 +1248,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#770000",
@@ -1270,7 +1256,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 2.0, "included": True},
                                 "upper": {"value": 2.0, "included": True},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -1278,7 +1263,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 1.0, "included": True},
                                 "upper": {"value": 2.0, "included": False},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -1323,6 +1307,7 @@ class StyleTestCase(TestCase):
                 {
                     "title": "my_layer_name",
                     "auto": True,
+                    "shape": "stackedCircle",
                     "items": [
                         {
                             "diameter": 20,
@@ -1332,7 +1317,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "circle",
                         }
                     ],
                 }
@@ -1393,51 +1377,45 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "stackedCircle",
                     "items": [
                         {
                             "diameter": 200.0,
                             "size": 200.0,
                             "boundaries": {"lower": {"value": 130}},
-                            "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 175.41160386140584,
                             "size": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100}},
-                            "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 124.03473458920845,
                             "size": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50}},
-                            "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 87.70580193070292,
                             "size": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25.0}},
-                            "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 55.47001962252292,
                             "size": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10}},
-                            "shape": "circle",
                             "color": "#0000cc",
                         },
                         {
                             "diameter": 39.22322702763681,
                             "size": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5}},
-                            "shape": "circle",
                             "color": "#0000cc",
                         },
                     ],
-                    "stackedCircles": True,
                     "title": "my_layer_name",
                 }
             ],
@@ -1545,58 +1523,51 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "stackedCircle",
                     "items": [
                         {
                             "diameter": 200.0,
                             "size": 200.0,
                             "boundaries": {"lower": {"value": 130}},
-                            "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 175.41160386140584,
                             "size": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100}},
-                            "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 124.03473458920845,
                             "size": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50}},
-                            "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 87.70580193070292,
                             "size": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25}},
-                            "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 55.47001962252292,
                             "size": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10}},
-                            "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 39.22322702763681,
                             "size": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5}},
-                            "shape": "circle",
                             "color": "#0000ca",
                         },
                         {
                             "diameter": 60,
                             "size": 60,
                             "boundaries": {"lower": {"value": None}},
-                            "shape": "circle",
                             "color": "#000000",
                         },
                     ],
-                    "stackedCircles": True,
                     "title": "my_layer_name",
                 }
             ],
@@ -1628,23 +1599,21 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "line",
                     "items": [
                         {
                             "size": 200.0,
                             "boundaries": {"lower": {"value": 110}},
-                            "shape": "line",
                             "color": "#0000cc",
                         },
                         {
                             "size": 99.0909090909091,
                             "boundaries": {"lower": {"value": 54.5}},
-                            "shape": "line",
                             "color": "#0000cc",
                         },
                         {
                             "size": 1.8181818181818181,
                             "boundaries": {"lower": {"value": 1}},
-                            "shape": "line",
                             "color": "#0000cc",
                         },
                     ],
@@ -1684,29 +1653,26 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "line",
                     "items": [
                         {
                             "size": 200.0,
                             "boundaries": {"lower": {"value": 110}},
-                            "shape": "line",
                             "color": "#0000cc",
                         },
                         {
                             "size": 99.0909090909091,
                             "boundaries": {"lower": {"value": 54.5}},
-                            "shape": "line",
                             "color": "#0000cc",
                         },
                         {
                             "size": 1.8181818181818181,
                             "boundaries": {"lower": {"value": 1}},
-                            "shape": "line",
                             "color": "#0000cc",
                         },
                         {
                             "size": 10,
                             "boundaries": {"lower": {"value": None}},
-                            "shape": "line",
                             "color": "#101010",
                         },
                     ],
@@ -1740,6 +1706,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "line",
                     "items": [
                         {
                             "diameter": None,
@@ -1749,7 +1716,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "line",
                         }
                     ],
                     "title": "my_layer_name",
@@ -1807,6 +1773,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -1814,7 +1781,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 7.554067900041074, "included": True},
                                 "upper": {"value": 15.25702131719717, "included": True},
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -1828,7 +1794,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -1842,7 +1807,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -1856,7 +1820,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -1915,6 +1878,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -1925,7 +1889,6 @@ class StyleTestCase(TestCase):
                                     "included": True,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -1939,7 +1902,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -1953,7 +1915,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -1967,7 +1928,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -2055,6 +2015,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -2065,7 +2026,6 @@ class StyleTestCase(TestCase):
                                     "included": True,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -2079,7 +2039,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -2093,7 +2052,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -2107,7 +2065,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#000000",
@@ -2115,7 +2072,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -2172,6 +2128,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -2182,7 +2139,6 @@ class StyleTestCase(TestCase):
                                     "included": True,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -2196,7 +2152,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -2210,7 +2165,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -2224,7 +2178,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -2294,6 +2247,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#CC0000",
@@ -2301,7 +2255,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -2389,6 +2342,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
                         {
                             "color": "#000000",
@@ -2399,7 +2353,6 @@ class StyleTestCase(TestCase):
                                     "included": True,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#330000",
@@ -2413,7 +2366,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#770000",
@@ -2427,7 +2379,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#aa0000",
@@ -2441,7 +2392,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "square",
                         },
                         {
                             "color": "#CC0000",
@@ -2449,7 +2399,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "square",
                         },
                     ],
                     "title": "my_layer_name",
@@ -2512,6 +2461,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "line",
                     "items": [
                         {
                             "color": "#ffffff",
@@ -2520,7 +2470,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": 5.727211814984125, "included": True},
                                 "upper": {"value": 15.25702131719717, "included": True},
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#ffffff",
@@ -2535,7 +2484,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#ffffff",
@@ -2550,7 +2498,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#ffffff",
@@ -2565,7 +2512,6 @@ class StyleTestCase(TestCase):
                                     "included": False,
                                 },
                             },
-                            "shape": "line",
                         },
                         {
                             "color": "#ffffff",
@@ -2574,7 +2520,6 @@ class StyleTestCase(TestCase):
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
                             },
-                            "shape": "line",
                         },
                     ],
                     "title": "my_layer_name",
@@ -2611,6 +2556,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [],
                     "title": "my_layer_name",
                 }
@@ -2671,12 +2617,13 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
-                        {"color": "#fc34bc", "label": "Alaska", "shape": "square"},
-                        {"color": "#2334bc", "label": "Cameroun", "shape": "square"},
-                        {"color": "#fc3445", "label": "France", "shape": "square"},
-                        {"color": "#fc15bc", "label": "Canada", "shape": "square"},
-                        {"color": "#1623bc", "label": "Groland", "shape": "square"},
+                        {"color": "#fc34bc", "label": "Alaska"},
+                        {"color": "#2334bc", "label": "Cameroun"},
+                        {"color": "#fc3445", "label": "France"},
+                        {"color": "#fc15bc", "label": "Canada"},
+                        {"color": "#1623bc", "label": "Groland"},
                     ],
                     "title": "my_layer_name",
                 }
@@ -2746,14 +2693,18 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "square",
                     "items": [
-                        {"color": "#fc34bc", "label": "Alaska", "shape": "square"},
-                        {"color": "#2334bc", "label": "Cameroun", "shape": "square"},
-                        {"color": "#fc3445", "label": "France", "shape": "square"},
-                        {"color": "#fc15bc", "label": "Canada", "shape": "square"},
-                        {"color": "#1623bc", "label": "Groland", "shape": "square"},
-                        {"color": "#0023bc", "label": "", "shape": "square"},
-                        {"color": "#110000", "label": None, "shape": "square"},
+                        {
+                            "color": "#fc34bc",
+                            "label": "Alaska",
+                        },
+                        {"color": "#2334bc", "label": "Cameroun"},
+                        {"color": "#fc3445", "label": "France"},
+                        {"color": "#fc15bc", "label": "Canada"},
+                        {"color": "#1623bc", "label": "Groland"},
+                        {"color": "#0023bc", "label": ""},
+                        {"color": "#110000", "label": None},
                     ],
                     "title": "my_layer_name",
                 }
@@ -2825,42 +2776,37 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "circle",
                     "items": [
                         {
                             "size": 10,
                             "label": "Alaska",
-                            "shape": "circle",
                             "color": "#00ffff",
                         },
                         {
                             "size": 20,
                             "label": "Cameroun",
-                            "shape": "circle",
                             "color": "#00ffff",
                         },
                         {
                             "size": 30,
                             "label": "France",
-                            "shape": "circle",
                             "color": "#00ffff",
                         },
                         {
                             "size": 40,
                             "label": "Canada",
-                            "shape": "circle",
                             "color": "#00ffff",
                         },
                         {
                             "size": 50,
                             "label": "Groland",
-                            "shape": "circle",
                             "color": "#00ffff",
                         },
-                        {"size": 2, "label": "", "shape": "circle", "color": "#00ffff"},
+                        {"size": 2, "label": "", "color": "#00ffff"},
                         {
                             "size": 0,
                             "label": None,
-                            "shape": "circle",
                             "color": "#00ffff",
                         },
                     ],
@@ -2933,39 +2879,35 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "shape": "line",
                     "items": [
                         {
                             "size": 10,
                             "label": "Alaska",
-                            "shape": "line",
                             "color": "#00ffff",
                         },
                         {
                             "size": 20,
                             "label": "Cameroun",
-                            "shape": "line",
                             "color": "#00ffff",
                         },
                         {
                             "size": 30,
                             "label": "France",
-                            "shape": "line",
                             "color": "#00ffff",
                         },
                         {
                             "size": 40,
                             "label": "Canada",
-                            "shape": "line",
                             "color": "#00ffff",
                         },
                         {
                             "size": 50,
                             "label": "Groland",
-                            "shape": "line",
                             "color": "#00ffff",
                         },
-                        {"size": 2, "label": "", "shape": "line", "color": "#00ffff"},
-                        {"size": 0, "label": None, "shape": "line", "color": "#00ffff"},
+                        {"size": 2, "label": "", "color": "#00ffff"},
+                        {"size": 0, "label": None, "color": "#00ffff"},
                     ],
                     "title": "my_layer_name",
                 }

@@ -14,9 +14,7 @@ from .utils import (
 )
 
 
-def gen_size_legend_steps(
-    boundaries, values, color, no_value, no_value_color, shape="square"
-):
+def gen_size_legend_steps(boundaries, values, color, no_value, no_value_color):
     """
     Generate a discrete size legend.
     """
@@ -32,7 +30,6 @@ def gen_size_legend_steps(
                     "included": index + 1 == size,
                 },
             },
-            "shape": shape,
         }
         for index in range(size)
     ]
@@ -47,7 +44,6 @@ def gen_size_legend_steps(
                     "lower": {"value": None, "included": True},
                     "upper": {"value": None, "included": True},
                 },
-                "shape": shape,
             },
         )
 
@@ -55,7 +51,6 @@ def gen_size_legend_steps(
 
 
 def gen_proportionnal_size_legend_items(
-    shape,  # line, square, circle
     min,
     max,
     max_value,
@@ -76,7 +71,6 @@ def gen_proportionnal_size_legend_items(
         {
             "size": (b / max) * max_value,
             "boundaries": {"lower": {"value": b}},
-            "shape": shape,
             "color": color,
         }
         for b in boundaries
@@ -87,7 +81,6 @@ def gen_proportionnal_size_legend_items(
             {
                 "size": no_value_size,
                 "boundaries": {"lower": {"value": None}},
-                "shape": shape,
                 "color": no_value_color,
             }
         )
@@ -151,8 +144,8 @@ def gen_graduated_size_legend(
                 color,
                 no_value,
                 no_value_color,
-                style_type_2_legend_shape.get(map_style_type, "square"),
             )[::-1],
+            "shape": style_type_2_legend_shape.get(map_style_type, "square"),
         }
     else:
         return {
@@ -163,9 +156,9 @@ def gen_graduated_size_legend(
                         "lower": {"value": None, "included": True},
                         "upper": {"value": None, "included": True},
                     },
-                    "shape": style_type_2_legend_shape.get(map_style_type, "square"),
                 }
-            ]
+            ],
+            "shape": style_type_2_legend_shape.get(map_style_type, "square"),
         }
 
 
@@ -207,7 +200,6 @@ def gen_proportionnal_size_legend(
 
         return {
             "items": gen_proportionnal_size_legend_items(
-                style_type_2_legend_shape[map_style_type],
                 mm[0],
                 mm[1],
                 max_value,
@@ -215,6 +207,7 @@ def gen_proportionnal_size_legend(
                 no_value_size,
                 no_value_color,
             ),
+            "shape": style_type_2_legend_shape.get(map_style_type, "circle"),
         }
     else:
         return {
@@ -227,7 +220,7 @@ def gen_proportionnal_size_legend(
                         "lower": {"value": None, "included": True},
                         "upper": {"value": None, "included": True},
                     },
-                    "shape": style_type_2_legend_shape.get(map_style_type, "circle"),
                 }
-            ]
+            ],
+            "shape": style_type_2_legend_shape.get(map_style_type, "circle"),
         }

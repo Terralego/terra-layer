@@ -6,7 +6,7 @@ from .utils import (
 )
 
 
-def gen_color_legend_steps(boundaries, colors, no_value_color, shape="square"):
+def gen_color_legend_steps(boundaries, colors, no_value_color):
     """
     Generate a discrete color legend.
     """
@@ -21,7 +21,6 @@ def gen_color_legend_steps(boundaries, colors, no_value_color, shape="square"):
                     "included": index + 1 == size,
                 },
             },
-            "shape": shape,
         }
         for index in range(size)
     ]
@@ -35,7 +34,6 @@ def gen_color_legend_steps(boundaries, colors, no_value_color, shape="square"):
                     "lower": {"value": None, "included": True},
                     "upper": {"value": None, "included": True},
                 },
-                "shape": shape,
             },
         )
 
@@ -95,6 +93,7 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
                 colors,
                 no_value,
             )[::-1],
+            "shape": style_type_2_legend_shape.get(map_style_type, "square"),
         }
     else:
         color = colors[0]
@@ -109,7 +108,7 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
                         "lower": {"value": None, "included": True},
                         "upper": {"value": None, "included": True},
                     },
-                    "shape": style_type_2_legend_shape.get(map_style_type, "square"),
                 }
-            ]
+            ],
+            "shape": style_type_2_legend_shape.get(map_style_type, "square"),
         }
