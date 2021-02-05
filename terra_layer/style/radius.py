@@ -15,7 +15,6 @@ from .utils import (
 
 
 def gen_proportionnal_radius_legend_items(
-    shape,
     min,
     max,
     max_value,
@@ -39,7 +38,6 @@ def gen_proportionnal_radius_legend_items(
             "diameter": math.sqrt(b / math.pi) * r,
             "size": math.sqrt(b / math.pi) * r,
             "boundaries": {"lower": {"value": b}},
-            "shape": shape,
             "color": color,
         }
         for b in boundaries
@@ -51,7 +49,6 @@ def gen_proportionnal_radius_legend_items(
                 "diameter": no_value_size * 2,
                 "size": no_value_size * 2,
                 "boundaries": {"lower": {"value": None}},
-                "shape": shape,
                 "color": no_value_color,
             }
         )
@@ -98,7 +95,6 @@ def gen_proportionnal_radius_legend(
 
         return {
             "items": gen_proportionnal_radius_legend_items(
-                style_type_2_legend_shape[map_style_type],
                 mm[0],
                 mm[1],
                 max_value,
@@ -106,7 +102,7 @@ def gen_proportionnal_radius_legend(
                 no_value_size,
                 no_value_color,
             ),
-            "stackedCircles": True,
+            "shape": "stackedCircle",
         }
     else:
         return {
@@ -119,7 +115,7 @@ def gen_proportionnal_radius_legend(
                         "lower": {"value": None, "included": True},
                         "upper": {"value": None, "included": True},
                     },
-                    "shape": style_type_2_legend_shape.get(map_style_type, "circle"),
                 }
-            ]
+            ],
+            "shape": "stackedCircle",
         }

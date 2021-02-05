@@ -185,7 +185,7 @@ def generate_style_from_wizard(geo_layer, config):
                         geo_layer, data_field, map_field, prop_config
                     )
                     # Add sort key
-                    # TODO find more intelligent way to do that
+                    # TODO find more smart way to do that
                     map_style["layout"] = {
                         f"{map_style_type}-sort-key": ["-", ["get", data_field]]
                     }

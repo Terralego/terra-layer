@@ -48,13 +48,9 @@ def gen_categorized_any_legend(
             default_value = value
             continue
 
-        items.append(
-            {legend_field: value, "label": name, "shape": shape, **other_properties}
-        )
+        items.append({legend_field: value, "label": name, **other_properties})
 
     if default_value is not None:
-        items.append(
-            {legend_field: value, "label": None, "shape": shape, **other_properties}
-        )
+        items.append({legend_field: value, "label": None, **other_properties})
 
-    return {"items": items}
+    return {"shape": shape, "items": items}
