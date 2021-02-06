@@ -197,32 +197,59 @@ class Layer(models.Model):
     class Meta:
         ordering = ("order", "name")
 
+    def generate_style_and_legend(self, style_config):
+        # Add uid to style if missing
+        if style_config and "uid" not in style_config:
+            style_config["uid"] = str(uuid.uuid4())
+
+        if style_config.get("type") == "wizard":
+            generated_map_style, legend_additions = generate_style_from_wizard(
+                self.source.get_layer(), style_config
+            )
+            style_config["map_style"] = generated_map_style
+            return legend_additions
+
+        return []
+
     def save(self, wizard_update=True, **kwargs):
         if wizard_update:
-            if self.main_style and "uid" not in self.main_style:
-                self.main_style["uid"] = str(uuid.uuid4())
+            # Mark not updated auto legends
+            [
+                legend.update({"not_updated": True})
+                for legend in self.legends
+                if legend.get("auto")
+            ]
+            legend_additions = self.generate_style_and_legend(self.main_style)
 
-            # Clean automatic legends
-            self.legends = [legend for legend in self.legends if not legend.get("auto")]
+            for extra_style in self.extra_styles.all():
+                legend_additions += self.generate_style_and_legend(
+                    extra_style.style_config
+                )
+                extra_style.save()
 
-        if self.main_style.get("type") == "wizard" and wizard_update:
-            generated_map_style, legend_additions = generate_style_from_wizard(
-                self.source.get_layer(), self.main_style
-            )
-            self.main_style["map_style"] = generated_map_style
-
-            # Add legend title
+            all_legends = list(self.legends)
             for legend_addition in legend_additions:
-                legend_addition["title"] = f"{self.name}"
-                legend_addition["auto"] = True
+                found = False
+                for legend in all_legends:
+                    if legend.get("uid") == legend_addition["uid"]:
+                        # Update found legend with addition
+                        legend.update(legend_addition)
+                        del legend["not_updated"]
+                        found = True
+                        break
+                if not found:
+                    # Add legend to legends
+                    legend_addition["title"] = f"{self.name}"
+                    legend_addition["auto"] = True
+                    self.legends.append(legend_addition)
 
-            self.legends += legend_additions
+            for legend in self.legends:
+                if legend.get("auto") and legend.get("not_updated"):
+                    del legend["auto"]
+                    del legend["uid"]
+                    del legend["not_updated"]
 
         super().save(**kwargs)
-
-        if wizard_update:
-            for extra_style in self.extra_styles.all():
-                extra_style.update_wizard()
 
         # Invalidate cache for layer group
         if self.group:
@@ -328,12 +355,6 @@ class CustomStyle(models.Model):
 
             self.layer.save(wizard_update=False)
             self.save()
-
-    def save(self, wizard_update=False, **kwargs):
-        if wizard_update:
-            self.update_wizard()
-
-        super().save(**kwargs)
 
 
 class FilterField(models.Model):
