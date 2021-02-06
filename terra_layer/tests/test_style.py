@@ -508,6 +508,152 @@ class StyleTestCase(TestCase):
             ],
         )
 
+    def test_update_wizard_for_extra_style_update(self):
+        self.layer.main_style = {
+            "type": "wizard",
+            "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
+            "style": {
+                "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
+            },
+        }
+        custom = CustomStyle.objects.create(
+            style_config={
+                "type": "wizard",
+                "map_style_type": "fill",
+                "uid": "f4bd8a48-3715-4ea0-ae02-b1d827bcb599",
+                "style": {
+                    "fill_color": {
+                        "type": "variable",
+                        "field": "a",
+                        "method": "jenks",
+                        "analysis": "graduated",
+                        "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                        "generate_legend": True,
+                    },
+                    "fill_outline_color": {
+                        "type": "variable",
+                        "field": "a",
+                        "analysis": "graduated",
+                        "method": "jenks",
+                        "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                        "generate_legend": True,
+                    },
+                },
+            },
+            source=self.layer.source,
+            layer=self.layer,
+        )
+
+        self.layer.save()
+
+        self.assertEqual(len(self.layer.legends), 2)
+
+        self.layer.legends[0]["title"] = "Another title"
+        self.layer.main_style["style"] = {
+            "fill_color": {
+                "type": "variable",
+                "field": "a",
+                "method": "jenks",
+                "analysis": "graduated",
+                "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                "generate_legend": True,
+            },
+        }
+
+        custom.style_config["style"] = {
+            "fill_color": {
+                "type": "variable",
+                "field": "a",
+                "method": "jenks",
+                "analysis": "graduated",
+                "values": ["#cc0000", "#bb0000", "#330000", "#000000"],
+                "generate_legend": True,
+            },
+        }
+        custom.save()
+
+        self.layer.legends.insert(
+            0,
+            {
+                "items": [
+                    {
+                        "color": "#aa0000",
+                        "boundaries": {
+                            "lower": {"value": None, "included": True},
+                            "upper": {"value": None, "included": True},
+                        },
+                    }
+                ],
+                "shape": "square",
+                "title": "Manual legend",
+            },
+        )
+
+        self.layer.save()
+
+        self.assertEqual(
+            self.layer.legends,
+            [
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                        }
+                    ],
+                    "shape": "square",
+                    "title": "Manual legend",
+                },
+                {
+                    "items": [
+                        {
+                            "color": "#cc0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                        }
+                    ],
+                    "shape": "square",
+                    "uid": "f4bd8a48-3715-4ea0-ae02-b1d827bcb599__fill_color",
+                    "title": "Another title",
+                    "auto": True,
+                },
+                {
+                    "items": [
+                        {
+                            "boundaries": {
+                                "lower": {"included": True, "value": None},
+                                "upper": {"included": True, "value": None},
+                            },
+                            "color": "#aa0000",
+                        }
+                    ],
+                    "shape": "square",
+                    "title": "my_layer_name",
+                },
+                {
+                    "items": [
+                        {
+                            "color": "#aa0000",
+                            "boundaries": {
+                                "lower": {"value": None, "included": True},
+                                "upper": {"value": None, "included": True},
+                            },
+                        }
+                    ],
+                    "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
+                    "title": "my_layer_name",
+                    "auto": True,
+                },
+            ],
+        )
+
     def test_update_wizard_only_for_good_style(self):
         self.layer.main_style = {
             "type": "wizard",
