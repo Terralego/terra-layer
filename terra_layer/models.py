@@ -199,6 +199,9 @@ class Layer(models.Model):
 
     def save(self, wizard_update=True, **kwargs):
         if wizard_update:
+            if self.main_style and "uid" not in self.main_style:
+                self.main_style["uid"] = str(uuid.uuid4())
+
             # Clean automatic legends
             self.legends = [legend for legend in self.legends if not legend.get("auto")]
 
@@ -213,10 +216,7 @@ class Layer(models.Model):
                 legend_addition["title"] = f"{self.name}"
                 legend_addition["auto"] = True
 
-            if not self.legends:
-                self.legends = legend_additions
-            else:
-                self.legends += legend_additions
+            self.legends += legend_additions
 
         super().save(**kwargs)
 
@@ -307,6 +307,10 @@ class CustomStyle(models.Model):
 
     def update_wizard(self):
         if self.style_config.get("type") == "wizard":
+
+            if self.style_config and "uid" not in self.style_config:
+                self.style_config["uid"] = str(uuid.uuid4())
+
             generated_map_style, legend_additions = generate_style_from_wizard(
                 self.source.get_layer(), self.style_config
             )

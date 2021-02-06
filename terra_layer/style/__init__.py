@@ -75,6 +75,7 @@ def generate_style_from_wizard(geo_layer, config):
 
     # fill, fill_extrusion, line, text, symbol, circle
     map_style_type = config["map_style_type"]
+    suid = config["uid"]
 
     map_style = {"type": get_layer_type(map_style_type)}
 
@@ -120,12 +121,12 @@ def generate_style_from_wizard(geo_layer, config):
                         geo_layer, data_field, map_field, prop_config
                     )
                     if prop_config.get("generate_legend"):
-                        # TODO reuse previous computations
-                        legends.append(
-                            gen_graduated_color_legend(
-                                geo_layer, data_field, map_style_type, prop_config
-                            )
+                        legend = gen_graduated_color_legend(
+                            geo_layer, data_field, map_style_type, prop_config
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        # TODO reuse previous computations
+                        legends.append(legend)
                 elif analysis == "categorized":
                     map_style.setdefault(paint_or_layout, {})[
                         map_style_prop
@@ -139,13 +140,13 @@ def generate_style_from_wizard(geo_layer, config):
                         del map_style.setdefault(paint_or_layout, {})[map_style_prop]
 
                     if prop_config.get("generate_legend"):
-                        legends.append(
-                            gen_categorized_any_legend(
-                                map_style_type,
-                                prop_config,
-                                "color",
-                            )
+                        legend = gen_categorized_any_legend(
+                            map_style_type,
+                            prop_config,
+                            "color",
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        legends.append(legend)
                 else:
                     raise ValueError(f'Unhandled analysis type "{analysis}"')
 
@@ -170,14 +171,15 @@ def generate_style_from_wizard(geo_layer, config):
                             .get(f"{map_style_type}_color", {})
                             .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
                         )
-                        legends.append(
-                            gen_categorized_any_legend(
-                                map_style_type,
-                                prop_config,
-                                "size",
-                                other_properties={"color": color},
-                            )
+                        legend = gen_categorized_any_legend(
+                            map_style_type,
+                            prop_config,
+                            "size",
+                            other_properties={"color": color},
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        legends.append(legend)
+
                 elif analysis == "proportionnal":
                     map_style.setdefault(paint_or_layout, {})[
                         map_style_prop
@@ -201,16 +203,16 @@ def generate_style_from_wizard(geo_layer, config):
                             .get(f"{map_style_type}_color", {})
                             .get("no_value")
                         )
-                        legends.append(
-                            gen_proportionnal_radius_legend(
-                                geo_layer,
-                                data_field,
-                                map_style_type,
-                                prop_config,
-                                color,
-                                no_value_color,
-                            )
+                        legend = gen_proportionnal_radius_legend(
+                            geo_layer,
+                            data_field,
+                            map_style_type,
+                            prop_config,
+                            color,
+                            no_value_color,
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        legends.append(legend)
                 else:
                     raise ValueError(f'Unhandled analysis type "{analysis}"')
 
@@ -233,16 +235,17 @@ def generate_style_from_wizard(geo_layer, config):
                             .get(f"{map_style_type}_color", {})
                             .get("no_value")
                         )
-                        legends.append(
-                            gen_graduated_size_legend(
-                                geo_layer,
-                                data_field,
-                                map_style_type,
-                                prop_config,
-                                color,
-                                no_value_color,
-                            )
+                        legend = gen_graduated_size_legend(
+                            geo_layer,
+                            data_field,
+                            map_style_type,
+                            prop_config,
+                            color,
+                            no_value_color,
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        legends.append(legend)
+
                 elif analysis == "categorized":
                     generated_style = gen_categorized_any_style(
                         geo_layer, data_field, prop_config, 0
@@ -258,14 +261,15 @@ def generate_style_from_wizard(geo_layer, config):
                             .get(f"{map_style_type}_color", {})
                             .get("value", DEFAULT_NO_VALUE_FILL_COLOR)
                         )
-                        legends.append(
-                            gen_categorized_any_legend(
-                                map_style_type,
-                                prop_config,
-                                "size",
-                                other_properties={"color": color},
-                            )
+                        legend = gen_categorized_any_legend(
+                            map_style_type,
+                            prop_config,
+                            "size",
+                            other_properties={"color": color},
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        legends.append(legend)
+
                 elif analysis == "proportionnal":
                     """map_style["layout"] = {
                         f"{map_style_type}-sort-key": ["-", ["get", data_field]]
@@ -287,16 +291,16 @@ def generate_style_from_wizard(geo_layer, config):
                             .get(f"{map_style_type}_color", {})
                             .get("no_value")
                         )
-                        legends.append(
-                            gen_proportionnal_size_legend(
-                                geo_layer,
-                                data_field,
-                                map_style_type,
-                                prop_config,
-                                color,
-                                no_value_color,
-                            )
+                        legend = gen_proportionnal_size_legend(
+                            geo_layer,
+                            data_field,
+                            map_style_type,
+                            prop_config,
+                            color,
+                            no_value_color,
                         )
+                        legend["uid"] = f"{suid}__{map_field}"
+                        legends.append(legend)
                 else:
                     raise ValueError(f'Unknow analysis type "{analysis}"')
 

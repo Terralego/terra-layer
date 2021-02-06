@@ -150,6 +150,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -170,6 +171,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -211,6 +213,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -248,6 +251,7 @@ class StyleTestCase(TestCase):
                         }
                     ],
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "title": "my_layer_name",
                 }
             ],
@@ -257,6 +261,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -294,6 +299,7 @@ class StyleTestCase(TestCase):
                         }
                     ],
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "title": "my_layer_name",
                 }
             ],
@@ -303,6 +309,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -339,6 +346,7 @@ class StyleTestCase(TestCase):
                         }
                     ],
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "title": "my_layer_name",
                 }
             ],
@@ -348,6 +356,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -376,6 +385,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#aa0000",
@@ -394,6 +404,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -421,6 +432,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#aa0000",
@@ -440,6 +452,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_outline_color": {"type": "fixed", "value": "#ffffff"},
             },
@@ -448,6 +461,7 @@ class StyleTestCase(TestCase):
             style_config={
                 "type": "wizard",
                 "map_style_type": "fill",
+                "uid": "f4bd8a48-3715-4ea0-ae02-b1d827bcb599",
                 "style": {
                     "fill_color": {
                         "type": "variable",
@@ -477,6 +491,9 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [
                 {
+                    "uid": "f4bd8a48-3715-4ea0-ae02-b1d827bcb599__fill_color",
+                    "title": "my_layer_name",
+                    "shape": "square",
                     "auto": True,
                     "items": [
                         {
@@ -487,8 +504,6 @@ class StyleTestCase(TestCase):
                             },
                         }
                     ],
-                    "shape": "square",
-                    "title": "my_layer_name",
                 }
             ],
         )
@@ -497,6 +512,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "fill",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -526,6 +542,7 @@ class StyleTestCase(TestCase):
             [
                 {
                     "auto": True,
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#aa0000",
@@ -547,6 +564,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -561,6 +579,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "circle",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "circle_radius": {
                     "type": "variable",
@@ -575,6 +594,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "line",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -592,6 +612,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -607,6 +628,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "line",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -627,6 +649,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -650,6 +673,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -668,6 +692,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "line",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -690,6 +715,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -737,6 +763,7 @@ class StyleTestCase(TestCase):
                     "title": "my_layer_name",
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -758,6 +785,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -798,6 +826,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -841,6 +870,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "line",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -875,6 +905,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "line",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
                             "color": "#000000",
@@ -929,25 +960,9 @@ class StyleTestCase(TestCase):
         self._feature_factory(geo_layer, a=None),
 
         self.layer.main_style = {
-            "type": "variable",
-            "variable_field": "fill_color",
-            "field": "a",
-            "symbology": "graduated",
-            "boundaries": [0, 10, 20, 30, 40],
-            "style": {
-                "fill_color": ["#aa0000", "#770000", "#330000", "#000000"],
-                "fill_opacity": 0.4,
-                "fill_outline_color": "#fffffa",
-            },
-            "no_value_style": {
-                "fill_color": "#000000",
-                "fill_outline_color": "#ffffff",
-            },
-        }
-
-        self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -1010,6 +1025,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -1060,6 +1076,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -1100,6 +1117,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -1143,6 +1161,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -1181,6 +1200,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#770000",
@@ -1210,6 +1230,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -1249,6 +1270,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#770000",
@@ -1274,6 +1296,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "circle",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "circle_radius": {
                     "type": "variable",
@@ -1308,6 +1331,7 @@ class StyleTestCase(TestCase):
                     "title": "my_layer_name",
                     "auto": True,
                     "shape": "stackedCircle",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
                             "diameter": 20,
@@ -1334,6 +1358,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "circle",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "circle_radius": {
                     "type": "variable",
@@ -1378,6 +1403,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "stackedCircle",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
                             "diameter": 200.0,
@@ -1431,6 +1457,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "circle",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "circle_radius": {
                     "type": "variable",
@@ -1524,6 +1551,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "stackedCircle",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
                             "diameter": 200.0,
@@ -1581,6 +1609,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "line",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -1600,6 +1629,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "line",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
                             "size": 200.0,
@@ -1630,6 +1660,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "line",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -1654,6 +1685,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "line",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
                             "size": 200.0,
@@ -1688,6 +1720,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "type": "wizard",
             "map_style_type": "line",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -1707,6 +1740,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "line",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
                             "diameter": None,
@@ -1733,6 +1767,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -1774,6 +1809,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -1837,6 +1873,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -1879,6 +1916,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -1947,6 +1985,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -2016,6 +2055,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -2089,6 +2129,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_outline_color": {
                     "type": "variable",
@@ -2129,6 +2170,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_outline_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -2193,6 +2235,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -2248,6 +2291,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#CC0000",
@@ -2274,6 +2318,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -2343,6 +2388,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#000000",
@@ -2416,6 +2462,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "line",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -2462,6 +2509,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "line",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
                             "color": "#ffffff",
@@ -2532,6 +2580,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -2557,6 +2606,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [],
                     "title": "my_layer_name",
                 }
@@ -2568,6 +2618,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -2618,6 +2669,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {"color": "#fc34bc", "label": "Alaska"},
                         {"color": "#2334bc", "label": "Cameroun"},
@@ -2635,6 +2687,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "fill",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "fill_color": {
                     "type": "variable",
@@ -2694,6 +2747,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "square",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
                     "items": [
                         {
                             "color": "#fc34bc",
@@ -2716,6 +2770,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "circle",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "circle_radius": {
                     "type": "variable",
@@ -2777,6 +2832,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "circle",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
                             "size": 10,
@@ -2820,6 +2876,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "line",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "line_width": {
                     "type": "variable",
@@ -2880,6 +2937,7 @@ class StyleTestCase(TestCase):
                 {
                     "auto": True,
                     "shape": "line",
+                    "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
                             "size": 10,
@@ -2922,6 +2980,7 @@ class StyleTestCase(TestCase):
             "min_zoom": 4,
             "max_zoom": 24,
             "weight": 50,
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "icon-image": {
                     "type": "fixed",
@@ -2949,6 +3008,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "icon",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "icon_image": {
                     "type": "fixed",
@@ -2980,6 +3040,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "text",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "text-size": {
                     "type": "fixed",
@@ -3033,6 +3094,7 @@ class StyleTestCase(TestCase):
         self.layer.main_style = {
             "map_style_type": "icon",
             "type": "wizard",
+            "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599",
             "style": {
                 "icon_image": {
                     "type": "fixed",
