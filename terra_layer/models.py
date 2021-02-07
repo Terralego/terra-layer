@@ -211,8 +211,9 @@ class Layer(models.Model):
 
         return []
 
-    def save(self, wizard_update=True, **kwargs):
+    def save(self, wizard_update=True, preserve_legend=False, **kwargs):
         if wizard_update:
+            style_by_uid = {}
             # Mark not updated auto legends
             [
                 legend.update({"not_updated": True})
@@ -220,11 +221,17 @@ class Layer(models.Model):
                 if legend.get("auto")
             ]
             legend_additions = self.generate_style_and_legend(self.main_style)
+            if self.main_style:
+                style_by_uid[self.main_style["uid"]] = self.main_style
 
             for extra_style in self.extra_styles.all():
                 legend_additions += self.generate_style_and_legend(
                     extra_style.style_config
                 )
+                if extra_style.style_config:
+                    style_by_uid[
+                        extra_style.style_config["uid"]
+                    ] = extra_style.style_config
                 extra_style.save()
 
             all_legends = list(self.legends)
@@ -243,11 +250,39 @@ class Layer(models.Model):
                     legend_addition["auto"] = True
                     self.legends.append(legend_addition)
 
+            # Update legend auto status and clean unused legends
+            kept_legend = []
             for legend in self.legends:
+                # Do we remove that legend ?
                 if legend.get("auto") and legend.get("not_updated"):
+                    if not preserve_legend:
+                        continue
+
+                    # Here we try to keep deactivated legends
+                    style_uid, style_prop = legend["uid"].split("__")
+
+                    if style_uid not in style_by_uid:
+                        # Style is dropped, we remove that legend
+                        continue
+
+                    prop_config = style_by_uid[style_uid]["style"].get(style_prop)
+
+                    if not prop_config:
+                        # Style prop is dropped, we remove that legend
+                        continue
+
+                    if prop_config["type"] in ["fixed", "none"]:
+                        # Legend not needed anymore for this field
+                        continue
+
+                    # Here We've just need to deactivate the legend
                     del legend["auto"]
-                    del legend["uid"]
+                    legend["uid"] = str(uuid.uuid4())
                     del legend["not_updated"]
+
+                kept_legend.append(legend)
+
+            self.legends = kept_legend
 
         super().save(**kwargs)
 
@@ -331,30 +366,6 @@ class CustomStyle(models.Model):
         return md5(
             f"{self.source.slug}-{self.source.pk}-{self.pk}".encode("utf-8")
         ).hexdigest()
-
-    def update_wizard(self):
-        if self.style_config.get("type") == "wizard":
-
-            if self.style_config and "uid" not in self.style_config:
-                self.style_config["uid"] = str(uuid.uuid4())
-
-            generated_map_style, legend_additions = generate_style_from_wizard(
-                self.source.get_layer(), self.style_config
-            )
-            self.style_config["map_style"] = generated_map_style
-
-            # Add legend title
-            for legend_addition in legend_additions:
-                legend_addition["title"] = f"{self.layer.name}"
-                legend_addition["auto"] = True
-
-            if not self.layer.legends:
-                self.layer.legends = legend_additions
-            else:
-                self.layer.legends += legend_additions
-
-            self.layer.save(wizard_update=False)
-            self.save()
 
 
 class FilterField(models.Model):

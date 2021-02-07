@@ -626,19 +626,6 @@ class StyleTestCase(TestCase):
                 {
                     "items": [
                         {
-                            "boundaries": {
-                                "lower": {"included": True, "value": None},
-                                "upper": {"included": True, "value": None},
-                            },
-                            "strokeColor": "#aa0000",
-                        }
-                    ],
-                    "shape": "square",
-                    "title": "my_layer_name",
-                },
-                {
-                    "items": [
-                        {
                             "color": "#aa0000",
                             "boundaries": {
                                 "lower": {"value": None, "included": True},
@@ -3259,3 +3246,77 @@ class StyleTestCase(TestCase):
             self.layer.legends,
             [],
         )
+
+    def test_clean_legend(self):
+        geo_layer = self.source.get_layer()
+        random.seed(33)
+        for _ in range(0, 1000):
+            self._feature_factory(geo_layer, a=random.gauss(0, 5)),
+
+        self.layer.main_style = {
+            "map_style_type": "fill",
+            "type": "wizard",
+            "uid": "bbbf4bd8-3715-4ea0-ae02-b1d827bcb599",
+            "style": {
+                "fill_color": {
+                    "type": "variable",
+                    "field": "a",
+                    "analysis": "graduated",
+                    "method": "jenks",
+                    "values": ["#aa0000", "#770000", "#330000", "#000000"],
+                    "no_value": "#000000",
+                    "generate_legend": True,
+                },
+                "fill_outline_color": {"type": "fixed", "value": "#00ffff"},
+            },
+        }
+
+        self.layer.save()
+
+        self.assertEqual(len(self.layer.legends), 1)
+        self.assertEqual(self.layer.legends[0]["auto"], True)
+        self.assertEqual(
+            self.layer.legends[0]["uid"],
+            "bbbf4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
+        )
+
+        # Legend generation is off. Should keep the legend.
+        self.layer.main_style["style"]["fill_color"]["generate_legend"] = False
+
+        self.layer.save(preserve_legend=True)
+
+        self.assertEqual(len(self.layer.legends), 1)
+        self.assertEqual(self.layer.legends[0].get("auto", False), False)
+        self.assertNotEqual(
+            self.layer.legends[0].get("uid"),
+            "bbbf4bd8-3715-4ea0-ae02-b1d827bcb599__fill_color",
+        )
+
+        # Add back the generated legend but previous one should be kept
+        self.layer.main_style["style"]["fill_color"]["generate_legend"] = True
+
+        self.layer.save(preserve_legend=True)
+
+        self.assertEqual(len(self.layer.legends), 2)
+
+        # Legend type is not variable anymore. Should drop the legend
+        self.layer.main_style["style"]["fill_color"]["type"] = "none"
+
+        self.layer.save(preserve_legend=True)
+
+        self.assertEqual(len(self.layer.legends), 1)
+
+        # Add back generated legend
+        self.layer.main_style["style"]["fill_color"]["generate_legend"] = True
+        self.layer.main_style["style"]["fill_color"]["type"] = "variable"
+
+        self.layer.save(preserve_legend=True)
+
+        self.assertEqual(len(self.layer.legends), 2)
+
+        # Know we fully drop the style. Should drop the generated legend
+        del self.layer.main_style["style"]["fill_color"]
+
+        self.layer.save(preserve_legend=True)
+
+        self.assertEqual(len(self.layer.legends), 1)
