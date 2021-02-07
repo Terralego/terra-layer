@@ -35,7 +35,6 @@ def gen_proportionnal_radius_legend_items(
 
     ret = [
         {
-            "diameter": math.sqrt(b / math.pi) * r,
             "size": math.sqrt(b / math.pi) * r,
             "boundaries": {"lower": {"value": b}},
             "color": color,
@@ -46,7 +45,6 @@ def gen_proportionnal_radius_legend_items(
     if no_value_size:
         ret.append(
             {
-                "diameter": no_value_size * 2,
                 "size": no_value_size * 2,
                 "boundaries": {"lower": {"value": None}},
                 "color": no_value_color,
@@ -108,7 +106,6 @@ def gen_proportionnal_radius_legend(
         return {
             "items": [
                 {
-                    "diameter": no_value_size,
                     "size": no_value_size,
                     "color": no_value_color or color,
                     "boundaries": {

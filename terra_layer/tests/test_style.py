@@ -1480,7 +1480,6 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
-                            "diameter": 20,
                             "size": 20,
                             "color": "#0000cc",
                             "boundaries": {
@@ -1552,37 +1551,31 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
-                            "diameter": 200.0,
                             "size": 200.0,
                             "boundaries": {"lower": {"value": 130}},
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 175.41160386140584,
                             "size": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100}},
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 124.03473458920845,
                             "size": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50}},
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 87.70580193070292,
                             "size": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25.0}},
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 55.47001962252292,
                             "size": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10}},
                             "color": "#0000cc",
                         },
                         {
-                            "diameter": 39.22322702763681,
                             "size": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5}},
                             "color": "#0000cc",
@@ -1700,43 +1693,36 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__circle_radius",
                     "items": [
                         {
-                            "diameter": 200.0,
                             "size": 200.0,
                             "boundaries": {"lower": {"value": 130}},
                             "color": "#0000ca",
                         },
                         {
-                            "diameter": 175.41160386140584,
                             "size": 175.41160386140584,
                             "boundaries": {"lower": {"value": 100}},
                             "color": "#0000ca",
                         },
                         {
-                            "diameter": 124.03473458920845,
                             "size": 124.03473458920845,
                             "boundaries": {"lower": {"value": 50}},
                             "color": "#0000ca",
                         },
                         {
-                            "diameter": 87.70580193070292,
                             "size": 87.70580193070292,
                             "boundaries": {"lower": {"value": 25}},
                             "color": "#0000ca",
                         },
                         {
-                            "diameter": 55.47001962252292,
                             "size": 55.47001962252292,
                             "boundaries": {"lower": {"value": 10}},
                             "color": "#0000ca",
                         },
                         {
-                            "diameter": 39.22322702763681,
                             "size": 39.22322702763681,
                             "boundaries": {"lower": {"value": 5}},
                             "color": "#0000ca",
                         },
                         {
-                            "diameter": 60,
                             "size": 60,
                             "boundaries": {"lower": {"value": None}},
                             "color": "#000000",
@@ -1889,7 +1875,6 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
-                            "diameter": None,
                             "strokeWidth": None,
                             "color": "#0000cc",
                             "boundaries": {
