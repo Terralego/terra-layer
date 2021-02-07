@@ -630,7 +630,7 @@ class StyleTestCase(TestCase):
                                 "lower": {"included": True, "value": None},
                                 "upper": {"included": True, "value": None},
                             },
-                            "color": "#aa0000",
+                            "strokeColor": "#aa0000",
                         }
                     ],
                     "shape": "square",
@@ -1055,7 +1055,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#000000",
-                            "size": 40,
+                            "strokeWidth": 40,
                             "boundaries": {
                                 "lower": {"value": 30, "included": True},
                                 "upper": {"value": 40, "included": True},
@@ -1063,7 +1063,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#000000",
-                            "size": 30,
+                            "strokeWidth": 30,
                             "boundaries": {
                                 "lower": {"value": 20, "included": True},
                                 "upper": {"value": 30, "included": False},
@@ -1071,7 +1071,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#000000",
-                            "size": 20,
+                            "strokeWidth": 20,
                             "boundaries": {
                                 "lower": {"value": 10, "included": True},
                                 "upper": {"value": 20, "included": False},
@@ -1079,7 +1079,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#000000",
-                            "size": 10,
+                            "strokeWidth": 10,
                             "boundaries": {
                                 "lower": {"value": 0, "included": True},
                                 "upper": {"value": 10, "included": False},
@@ -1087,7 +1087,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#000000",
-                            "size": 5,
+                            "strokeWidth": 5,
                             "boundaries": {
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
@@ -1778,17 +1778,17 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
-                            "size": 200.0,
+                            "strokeWidth": 200.0,
                             "boundaries": {"lower": {"value": 110}},
                             "color": "#0000cc",
                         },
                         {
-                            "size": 99.0909090909091,
+                            "strokeWidth": 99.0909090909091,
                             "boundaries": {"lower": {"value": 54.5}},
                             "color": "#0000cc",
                         },
                         {
-                            "size": 1.8181818181818181,
+                            "strokeWidth": 1.8181818181818181,
                             "boundaries": {"lower": {"value": 1}},
                             "color": "#0000cc",
                         },
@@ -1834,22 +1834,22 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
-                            "size": 200.0,
+                            "strokeWidth": 200.0,
                             "boundaries": {"lower": {"value": 110}},
                             "color": "#0000cc",
                         },
                         {
-                            "size": 99.0909090909091,
+                            "strokeWidth": 99.0909090909091,
                             "boundaries": {"lower": {"value": 54.5}},
                             "color": "#0000cc",
                         },
                         {
-                            "size": 1.8181818181818181,
+                            "strokeWidth": 1.8181818181818181,
                             "boundaries": {"lower": {"value": 1}},
                             "color": "#0000cc",
                         },
                         {
-                            "size": 10,
+                            "strokeWidth": 10,
                             "boundaries": {"lower": {"value": None}},
                             "color": "#101010",
                         },
@@ -1890,7 +1890,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "diameter": None,
-                            "size": None,
+                            "strokeWidth": None,
                             "color": "#0000cc",
                             "boundaries": {
                                 "lower": {"value": None, "included": True},
@@ -2319,7 +2319,7 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__fill_outline_color",
                     "items": [
                         {
-                            "color": "#000000",
+                            "strokeColor": "#000000",
                             "boundaries": {
                                 "lower": {"value": 5.727211814984125, "included": True},
                                 "upper": {
@@ -2329,7 +2329,7 @@ class StyleTestCase(TestCase):
                             },
                         },
                         {
-                            "color": "#330000",
+                            "strokeColor": "#330000",
                             "boundaries": {
                                 "lower": {
                                     "value": 0.5740581144424383,
@@ -2342,7 +2342,7 @@ class StyleTestCase(TestCase):
                             },
                         },
                         {
-                            "color": "#770000",
+                            "strokeColor": "#770000",
                             "boundaries": {
                                 "lower": {
                                     "value": -4.292341999003442,
@@ -2355,7 +2355,7 @@ class StyleTestCase(TestCase):
                             },
                         },
                         {
-                            "color": "#aa0000",
+                            "strokeColor": "#aa0000",
                             "boundaries": {
                                 "lower": {
                                     "value": -15.554792351427212,
@@ -2659,7 +2659,7 @@ class StyleTestCase(TestCase):
                     "items": [
                         {
                             "color": "#ffffff",
-                            "size": 15,
+                            "strokeWidth": 15,
                             "boundaries": {
                                 "lower": {"value": 5.727211814984125, "included": True},
                                 "upper": {"value": 15.25702131719717, "included": True},
@@ -2667,7 +2667,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#ffffff",
-                            "size": 10,
+                            "strokeWidth": 10,
                             "boundaries": {
                                 "lower": {
                                     "value": 0.5740581144424383,
@@ -2681,7 +2681,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#ffffff",
-                            "size": 5,
+                            "strokeWidth": 5,
                             "boundaries": {
                                 "lower": {
                                     "value": -4.292341999003442,
@@ -2695,7 +2695,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#ffffff",
-                            "size": 3,
+                            "strokeWidth": 3,
                             "boundaries": {
                                 "lower": {
                                     "value": -15.554792351427212,
@@ -2709,7 +2709,7 @@ class StyleTestCase(TestCase):
                         },
                         {
                             "color": "#ffffff",
-                            "size": 7,
+                            "strokeWidth": 7,
                             "boundaries": {
                                 "lower": {"value": None, "included": True},
                                 "upper": {"value": None, "included": True},
@@ -3086,32 +3086,32 @@ class StyleTestCase(TestCase):
                     "uid": "a48f4bd8-3715-4ea0-ae02-b1d827bcb599__line_width",
                     "items": [
                         {
-                            "size": 10,
+                            "strokeWidth": 10,
                             "label": "Alaska",
                             "color": "#00ffff",
                         },
                         {
-                            "size": 20,
+                            "strokeWidth": 20,
                             "label": "Cameroun",
                             "color": "#00ffff",
                         },
                         {
-                            "size": 30,
+                            "strokeWidth": 30,
                             "label": "France",
                             "color": "#00ffff",
                         },
                         {
-                            "size": 40,
+                            "strokeWidth": 40,
                             "label": "Canada",
                             "color": "#00ffff",
                         },
                         {
-                            "size": 50,
+                            "strokeWidth": 50,
                             "label": "Groland",
                             "color": "#00ffff",
                         },
-                        {"size": 2, "label": "", "color": "#00ffff"},
-                        {"size": 0, "label": None, "color": "#00ffff"},
+                        {"strokeWidth": 2, "label": "", "color": "#00ffff"},
+                        {"strokeWidth": 0, "label": None, "color": "#00ffff"},
                     ],
                     "title": "my_layer_name",
                 }

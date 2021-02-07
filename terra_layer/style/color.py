@@ -6,14 +6,14 @@ from .utils import (
 )
 
 
-def gen_color_legend_steps(boundaries, colors, no_value_color):
+def gen_color_legend_steps(boundaries, colors, no_value_color, legend_field="color"):
     """
     Generate a discrete color legend.
     """
     size = len(boundaries) - 1
     ret = [
         {
-            "color": colors[index],
+            legend_field: colors[index],
             "boundaries": {
                 "lower": {"value": boundaries[index], "included": True},
                 "upper": {
@@ -29,7 +29,7 @@ def gen_color_legend_steps(boundaries, colors, no_value_color):
         ret.insert(
             0,
             {
-                "color": no_value_color,
+                legend_field: no_value_color,
                 "boundaries": {
                     "lower": {"value": None, "included": True},
                     "upper": {"value": None, "included": True},
@@ -73,7 +73,9 @@ def gen_graduated_color_style(geo_layer, data_field, map_field, prop_config):
         return no_value or colors[0]
 
 
-def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_config):
+def gen_graduated_color_legend(
+    geo_layer, data_field, map_style_type, prop_config, legend_field
+):
     colors = prop_config["values"]
     no_value = prop_config.get("no_value")
 
@@ -88,11 +90,9 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
     # Use boundaries to make style
     if boundaries is not None:
         return {
-            "items": gen_color_legend_steps(
-                boundaries,
-                colors,
-                no_value,
-            )[::-1],
+            "items": gen_color_legend_steps(boundaries, colors, no_value, legend_field)[
+                ::-1
+            ],
             "shape": style_type_2_legend_shape.get(map_style_type, "square"),
         }
     else:
@@ -103,7 +103,7 @@ def gen_graduated_color_legend(geo_layer, data_field, map_style_type, prop_confi
         return {
             "items": [
                 {
-                    "color": color,
+                    legend_field: color,
                     "boundaries": {
                         "lower": {"value": None, "included": True},
                         "upper": {"value": None, "included": True},

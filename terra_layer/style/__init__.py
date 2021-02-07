@@ -2,9 +2,7 @@ from terra_layer.settings import (
     DEFAULT_NO_VALUE_FILL_COLOR,
 )
 
-from .utils import (
-    get_style_no_value_condition,
-)
+from .utils import get_style_no_value_condition, style_type_2_legend_property
 
 from .all import (
     gen_categorized_any_legend,
@@ -122,7 +120,11 @@ def generate_style_from_wizard(geo_layer, config):
                     )
                     if prop_config.get("generate_legend"):
                         legend = gen_graduated_color_legend(
-                            geo_layer, data_field, map_style_type, prop_config
+                            geo_layer,
+                            data_field,
+                            map_style_type,
+                            prop_config,
+                            style_type_2_legend_property(map_field),
                         )
                         legend["uid"] = f"{suid}__{map_field}"
                         # TODO reuse previous computations
@@ -143,7 +145,7 @@ def generate_style_from_wizard(geo_layer, config):
                         legend = gen_categorized_any_legend(
                             map_style_type,
                             prop_config,
-                            "color",
+                            style_type_2_legend_property(map_field),
                         )
                         legend["uid"] = f"{suid}__{map_field}"
                         legends.append(legend)
@@ -174,7 +176,7 @@ def generate_style_from_wizard(geo_layer, config):
                         legend = gen_categorized_any_legend(
                             map_style_type,
                             prop_config,
-                            "size",
+                            style_type_2_legend_property(map_field),
                             other_properties={"color": color},
                         )
                         legend["uid"] = f"{suid}__{map_field}"
@@ -242,6 +244,7 @@ def generate_style_from_wizard(geo_layer, config):
                             prop_config,
                             color,
                             no_value_color,
+                            style_type_2_legend_property(map_field),
                         )
                         legend["uid"] = f"{suid}__{map_field}"
                         legends.append(legend)
@@ -264,7 +267,7 @@ def generate_style_from_wizard(geo_layer, config):
                         legend = gen_categorized_any_legend(
                             map_style_type,
                             prop_config,
-                            "size",
+                            style_type_2_legend_property(map_field),
                             other_properties={"color": color},
                         )
                         legend["uid"] = f"{suid}__{map_field}"
@@ -298,6 +301,7 @@ def generate_style_from_wizard(geo_layer, config):
                             prop_config,
                             color,
                             no_value_color,
+                            style_type_2_legend_property(map_field),
                         )
                         legend["uid"] = f"{suid}__{map_field}"
                         legends.append(legend)

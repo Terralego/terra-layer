@@ -14,7 +14,9 @@ from .utils import (
 )
 
 
-def gen_size_legend_steps(boundaries, values, color, no_value, no_value_color):
+def gen_size_legend_steps(
+    boundaries, values, color, no_value, no_value_color, legend_field="size"
+):
     """
     Generate a discrete size legend.
     """
@@ -22,7 +24,7 @@ def gen_size_legend_steps(boundaries, values, color, no_value, no_value_color):
     ret = [
         {
             "color": color,
-            "size": values[index],
+            legend_field: values[index],
             "boundaries": {
                 "lower": {"value": boundaries[index], "included": True},
                 "upper": {
@@ -39,7 +41,7 @@ def gen_size_legend_steps(boundaries, values, color, no_value, no_value_color):
             0,
             {
                 "color": no_value_color or color,
-                "size": no_value,
+                legend_field: no_value,
                 "boundaries": {
                     "lower": {"value": None, "included": True},
                     "upper": {"value": None, "included": True},
@@ -51,12 +53,7 @@ def gen_size_legend_steps(boundaries, values, color, no_value, no_value_color):
 
 
 def gen_proportionnal_size_legend_items(
-    min,
-    max,
-    max_value,
-    color,
-    no_value_size,
-    no_value_color,
+    min, max, max_value, color, no_value_size, no_value_color, legend_field="size"
 ):
     """
     Generate a proportionnal size legend
@@ -69,7 +66,7 @@ def gen_proportionnal_size_legend_items(
 
     ret = [
         {
-            "size": (b / max) * max_value,
+            legend_field: (b / max) * max_value,
             "boundaries": {"lower": {"value": b}},
             "color": color,
         }
@@ -79,7 +76,7 @@ def gen_proportionnal_size_legend_items(
     if no_value_size:
         ret.append(
             {
-                "size": no_value_size,
+                legend_field: no_value_size,
                 "boundaries": {"lower": {"value": None}},
                 "color": no_value_color,
             }
@@ -122,7 +119,13 @@ def gen_graduated_size_style(geo_layer, data_field, map_field, prop_config):
 
 
 def gen_graduated_size_legend(
-    geo_layer, data_field, map_style_type, prop_config, color, no_value_color
+    geo_layer,
+    data_field,
+    map_style_type,
+    prop_config,
+    color,
+    no_value_color,
+    legend_field,
 ):
     values = prop_config["values"]
     no_value = prop_config.get("no_value")
@@ -139,11 +142,7 @@ def gen_graduated_size_legend(
     if boundaries is not None:
         return {
             "items": gen_size_legend_steps(
-                boundaries,
-                values,
-                color,
-                no_value,
-                no_value_color,
+                boundaries, values, color, no_value, no_value_color, legend_field
             )[::-1],
             "shape": style_type_2_legend_shape.get(map_style_type, "square"),
         }
@@ -187,7 +186,13 @@ def gen_proportionnal_size_style(geo_layer, data_field, map_field, prop_config):
 
 
 def gen_proportionnal_size_legend(
-    geo_layer, data_field, map_style_type, prop_config, color, no_value_color
+    geo_layer,
+    data_field,
+    map_style_type,
+    prop_config,
+    color,
+    no_value_color,
+    legend_field,
 ):
     no_value_size = prop_config.get("no_value")
     max_value = prop_config["max_value"]
@@ -206,6 +211,7 @@ def gen_proportionnal_size_legend(
                 color,
                 no_value_size,
                 no_value_color,
+                legend_field,
             ),
             "shape": style_type_2_legend_shape.get(map_style_type, "circle"),
         }
@@ -214,7 +220,7 @@ def gen_proportionnal_size_legend(
             "items": [
                 {
                     "diameter": no_value_size,
-                    "size": no_value_size,
+                    legend_field: no_value_size,
                     "color": no_value_color or color,
                     "boundaries": {
                         "lower": {"value": None, "included": True},

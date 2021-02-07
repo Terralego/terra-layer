@@ -11,6 +11,20 @@ style_type_2_legend_shape = {
     "line": "line",
 }
 
+stroke_color_props = ["line_color", "stroke_color", "outline_color"]
+stroke_width_props = ["line_width", "stroke_width"]
+shape_size_props = ["size", "radius"]
+
+
+def style_type_2_legend_property(style_type):
+    if any([s in style_type for s in stroke_color_props]):
+        return "strokeColor"
+    if any([s in style_type for s in stroke_width_props]):
+        return "strokeWidth"
+    if any([s in style_type for s in shape_size_props]):
+        return "size"
+    return "color"
+
 
 def _flatten(levels):
     """
