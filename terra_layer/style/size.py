@@ -219,7 +219,6 @@ def gen_proportionnal_size_legend(
         return {
             "items": [
                 {
-                    "diameter": no_value_size,
                     legend_field: no_value_size,
                     "color": no_value_color or color,
                     "boundaries": {
