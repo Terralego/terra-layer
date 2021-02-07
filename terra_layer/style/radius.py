@@ -10,7 +10,6 @@ from .utils import (
     boundaries_round,
     circle_boundaries_candidate,
     circle_boundaries_filter_values,
-    style_type_2_legend_shape,
 )
 
 
