@@ -1,4 +1,14 @@
 
+0.7.7 / 2021-02-08
+==================
+
+  * Better legend cleanup
+  * Remove diameter in legend
+  * Use correct legend field on stroke
+  * Update legend instead of dropping and recreate them
+  * Add uid to style to prepare legend link
+  * Update legend code generation
+
 0.7.6 / 2021-01-26
 ==================
 
