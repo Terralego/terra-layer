@@ -39,9 +39,10 @@ def field_2_variation_type(field):
         or "height" in field
         or "opacity" in field
         or "intensity" in field
+        or "size" in field
     ):
         return "value"
-    if "radius" in field or "size" in field:
+    if "radius" in field:
         return "radius"
 
 
