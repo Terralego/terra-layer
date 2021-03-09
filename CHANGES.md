@@ -1,4 +1,9 @@
 
+0.7.9 / 2021-03-09
+==================
+
+  * Set main_field to null when source field is removed
+
 0.7.8 / 2021-02-11
 ==================
 
