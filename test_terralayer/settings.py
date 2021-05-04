@@ -170,3 +170,7 @@ LOGGING = {
         "": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
+
+TERRA_APPLIANCE_SETTINGS = {
+    "disabled_modules": [],
+}

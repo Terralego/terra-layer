@@ -9,3 +9,6 @@ class TerraLayerConfig(PermissionRegistrationMixin, AppConfig):
         ("DataLayer", "can_manage_layers", "Can manage layers"),
         ("DataSource", "can_manage_sources", "Can manage sources"),
     )
+
+    def ready(self):
+        from terra_layer import receivers
