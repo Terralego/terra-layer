@@ -155,12 +155,16 @@ class Layer(models.Model):
         LayerGroup, on_delete=models.SET_NULL, null=True, related_name="layers"
     )
     name = models.CharField(max_length=255, blank=False)
+
     # Whether the layer is shown in tree or hidden
     in_tree = models.BooleanField(default=True)
 
     order = models.IntegerField(default=0)
 
     description = models.TextField(blank=True)
+
+    # Contains the filter expression for source data
+    source_filter = models.TextField(blank=True)
 
     layer_style = JSONField(default=dict)  # To be removed
     layer_style_wizard = JSONField(default=dict)  # To be removed

@@ -448,6 +448,7 @@ class LayerView(APIView):
             "label": layer.name,
             "order": layer.order,
             "content": layer.description,
+            "source_filter": layer.source_filter,
             "layers": self.get_layers_list_for_layer(layer),
             "legends": layer.legends,
             "mainField": main_field,
