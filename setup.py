@@ -41,7 +41,7 @@ setup(
         "Programming Language :: Python :: 3.8",
     ],
     install_requires=[
-        "Django>=2.2",
+        "Django>=2.2,<3.0",
         "djangorestframework",
         "django-geosource>=0.4.10",
         "django-geostore>=0.5.4",
@@ -49,6 +49,7 @@ setup(
         "jsonschema",
         "django-mapbox-baselayer>=0.0.3",
         "django-terra-settings>=1.0",
+        "pillow",
     ],
     extras_require={"dev": tests_require},
 )

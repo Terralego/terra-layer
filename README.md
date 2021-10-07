@@ -67,7 +67,7 @@ the same command twice.
 Then initialize the database:
 
 ```sh
-docker-compose run --rm web /code/venv/bin/python3 /code/src/manage.py migrate
+docker-compose exec web /code/venv/bin/python3 /code/src/manage.py migrate
 ```
 
 You can now edit your code. A django runserver is launched internally so the
@@ -80,7 +80,7 @@ You can access to the api on http://localhost:8000/api/
 To run test suite, just launch:
 
 ```sh
-docker-compose run --rm web /code/venv/bin/python3 /code/src/manage.py test
+docker-compose exec web /code/venv/bin/python3 /code/src/manage.py test
 ```
 
 ## Contributing

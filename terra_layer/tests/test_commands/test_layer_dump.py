@@ -42,6 +42,7 @@ class LayerDumpTestCase(TestCase):
                 "extra_styles": [],
                 "uuid": "91c60192-9060-4bf6-b0de-818c5a362d89",
                 "name": "Layer_without_custom_style",
+                "source_filter": "",
                 "in_tree": True,
                 "order": 0,
                 "description": "",

@@ -253,6 +253,7 @@ class ModelSourceViewsetTestCase(TestCase):
             [
                 {
                     "id": "5f3f90d2aa8a14d5bb88c2f0bbf44610",
+                    "layerId": 1,
                     "source": "terra",
                     "source-layer": "test_view_2",
                 }
@@ -293,6 +294,7 @@ class ModelSourceViewsetTestCase(TestCase):
             [
                 {
                     "id": "282d40e1ab9a059aa9d6eff431407e76",
+                    "layerId": 1,
                     "type": "raster",
                     "minzoom": 14,
                     "maxzoom": 15,

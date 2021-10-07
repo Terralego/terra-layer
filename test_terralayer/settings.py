@@ -147,6 +147,8 @@ TERRA_DEFAULT_MAP_SETTINGS = {
     },
 }
 
+TERRA_APPLIANCE_SETTINGS = {}
+
 GEOSOURCE_LAYER_CALLBACK = "test_terralayer.callbacks.layer_callback"
 
 LOGGING = {
