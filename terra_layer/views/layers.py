@@ -276,9 +276,15 @@ class LayerView(APIView):
         map_layers = []
         for layer in self.layers.filter(source__slug__in=self.authorized_sources):
             map_layers += [
-                SourceSerializer.get_object_serializer(layer).data,
+                dict(
+                    **SourceSerializer.get_object_serializer(layer).data,
+                    layerId=layer.id,
+                ),
                 *[
-                    SourceSerializer.get_object_serializer(cs).data
+                    dict(
+                        **SourceSerializer.get_object_serializer(cs).data,
+                        layerId=layer.id,
+                    )
                     for cs in layer.extra_styles.filter(
                         source__slug__in=self.authorized_sources
                     )
@@ -445,6 +451,7 @@ class LayerView(APIView):
         # Construct the layer object
         layer_object = {
             **dict_merge(default_values, layer.settings),
+            "id": layer.id,
             "label": layer.name,
             "order": layer.order,
             "content": layer.description,
@@ -454,6 +461,7 @@ class LayerView(APIView):
             "mainField": main_field,
             "filters": {
                 "layer": layer.source.slug,
+                "layerId": layer.id,
                 "mainField": main_field,
                 "fields": self.get_filter_fields_for_layer(layer),
                 "form": self.get_filter_forms_for_layer(layer),
