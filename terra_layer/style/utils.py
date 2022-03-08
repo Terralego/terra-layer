@@ -267,12 +267,12 @@ def circle_boundaries_candidate(min, max):
 
     # Find the index into the bases array for the first limit smaller than max_s
     for i in range(0, len(bases)):
-        if (max_s / 10 ** ndigits) >= bases[i]:
+        if (max_s / 10**ndigits) >= bases[i]:
             base_id = i
             break
 
     while True:
-        v = bases[base_id] * (10 ** ndigits)
+        v = bases[base_id] * (10**ndigits)
         # stop the loop if the value is smaller than min_s
         if v <= min_s:
             break
@@ -347,17 +347,17 @@ def lost_scale_digit(n, scale):
 
 def trunc_scale(n, scale):
     lost = lost_scale_digit(n, scale)
-    return math.trunc(n / (10 ** lost)) * (10 ** lost)
+    return math.trunc(n / (10**lost)) * (10**lost)
 
 
 def round_scale(n, scale):
     lost = lost_scale_digit(n, scale)
-    return round(n / (10 ** lost)) * (10 ** lost)
+    return round(n / (10**lost)) * (10**lost)
 
 
 def ceil_scale(n, scale):
     lost = lost_scale_digit(n, scale)
-    return math.ceil(n / (10 ** lost)) * (10 ** lost)
+    return math.ceil(n / (10**lost)) * (10**lost)
 
 
 def boundaries_round(boundaries, scale=2):

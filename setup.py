@@ -39,9 +39,10 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
     install_requires=[
-        "Django>=2.2,<3.0",
+        "django",
         "djangorestframework",
         "django-geosource>=0.4.10",
         "django-geostore>=0.5.4",
@@ -51,5 +52,6 @@ setup(
         "django-terra-settings>=1.0",
         "pillow",
     ],
+    python_requires=">=3.6",
     extras_require={"dev": tests_require},
 )
