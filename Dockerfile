@@ -1,4 +1,4 @@
-FROM makinacorpus/geodjango:bionic-3.7
+FROM makinacorpus/geodjango:bionic-3.6
 
 RUN mkdir -p /code/src
 COPY . /code/src
@@ -9,7 +9,7 @@ RUN chown -R django:django /code
 
 USER django
 
-RUN python3.7 -m venv /code/venv
+RUN python3.6 -m venv /code/venv
 RUN  /code/venv/bin/pip install --no-cache-dir pip setuptools wheel -U
 
 # Install dev requirements
