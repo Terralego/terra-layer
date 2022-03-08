@@ -52,5 +52,6 @@ setup(
         "django-terra-settings>=1.0",
         "pillow",
     ],
+    python_requires=">=3.6",
     extras_require={"dev": tests_require},
 )
