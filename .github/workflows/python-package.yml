@@ -34,8 +34,7 @@ jobs:
 
     - name: Black check
       run: |
-        black --check terra_layer
-        black --check test_terralayer
+        black --check terra_layer test_terralayer
 
   build:
     runs-on: ubuntu-18.04
