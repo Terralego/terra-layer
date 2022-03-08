@@ -30,12 +30,12 @@ jobs:
 
     - name: Flake8 check
       run: |
-        flake8 terra_layer test_terra_layer
+        flake8 terra_layer test_terralayer
 
     - name: Black check
       run: |
         black --check terra_layer
-        black --check terra_layer
+        black --check test_terralayer
 
   build:
     runs-on: ubuntu-18.04
