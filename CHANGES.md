@@ -1,4 +1,13 @@
 
+0.7.11 / 2022-03-10
+==================
+
+  * Improve CI
+  * Dev with python 3.6
+  * Prevent postgresql bug
+  * Allow django
+  * Fix black alerts
+
 0.7.10 / 2021-10-07
 ==================
 
