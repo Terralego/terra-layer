@@ -214,12 +214,25 @@ class LayerView(APIView):
                 }
             )
 
+        tilejson_urls = []
+        for i, layer in enumerate(self.layers.all()):
+            geolayer = layer.source.get_layer()
+            url = reverse("layer-tilejson", args=(geolayer.id,))
+            source_id = f"{self.DEFAULT_SOURCE_NAME}_{i}"
+            tilejson_urls.append((url, source_id))
+
+            # Set the correct source "id" for each non-raster layer in the customStyle field
+            for map_layer in layer_structure["map"]["customStyle"]["layers"]:
+                if map_layer["type"] == "raster" or map_layer["layerId"] != layer.id:
+                    continue
+                map_layer["source"] =  source_id
+
         layer_structure["map"]["customStyle"]["sources"] = [
             {
-                "id": self.DEFAULT_SOURCE_NAME,
+                "id": source_id,
                 "type": self.DEFAULT_SOURCE_TYPE,
-                "url": f"{tilejson_url}?{querystring.urlencode()}",
-            }
+                "url": f"{url}?{querystring.urlencode()}",
+            } for url, source_id in tilejson_urls
         ]
         return layer_structure
 
