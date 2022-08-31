@@ -131,7 +131,7 @@ class LayerViewset(ModelViewSet):
         return LayerListSerializer
 
     def perform_destroy(self, instance):
-        if instance.group:  #  Prevent deletion of layer used in any layer tree
+        if instance.group:  # Prevent deletion of layer used in any layer tree
             raise ValidationError("Can't delete a layer linked to a scene")
         super().perform_destroy(instance)
 
@@ -197,7 +197,6 @@ class LayerView(APIView):
 
         layer_structure = self.get_layer_structure()
 
-        tilejson_url = reverse("group-tilejson", args=(self.layergroup.slug,))
         querystring = QueryDict(mutable=True)
 
         # When the user is not anonymous, we provide tokens in the URL to authenticated
@@ -225,7 +224,7 @@ class LayerView(APIView):
             for map_layer in layer_structure["map"]["customStyle"]["layers"]:
                 if map_layer["type"] == "raster" or map_layer["layerId"] != layer.id:
                     continue
-                map_layer["source"] =  source_id
+                map_layer["source"] = source_id
 
         layer_structure["map"]["customStyle"]["sources"] = [
             {
