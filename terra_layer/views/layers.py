@@ -231,7 +231,8 @@ class LayerView(APIView):
                 "id": source_id,
                 "type": self.DEFAULT_SOURCE_TYPE,
                 "url": f"{url}?{querystring.urlencode()}",
-            } for url, source_id in tilejson_urls
+            }
+            for url, source_id in tilejson_urls
         ]
         return layer_structure
 
