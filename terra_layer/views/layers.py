@@ -215,6 +215,22 @@ class LayerView(APIView):
 
         tilejson_urls = []
         for i, layer in enumerate(self.layers.all()):
+            if layer.extra_styles.exists():
+                # Layer's extra styles have "sub sources" & "sub layers" we need to handle
+                for y, style in enumerate(layer.extra_styles.all()):
+                    sub_source = style.source
+                    sub_layer = sub_source.get_layer()
+                    subl_url = reverse("layer-tilejson", args=(sub_layer.id,))
+                    sub_source_id = f"{sub_source.slug}_{sub_source.id}_{y}"
+                    tilejson_urls.append((subl_url, sub_source_id))
+                    
+                    for ml in layer_structure["map"]["customStyle"]["layers"]:
+                        if ml["type"] == "raster" or ml["layerId"] != layer.id:
+                            continue
+                        if ml["source-layer"] != sub_source.slug:
+                            continue
+                        ml["source"] =  sub_source_id
+                    
             geolayer = layer.source.get_layer()
             url = reverse("layer-tilejson", args=(geolayer.id,))
             source_id = f"{self.DEFAULT_SOURCE_NAME}_{i}"
@@ -224,7 +240,10 @@ class LayerView(APIView):
             for map_layer in layer_structure["map"]["customStyle"]["layers"]:
                 if map_layer["type"] == "raster" or map_layer["layerId"] != layer.id:
                     continue
+                if map_layer["source-layer"] != layer.source.slug:
+                    continue
                 map_layer["source"] = source_id
+
 
         layer_structure["map"]["customStyle"]["sources"] = [
             {
