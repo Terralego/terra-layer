@@ -223,14 +223,14 @@ class LayerView(APIView):
                     subl_url = reverse("layer-tilejson", args=(sub_layer.id,))
                     sub_source_id = f"{sub_source.slug}_{sub_source.id}_{y}"
                     tilejson_urls.append((subl_url, sub_source_id))
-                    
+
                     for ml in layer_structure["map"]["customStyle"]["layers"]:
                         if ml["type"] == "raster" or ml["layerId"] != layer.id:
                             continue
                         if ml["source-layer"] != sub_source.slug:
                             continue
-                        ml["source"] =  sub_source_id
-                    
+                        ml["source"] = sub_source_id
+
             geolayer = layer.source.get_layer()
             url = reverse("layer-tilejson", args=(geolayer.id,))
             source_id = f"{self.DEFAULT_SOURCE_NAME}_{i}"
@@ -244,7 +244,6 @@ class LayerView(APIView):
                     continue
                 map_layer["source"] = source_id
 
-
         layer_structure["map"]["customStyle"]["sources"] = [
             {
                 "id": source_id,
@@ -253,6 +252,7 @@ class LayerView(APIView):
             }
             for url, source_id in tilejson_urls
         ]
+
         return layer_structure
 
     def get_map_settings(self, scene):
