@@ -254,7 +254,7 @@ class ModelSourceViewsetTestCase(TestCase):
                 {
                     "id": "5f3f90d2aa8a14d5bb88c2f0bbf44610",
                     "layerId": 1,
-                    "source": "terra",
+                    "source": "terra_0",
                     "source-layer": "test_view_2",
                 }
             ],
