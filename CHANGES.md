@@ -1,3 +1,7 @@
+0.7.12 / 2022-09-15
+==================
+
+  * LayerViewset return customStyle for each layer instead of reference group
 
 0.7.11 / 2022-03-10
 ==================
