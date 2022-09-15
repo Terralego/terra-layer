@@ -131,7 +131,7 @@ class LayerViewset(ModelViewSet):
         return LayerListSerializer
 
     def perform_destroy(self, instance):
-        if instance.group:  #  Prevent deletion of layer used in any layer tree
+        if instance.group:  # Prevent deletion of layer used in any layer tree
             raise ValidationError("Can't delete a layer linked to a scene")
         super().perform_destroy(instance)
 
@@ -197,7 +197,6 @@ class LayerView(APIView):
 
         layer_structure = self.get_layer_structure()
 
-        tilejson_url = reverse("group-tilejson", args=(self.layergroup.slug,))
         querystring = QueryDict(mutable=True)
 
         # When the user is not anonymous, we provide tokens in the URL to authenticated
@@ -214,13 +213,52 @@ class LayerView(APIView):
                 }
             )
 
+        custom_style_infos = []
+        for i, layer in enumerate(self.layers.all()):
+            if layer.extra_styles.exists():
+                # Layer's extra styles have "sub sources" & "sub layers" we need to handle
+                for y, style in enumerate(layer.extra_styles.all()):
+                    sub_source = style.source
+                    sub_layer = sub_source.get_layer()
+                    subl_url = reverse("layer-tilejson", args=(sub_layer.id,))
+                    sub_source_id = f"{self.DEFAULT_SOURCE_NAME}_{i}_{y}"
+                    custom_style_infos.append((subl_url, sub_source_id))
+
+                    for map_layer in layer_structure["map"]["customStyle"]["layers"]:
+                        if (
+                            map_layer.get("type", "") == "raster"
+                            or map_layer["layerId"] != layer.id
+                        ):
+                            continue
+                        if map_layer["source-layer"] != sub_source.slug:
+                            continue
+                        map_layer["source"] = sub_source_id
+
+            geolayer = layer.source.get_layer()
+            url = reverse("layer-tilejson", args=(geolayer.id,))
+            source_id = f"{self.DEFAULT_SOURCE_NAME}_{i}"
+            custom_style_infos.append((url, source_id))
+
+            # Set the correct source "id" for each non-raster layer in the customStyle field
+            for map_layer in layer_structure["map"]["customStyle"]["layers"]:
+                if (
+                    map_layer.get("type", "") == "raster"
+                    or map_layer["layerId"] != layer.id
+                ):
+                    continue
+                if map_layer["source-layer"] != layer.source.slug:
+                    continue
+                map_layer["source"] = source_id
+
         layer_structure["map"]["customStyle"]["sources"] = [
             {
-                "id": self.DEFAULT_SOURCE_NAME,
+                "id": source_id,
                 "type": self.DEFAULT_SOURCE_TYPE,
-                "url": f"{tilejson_url}?{querystring.urlencode()}",
+                "url": f"{url}?{querystring.urlencode()}",
             }
+            for url, source_id in custom_style_infos
         ]
+
         return layer_structure
 
     def get_map_settings(self, scene):
